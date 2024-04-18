@@ -1,48 +1,39 @@
-//---------------------------------------------------------------------------
-// Bullet Class
-
-const { Game } = require("phaser-ce");
-
-//---------------------------------------------------------------------------
-class bullet
-{
-    constructor(x, y, dmg)
-    {
-        this.x      = x;
-        this.y      = y;
-        this.dmg    = dmg;
-
-        let x       = player.x;
-        let y       = player.y;
-        let dmg     = 1;
-    }
-}
-//---------------------------------------------------------------------------
-//End of Bullet Class
-//---------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------
 // Weapon Class
+
+const { Bullet } = require("phaser-ce");
+
 //----------------------------------------------------------------------------
 class weapon
 {
-    constructor(name, dmgMult, dist, reload, nBullets, type)
+    constructor(type, name, dmgMult, dist, reload, nBullets)
     {
+        this.type = type;
         this.name = name;
         this.dmgMult = dmgMult;
         this.dist = dist;
         this.reload = reload;
-        this.nBullets = nBullets;
-        this.type = type;
+        this.nBullets = nBullets; 
+
+        if (type = 0)
+        {
+            let name = 'Base';
+            let dmgMult = 1;
+            let dist = 100;
+            let reload = 0.1;
+            let nBullets = 6;
+        }
     }
 
-    shoot()
+    shoot(character)
     {
-        if (this.type == 0)
+        if (this.type = 0)
         {
-            this.nBullets = 6;
+            let angle = game.physics.arcade.angleToPointer( character );
+            angle = angle + Phaser.Math.degToRad( 90 );
             
+            let bullet = new Bullet(game, character.x, character.y);
         }
     }
 }
