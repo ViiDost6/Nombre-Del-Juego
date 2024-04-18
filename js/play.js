@@ -1,6 +1,6 @@
-const characterSpeed = 300;
+const characterSpeed = 300 , totalSprint = 50 , sprintCooldown = 100 , sprintSpeed = 600;
 
-let character , xTimer , yTimer;
+let character , xTimer , yTimer , canSprint , isSprinting , sprintLeft;
 
 let playState = {
     preload: preloadPlay,
@@ -11,10 +11,9 @@ let playState = {
 function preloadPlay ()
 {
     game.load.image( 'craft' , 'assets/imgs/craft.png' );
-    game.load.image( 'ufo' , 'assets/imgs/ufo.png' );
 }
 
-function createPlay()
+function createPlay ()
 {
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'craft' );
     character.anchor.setTo( 0.5 , 0.5 );
@@ -22,6 +21,10 @@ function createPlay()
 
     xTimer = game.time.create( false );
     yTimer = game.time.create( false );
+
+    canSprint = true;
+    isSprinting = false;
+    sprintLeft = totalSprint;
 }
 
 function updatePlay ()
@@ -29,16 +32,36 @@ function updatePlay ()
     MoveCharacter();
 }
 
-function MoveCharacter()
+function MoveCharacter ()
 {
     if ( game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A ) )
     {
-        character.body.velocity.x = -characterSpeed;
+        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        {
+            isSprinting = true;
+            character.body.velocity.x = -sprintSpeed;
+            Sprint();
+        }
+        else
+        {
+            character.body.velocity.x = -characterSpeed;
+        }
+
         xTimer.stop(); // Stop the timer if a key is pressed
     }
     else if ( game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D ) )
     {
-        character.body.velocity.x = characterSpeed;
+        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        {
+            isSprinting = true;
+            character.body.velocity.x = sprintSpeed;
+            Sprint();
+        }
+        else
+        {
+            character.body.velocity.x = characterSpeed;
+        }
+
         xTimer.stop(); // Stop the timer if a key is pressed
     }
     else
@@ -49,12 +72,32 @@ function MoveCharacter()
 
     if ( game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W ) )
     {
-        character.body.velocity.y = -characterSpeed;
+        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        {
+            isSprinting = true;
+            character.body.velocity.y = -sprintSpeed;
+            Sprint();
+        }
+        else
+        {
+            character.body.velocity.y = -characterSpeed;
+        }
+
         yTimer.stop(); // Stop the timer if a key is pressed
     }
     else if ( game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S ) )
     {
-        character.body.velocity.y = characterSpeed;
+        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        {
+            isSprinting = true;
+            character.body.velocity.y = sprintSpeed;
+            Sprint();
+        }
+        else
+        {
+            character.body.velocity.y = characterSpeed;
+        }
+
         yTimer.stop(); // Stop the timer if a key is pressed
     }
     else
@@ -66,7 +109,7 @@ function MoveCharacter()
     RotateTowardsMouse();
 }
 
-function SmoothStopping( x , timeToStop )
+function SmoothStopping ( x , timeToStop )
 {
     let timer = x ? xTimer : yTimer; // Choose the correct timer
     let axis = x ? 'x' : 'y'; // Choose the correct axis
@@ -82,12 +125,26 @@ function SmoothStopping( x , timeToStop )
     } , this );
 
     timer.start();
-}   
+}
 
-function RotateTowardsMouse()
+function RotateTowardsMouse ()
 {
     let angle = game.physics.arcade.angleToPointer( character );
     character.rotation = angle + Phaser.Math.degToRad( 90 );
+}
+
+function Sprint ()
+{
+    sprintLeft -= 1;
+
+    if ( sprintLeft == 0 )
+    {
+        canSprint = false;
+        sprintLeft = totalSprint;
+        setTimeout( function() {
+            canSprint = true;
+        } , sprintCooldown );
+    }
 }
 
 /*
