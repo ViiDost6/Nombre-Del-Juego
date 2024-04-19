@@ -29,9 +29,9 @@ pistol.trackSprite(character, 0, 0, true);
 if (pistolIs && Phaser.Pointer.mouse.LEFT_BUTTON == 1)
 {
     pistol.fire(null, null, null, 0, 0);
-    // Nulls are set so fire follows the traked sprite defined
+    // Nulls are set so fire follows the tracked sprite defined
 }
-// sets fire position, and key control. angles and position are managed with spriteTraker
+// sets fire position, and key control. angles and position are managed with spriteTracker
 
 pistol.bulletKillDistance(100);
 // pixels until the bullet instance gets killed
@@ -45,6 +45,8 @@ pistol.fireRate(100);
 pistol.onFireLimit()
 {
     var reload = new Timer(game, true);
+    // A timer manages reload events. Bool indicates it kills
+    // itself when all events finish. Events call functions
 
     if (Phaser.Pointer.mouse.LEFT_BUTTON == 1)
     {
