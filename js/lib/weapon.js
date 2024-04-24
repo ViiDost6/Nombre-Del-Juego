@@ -2,7 +2,7 @@
 // Weapons used in-game
 //---------------------------------------------------------------------------------
 
-const { Weapon, Bullet } = require("phaser-ce");
+import { Weapon, Bullet } from "phaser";
 
 //----------------------------------------------------------------------
 // Universal functions all weapons use on callbacks
