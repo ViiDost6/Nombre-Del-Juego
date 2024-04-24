@@ -155,17 +155,13 @@ function Sprint ()
 //crea las propiedas iniciales de la pistola inical
 function createWeaponPistol()
 {
-    pistol = game.add.weapon(6, 'bullet'); 
+    pistol = game.add.weapon(6, 'bullet');
     pistol.trackSprite(character, 25, -25, true);
-    
     pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
     pistol.bulletKillDistance = 300;
     pistol.bulletSpeed = 250;
     pistol.fireRate = 100;
     pistol.bulletAngleVariance = 20;
-    
-    
-
 }
 
 //dispara la pistola, un solo click dispara las 6 balas
