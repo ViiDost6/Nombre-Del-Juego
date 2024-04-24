@@ -1,6 +1,6 @@
-const characterSpeed = 300 , totalSprint = 50 , sprintCooldown = 100 , sprintSpeed = 600;
+const characterSpeed = 150 , totalSprint = 50 , sprintCooldown = 100 , sprintSpeed = 300;
 
-let character , xTimer , yTimer , canSprint , isSprinting , sprintLeft;
+let character , xTimer , yTimer , canSprint , isSprinting , sprintLeft, pistol;
 
 let playState = {
     preload: preloadPlay,
@@ -11,11 +11,13 @@ let playState = {
 function preloadPlay ()
 {
     game.load.image( 'craft' , 'assets/imgs/craft.png' );
+    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
+    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
 }
 
 function createPlay ()
 {
-    character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'craft' );
+    character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
     character.anchor.setTo( 0.5 , 0.5 );
     game.physics.arcade.enable( character );
 
@@ -25,11 +27,13 @@ function createPlay ()
     canSprint = true;
     isSprinting = false;
     sprintLeft = totalSprint;
+    createWeaponPistol();
 }
 
 function updatePlay ()
 {
     MoveCharacter();
+    shootPistol();
 }
 
 function MoveCharacter ()
@@ -145,6 +149,49 @@ function Sprint ()
             canSprint = true;
         } , sprintCooldown );
     }
+}
+
+
+//crea las propiedas iniciales de la pistola inical
+function createWeaponPistol()
+{
+    pistol = game.add.weapon(6, 'bullet'); 
+    pistol.trackSprite(character, 25, -25, true);
+    
+    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
+    pistol.bulletKillDistance = 300;
+    pistol.bulletSpeed = 250;
+    pistol.fireRate = 100;
+    pistol.bulletAngleVariance = 20;
+    
+    
+
+}
+
+//dispara la pistola, un solo click dispara las 6 balas
+function shootPistol()
+{
+    
+    let nbullets = pistol.shots; 
+    if (game.input.activePointer.leftButton.isDown && nbullets == 0)
+    {
+        
+        pistol.fireAtPointer(game.input.activePointer);
+        
+    }else if (nbullets > 0 && nbullets < 6)
+    {
+        
+        pistol.fireAtPointer(game.input.activePointer);
+    }else if (nbullets == 6)
+    {
+        nbullets = pistol.resetShots();
+    }
+}
+
+//sinceramente esto ni putas pero funciona
+function fullBullets(weapon)
+{
+    weapon.quantity = -1;
 }
 
 /*
