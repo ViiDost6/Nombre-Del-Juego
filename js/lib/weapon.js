@@ -13,8 +13,6 @@ function fullBullets(weapon)
     // This number sets all chargers to max
 }
 
-
-
 //----------------------------------------------------------------------------------
 // Pistol weapon
 //----------------------------------------------------------------------------------
@@ -33,13 +31,13 @@ if (pistolIs && Phaser.Pointer.mouse.LEFT_BUTTON == 1)
 }
 // sets fire position, and key control. angles and position are managed with spriteTracker
 
-pistol.bulletKillDistance(100);
+pistol.bulletKillDistance = 100;
 // pixels until the bullet instance gets killed
 
-pistol.bulletSpeed(100);
+pistol.bulletSpeed = 100;
 // how many pixels per second the bullet travels
 
-pistol.fireRate(100);
+pistol.fireRate = 100;
 // miliseconds until next bullet can be fired
 
 pistol.onFireLimit()
@@ -54,3 +52,8 @@ pistol.onFireLimit()
         reload.start();
     }
 }
+
+//pistols come with textures, which may be spritesheets
+// this bool changes the frame per shot
+
+pistol.bulletFrameCycle = true;
