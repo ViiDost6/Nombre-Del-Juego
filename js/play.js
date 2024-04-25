@@ -9,7 +9,7 @@ SPRINT_SPEED = 300 ,
 ANCHOR_X = 0.5 ,
 ANCHOR_Y = 0.5 ,
 TIME_TO_STOP = 1 ,
-FPS = 60
+FPS = 60 ,
 FIXED_ANGLE = 90;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol;
