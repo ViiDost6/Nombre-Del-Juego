@@ -1,6 +1,6 @@
-const characterSpeed = 150 , totalSprint = 50 , sprintCooldown = 100 , sprintSpeed = 300;
+const characterSpeed = 150 , totalSprint = 500 , sprintCooldown = 2.5 , sprintSpeed = 300;
 
-let character , xTimer , yTimer , canSprint , isSprinting , sprintLeft, pistol;
+let character , xTimer , yTimer , canSprint , sprintLeft, pistol;
 
 let playState = {
     preload: preloadPlay,
@@ -25,7 +25,6 @@ function createPlay ()
     yTimer = game.time.create( false );
 
     canSprint = true;
-    isSprinting = false;
     sprintLeft = totalSprint;
     createWeaponPistol();
 }
@@ -34,6 +33,8 @@ function updatePlay ()
 {
     MoveCharacter();
     shootPistol();
+
+    console.log(sprintLeft);
 }
 
 function MoveCharacter ()
@@ -42,7 +43,6 @@ function MoveCharacter ()
     {
         if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
         {
-            isSprinting = true;
             character.body.velocity.x = -sprintSpeed;
             Sprint();
         }
@@ -57,7 +57,6 @@ function MoveCharacter ()
     {
         if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
         {
-            isSprinting = true;
             character.body.velocity.x = sprintSpeed;
             Sprint();
         }
@@ -78,7 +77,6 @@ function MoveCharacter ()
     {
         if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
         {
-            isSprinting = true;
             character.body.velocity.y = -sprintSpeed;
             Sprint();
         }
@@ -93,7 +91,6 @@ function MoveCharacter ()
     {
         if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
         {
-            isSprinting = true;
             character.body.velocity.y = sprintSpeed;
             Sprint();
         }
@@ -139,15 +136,15 @@ function RotateTowardsMouse ()
 
 function Sprint ()
 {
-    sprintLeft -= 1;
+    sprintLeft--;
 
     if ( sprintLeft == 0 )
     {
         canSprint = false;
         sprintLeft = totalSprint;
-        setTimeout( function() {
+        setTimeout(function() {
             canSprint = true;
-        } , sprintCooldown );
+        }, sprintCooldown * 1000);
     }
 }
 
