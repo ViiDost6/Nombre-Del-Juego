@@ -5,38 +5,103 @@
 const CHARACTER_SPEED = 150 , 
 TOTAL_SPRINT = 500 , 
 SPRINT_COOLDOWN = 2.5 , 
-SPRINT_SPEED = 300 ,
+SPRINT_SPEED = 450 ,
 ANCHOR_X = 0.5 ,
 ANCHOR_Y = 0.5 ,
 TIME_TO_STOP = 1 ,
 FPS = 60 ,
-FIXED_ANGLE = 90
+FIXED_ANGLE = 90 ,
 DASH_DURATION = 0.15 ,
 DASH_COOLDOWN = 1.5 ,
-DASH_MULTIPLIER = 5;
+DASH_MULTIPLIER = 5 ,
+WORLD_WIDTH = 2400 ,
+WORLD_HEIGHT = 3200;
 
-let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing;
+let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
+sprintBar , hudGroup , sprintHolder;
 
 let playState = { // GAME PHASES
-    preload: preloadPlay,
-    create: createPlay,
-    update: updatePlay
+    preload: PreloadPlay,
+    create: CreatePlay,
+    update: UpdatePlay
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// INDEX (YOU CAN USE CTRL+F3 TO FIND THE FUNCTIONS)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// MAIN FUNCTIONS
+
+// PreloadPlay()
+// CreatePlay()
+// UpdatePlay()
+// CreateTimers()
+// CreateBackground()
+// CreateCharacter()
+// CreateHUD()
+// CreateImages()
+
+// HUD FUNCTIONS
+
+// UpdateSprintBar()
+
+// MOVEMENT FUNCTIONS
+
+// MoveCharacter()
+// CheckDash()
+// CheckSprint()
+// SmoothStopping()
+// RotateTowardsMouse()
+// Sprint()
+// CheckBounds()
+
+// WEAPON FUNCTIONS
+
+// CreateWeaponPistol()
+// ShootPistol()
+// FullBullets()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function preloadPlay () // LOAD ASSETS FOR THE GAME
+function PreloadPlay () // LOAD ASSETS FOR THE GAME
 {
-    game.load.image( 'craft' , 'assets/imgs/craft.png' );
-    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
-    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
+    CreateImages();
 }
 
-function createPlay () // SET UP THE GAME
+function CreatePlay () // SET UP THE GAME
 {
-    // SET UP THE CHARACTER
+    CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
+    CreateBackground();
+    CreateCharacter();
+    CreateHUD();
+}
+
+function UpdatePlay () // GAME LOOP
+{
+    MoveCharacter();
+    ShootPistol();
+}
+
+function CreateTimers ()
+{
+    xTimer = game.time.create( false );
+    yTimer = game.time.create( false );
+}
+
+function CreateBackground ()
+{
+    game.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+    // SMOOTH SCROLLING
+    let background = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'background');
+    background.scrollFactorX = 0.7;
+    background.scrollFactorY = 0.7;
+}
+
+function CreateCharacter ()
+{
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     game.physics.arcade.enable( character );
@@ -44,21 +109,43 @@ function createPlay () // SET UP THE GAME
     sprintLeft = TOTAL_SPRINT;
     canDash = true;
     isDashing = false;
-    createWeaponPistol();
+    CreateWeaponPistol();
 
-    // INITIALIZING TIMERS FOR SMOOTH STOPPING
-    xTimer = game.time.create( false );
-    yTimer = game.time.create( false );
+    // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
+    game.camera.follow( character );
 }
 
-function updatePlay () // GAME LOOP
+function CreateHUD ()
 {
-    MoveCharacter();
-    shootPistol();
+    hudGroup = game.add.group();
+    sprintBar = hudGroup.create( 5 , 595 , 'sprintBar' );
+    sprintBar.anchor.setTo( 0 , 1 );
+    sprintHolder = hudGroup.create( 5 , 595 , 'sprintHolder' );
+    sprintHolder.anchor.setTo( 0 , 1 );
+    hudGroup.fixedToCamera = true;
+}
+
+function CreateImages ()
+{
+    game.load.image( 'craft' , 'assets/imgs/craft.png' );
+    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
+    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
+    game.load.image( 'background' , 'assets/imgs/background.png' );
+    game.load.image('sprintHolder', 'assets/imgs/sprint_holder.png');
+    game.load.image('sprintBar', 'assets/imgs/sprint_bar.png');
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// FUNCTIONS FOR THE GAME
+// HUD FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function UpdateSprintBar ()
+{
+    sprintBar.scale.y = sprintLeft / TOTAL_SPRINT;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MOVEMENT FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
@@ -68,6 +155,7 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     let canMoveUpwards = game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W );
     let canMoveDownwards = game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S );
 
+    CheckBounds(); // CHECKS IF THE CHARACTER IS WITHIN THE BOUNDS OF THE WORLD
     CheckDash(); // CHECKS IF THE CHARACTER DASHES
 
     if ( canMoveLeftwards )
@@ -145,7 +233,10 @@ function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
         canSprint ? character.body.velocity.y = SPRINT_SPEED * movementMultiplier : character.body.velocity.y = CHARACTER_SPEED * movementMultiplier; // SPRINT DOWNWARDS
     }
 
-    Sprint(); // SPRINT FUNCTIONALITY
+    if ( canSprint )
+    {
+        Sprint();
+    }
 }
 
 function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF THE CHARACTER. IT MAKES THE MOVEMENT SMOOTHER
@@ -191,9 +282,36 @@ function Sprint () // SPRINT FUNCTIONALITY
             sprintEnabled = true;
         }, SPRINT_COOLDOWN * 1000); // WE MULTIPLY BY 1000 TO GET SPRINT COOLDOWN IN SECONDS
     }
+
+    UpdateSprintBar();
 }
 
-function createWeaponPistol () // CREATES THE PISTOL WEAPON. ANY WEAPON CAN BE CREATED HERE
+function CheckBounds ()
+{
+    if ( character.x < 0 )
+    {
+        character.x = 0;
+    }
+    else if ( character.x > WORLD_WIDTH )
+    {
+        character.x = WORLD_WIDTH;
+    }
+
+    if ( character.y < 0 )
+    {
+        character.y = 0;
+    }
+    else if ( character.y > WORLD_HEIGHT )
+    {
+        character.y = WORLD_HEIGHT;
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WEAPON FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function CreateWeaponPistol () // CREATES THE PISTOL WEAPON. ANY WEAPON CAN BE CREATED HERE
 {
     pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
     pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
@@ -204,7 +322,7 @@ function createWeaponPistol () // CREATES THE PISTOL WEAPON. ANY WEAPON CAN BE C
     pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
 }
 
-function shootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
+function ShootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
 {
     let nbullets = pistol.shots; // GET THE NUMBER OF BULLETS SHOT
 
@@ -229,7 +347,7 @@ function shootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
     }
 }
 
-function fullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
+function FullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
 {
     weapon.quantity = -1;
 }
