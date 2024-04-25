@@ -10,9 +10,12 @@ ANCHOR_X = 0.5 ,
 ANCHOR_Y = 0.5 ,
 TIME_TO_STOP = 1 ,
 FPS = 60 ,
-FIXED_ANGLE = 90;
+FIXED_ANGLE = 90
+DASH_DURATION = 0.15 ,
+DASH_COOLDOWN = 1.5 ,
+DASH_MULTIPLIER = 5;
 
-let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol;
+let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing;
 
 let playState = { // GAME PHASES
     preload: preloadPlay,
@@ -39,6 +42,8 @@ function createPlay () // SET UP THE GAME
     game.physics.arcade.enable( character );
     sprintEnabled = true;
     sprintLeft = TOTAL_SPRINT;
+    canDash = true;
+    isDashing = false;
     createWeaponPistol();
 
     // INITIALIZING TIMERS FOR SMOOTH STOPPING
@@ -58,38 +63,21 @@ function updatePlay () // GAME LOOP
 
 function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
 {
-    let canSprint = sprintEnabled && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT );
     let canMoveLeftwards = game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A );
     let canMoveRightwards = game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D );
     let canMoveUpwards = game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W );
     let canMoveDownwards = game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S );
 
+    CheckDash(); // CHECKS IF THE CHARACTER DASHES
+
     if ( canMoveLeftwards )
     {
-        if ( canSprint )
-        {
-            character.body.velocity.x = -SPRINT_SPEED;
-            Sprint();
-        }
-        else
-        {
-            character.body.velocity.x = -CHARACTER_SPEED;
-        }
-
+        CheckSprint( 'left' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
         xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else if ( canMoveRightwards )
     {
-        if ( canSprint )
-        {
-            character.body.velocity.x = SPRINT_SPEED;
-            Sprint();
-        }
-        else
-        {
-            character.body.velocity.x = CHARACTER_SPEED;
-        }
-
+        CheckSprint( 'right' ); // CHECKS IF THE CHARACTER SPRINTS TO THE RIGHT
         xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
@@ -100,30 +88,12 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
 
     if ( canMoveUpwards  )
     {
-        if ( canSprint )
-        {
-            character.body.velocity.y = -SPRINT_SPEED;
-            Sprint();
-        }
-        else
-        {
-            character.body.velocity.y = -CHARACTER_SPEED;
-        }
-
+        CheckSprint( 'up' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
         yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else if ( canMoveDownwards )
     {
-        if ( canSprint )
-        {
-            character.body.velocity.y = SPRINT_SPEED;
-            Sprint();
-        }
-        else
-        {
-            character.body.velocity.y = CHARACTER_SPEED;
-        }
-
+        CheckSprint( 'down' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
         yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else
@@ -133,6 +103,49 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     }
 
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
+}
+
+function CheckDash () // DASH FUNCTIONALITY
+{
+    let wantsToDash = game.input.keyboard.isDown( Phaser.Keyboard.SPACEBAR );
+
+    if ( wantsToDash && canDash )
+    {
+        isDashing = true;
+        canDash = false;
+        setTimeout( function() {
+            isDashing = false;
+            setTimeout( function() {
+                canDash = true;
+            }, DASH_COOLDOWN * 1000 );
+        }, DASH_DURATION * 1000 );
+    }
+}
+
+function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
+{
+    let movementMultiplier = isDashing ? DASH_MULTIPLIER : 1; // IF THE CHARACTER IS DASHING, MULTIPLY THE SPEED BY THE DASH MULTIPLIER
+    let canSprint = sprintEnabled && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT );
+
+    if ( direction == 'left' )
+    {
+        canSprint ? character.body.velocity.x = -SPRINT_SPEED * movementMultiplier : character.body.velocity.x = -CHARACTER_SPEED * movementMultiplier; // SPRINT LEFTWARDS
+    }
+    else if ( direction == 'right' )
+    {
+        canSprint ? character.body.velocity.x = SPRINT_SPEED * movementMultiplier : character.body.velocity.x = CHARACTER_SPEED * movementMultiplier; // SPRINT RIGHTWARDS
+    }
+
+    if ( direction == 'up' )
+    {
+        canSprint ? character.body.velocity.y = -SPRINT_SPEED * movementMultiplier : character.body.velocity.y = -CHARACTER_SPEED * movementMultiplier; // SPRINT UPWARDS
+    }
+    else if ( direction == 'down' )
+    {
+        canSprint ? character.body.velocity.y = SPRINT_SPEED * movementMultiplier : character.body.velocity.y = CHARACTER_SPEED * movementMultiplier; // SPRINT DOWNWARDS
+    }
+
+    Sprint(); // SPRINT FUNCTIONALITY
 }
 
 function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF THE CHARACTER. IT MAKES THE MOVEMENT SMOOTHER
