@@ -2,9 +2,17 @@
 // CONSTANTS, GLOBAL VARIABLES AND PHASES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const characterSpeed = 150 , totalSprint = 500 , sprintCooldown = 2.5 , sprintSpeed = 300;
+const CHARACTER_SPEED = 150 , 
+TOTAL_SPRINT = 500 , 
+SPRINT_COOLDOWN = 2.5 , 
+SPRINT_SPEED = 300 ,
+ANCHOR_X = 0.5 ,
+ANCHOR_Y = 0.5 ,
+TIME_TO_STOP = 1 ,
+FPS = 60
+FIXED_ANGLE = 90;
 
-let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol;
+let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , fixedAngle;
 
 let playState = { // GAME PHASES
     preload: preloadPlay,
@@ -27,15 +35,17 @@ function createPlay () // SET UP THE GAME
 {
     // SET UP THE CHARACTER
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
-    character.anchor.setTo( 0.5 , 0.5 );
+    character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     game.physics.arcade.enable( character );
     sprintEnabled = true;
-    sprintLeft = totalSprint;
+    sprintLeft = TOTAL_SPRINT;
     createWeaponPistol();
 
     // INITIALIZING TIMERS FOR SMOOTH STOPPING
     xTimer = game.time.create( false );
     yTimer = game.time.create( false );
+
+    
 }
 
 function updatePlay () // GAME LOOP
@@ -62,12 +72,12 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     {
         if ( canSprint )
         {
-            character.body.velocity.x = -sprintSpeed;
+            character.body.velocity.x = -SPRINT_SPEED;
             Sprint();
         }
         else
         {
-            character.body.velocity.x = -characterSpeed;
+            character.body.velocity.x = -CHARACTER_SPEED;
         }
 
         xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
@@ -76,12 +86,12 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     {
         if ( canSprint )
         {
-            character.body.velocity.x = sprintSpeed;
+            character.body.velocity.x = SPRINT_SPEED;
             Sprint();
         }
         else
         {
-            character.body.velocity.x = characterSpeed;
+            character.body.velocity.x = CHARACTER_SPEED;
         }
 
         xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
@@ -89,19 +99,19 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
     {
         // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
-        SmoothStopping( true , 1 ); // THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
+        SmoothStopping( true , TIME_TO_STOP ); // THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
     }
 
     if ( canMoveUpwards  )
     {
         if ( canSprint )
         {
-            character.body.velocity.y = -sprintSpeed;
+            character.body.velocity.y = -SPRINT_SPEED;
             Sprint();
         }
         else
         {
-            character.body.velocity.y = -characterSpeed;
+            character.body.velocity.y = -CHARACTER_SPEED;
         }
 
         yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
@@ -110,12 +120,12 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     {
         if ( canSprint )
         {
-            character.body.velocity.y = sprintSpeed;
+            character.body.velocity.y = SPRINT_SPEED;
             Sprint();
         }
         else
         {
-            character.body.velocity.y = characterSpeed;
+            character.body.velocity.y = CHARACTER_SPEED;
         }
 
         yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
@@ -123,7 +133,7 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     else
     {
         // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
-        SmoothStopping( false , 1 ); // THE FIRST PARAMETER IS A BOOL THAT CHECKS WHETHER IT IS A HORIZONTAL INPUT OR NOT, AND THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
+        SmoothStopping( false , TIME_TO_STOP ); // THE FIRST PARAMETER IS A BOOL THAT CHECKS WHETHER IT IS A HORIZONTAL INPUT OR NOT, AND THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
     }
 
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
@@ -133,7 +143,7 @@ function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF TH
 {
     let timer = x ? xTimer : yTimer; // IT CHOOSES THE TIMER TO USE
     let axis = x ? 'x' : 'y'; // IT CHOOSES THE AXIS TO STOP
-    let decreaseAmount = character.body.velocity[ axis ] / ( timeToStop * 60 ); // 60 IS THE FRAMES PER SECOND
+    let decreaseAmount = character.body.velocity[ axis ] / ( timeToStop * FPS );
 
     timer.loop( 1 / 60 * 1000 , // 1/60 * 1000 TO CONVERT SECONDS TO MILLISECONDS
         function() { 
@@ -155,7 +165,7 @@ function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF TH
 function RotateTowardsMouse () // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 {
     let angle = game.physics.arcade.angleToPointer( character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
-    character.rotation = angle + Phaser.Math.degToRad( 90 ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
+    character.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 }
 
 function Sprint () // SPRINT FUNCTIONALITY
@@ -167,10 +177,10 @@ function Sprint () // SPRINT FUNCTIONALITY
     if ( outOfSprint ) // IF THE SPRINT IS OUT, DISABLE IT AND START THE COOLDOWN
     {
         sprintEnabled = false;
-        sprintLeft = totalSprint;
+        sprintLeft = TOTAL_SPRINT;
         setTimeout(function() {
             sprintEnabled = true;
-        }, sprintCooldown * 1000);
+        }, SPRINT_COOLDOWN * 1000); // WE MULTIPLY BY 100 TO GET SPRINT COOLDOWN IN SECONDS
     }
 }
 
