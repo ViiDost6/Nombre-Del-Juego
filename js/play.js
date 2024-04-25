@@ -1,47 +1,66 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CONSTANTS, GLOBAL VARIABLES AND PHASES
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const characterSpeed = 150 , totalSprint = 500 , sprintCooldown = 2.5 , sprintSpeed = 300;
 
-let character , xTimer , yTimer , canSprint , sprintLeft, pistol;
+let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol;
 
-let playState = {
+let playState = { // GAME PHASES
     preload: preloadPlay,
     create: createPlay,
     update: updatePlay
 };
 
-function preloadPlay ()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MAIN FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function preloadPlay () // LOAD ASSETS FOR THE GAME
 {
     game.load.image( 'craft' , 'assets/imgs/craft.png' );
     game.load.image( 'bullet' , 'assets/imgs/laser.png' );
     game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
 }
 
-function createPlay ()
+function createPlay () // SET UP THE GAME
 {
+    // SET UP THE CHARACTER
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
     character.anchor.setTo( 0.5 , 0.5 );
     game.physics.arcade.enable( character );
-
-    xTimer = game.time.create( false );
-    yTimer = game.time.create( false );
-
-    canSprint = true;
+    sprintEnabled = true;
     sprintLeft = totalSprint;
     createWeaponPistol();
+
+    // INITIALIZING TIMERS FOR SMOOTH STOPPING
+    xTimer = game.time.create( false );
+    yTimer = game.time.create( false );
 }
 
-function updatePlay ()
+function updatePlay () // GAME LOOP
 {
     MoveCharacter();
     shootPistol();
 
-    console.log(sprintLeft);
+    console.log( sprintLeft );
 }
 
-function MoveCharacter ()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTIONS FOR THE GAME
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
 {
-    if ( game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A ) )
+    let canSprint = sprintEnabled && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT );
+    let canMoveLeftwards = game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A );
+    let canMoveRightwards = game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D );
+    let canMoveUpwards = game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W );
+    let canMoveDownwards = game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S );
+
+    if ( canMoveLeftwards )
     {
-        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        if ( canSprint )
         {
             character.body.velocity.x = -sprintSpeed;
             Sprint();
@@ -51,11 +70,11 @@ function MoveCharacter ()
             character.body.velocity.x = -characterSpeed;
         }
 
-        xTimer.stop(); // Stop the timer if a key is pressed
+        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
-    else if ( game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D ) )
+    else if ( canMoveRightwards )
     {
-        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        if ( canSprint )
         {
             character.body.velocity.x = sprintSpeed;
             Sprint();
@@ -65,17 +84,17 @@ function MoveCharacter ()
             character.body.velocity.x = characterSpeed;
         }
 
-        xTimer.stop(); // Stop the timer if a key is pressed
+        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
-    else
+    else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
     {
-        // Start the coroutine to gradually decrease the velocity
-        SmoothStopping( true , 1 ); // 0.5 is the time to stop in seconds
+        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
+        SmoothStopping( true , 1 ); // THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
     }
 
-    if ( game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W ) )
+    if ( canMoveUpwards  )
     {
-        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        if ( canSprint )
         {
             character.body.velocity.y = -sprintSpeed;
             Sprint();
@@ -85,11 +104,11 @@ function MoveCharacter ()
             character.body.velocity.y = -characterSpeed;
         }
 
-        yTimer.stop(); // Stop the timer if a key is pressed
+        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
-    else if ( game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S ) )
+    else if ( canMoveDownwards )
     {
-        if ( canSprint && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT ) )
+        if ( canSprint )
         {
             character.body.velocity.y = sprintSpeed;
             Sprint();
@@ -99,26 +118,31 @@ function MoveCharacter ()
             character.body.velocity.y = characterSpeed;
         }
 
-        yTimer.stop(); // Stop the timer if a key is pressed
+        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else
     {
-        // Start the coroutine to gradually decrease the velocity
-        SmoothStopping( false , 1 ); // 0.5 is the time to stop in seconds
+        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
+        SmoothStopping( false , 1 ); // THE FIRST PARAMETER IS A BOOL THAT CHECKS WHETHER IT IS A HORIZONTAL INPUT OR NOT, AND THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
     }
 
-    RotateTowardsMouse();
+    RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 }
 
-function SmoothStopping ( x , timeToStop )
+function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF THE CHARACTER. IT MAKES THE MOVEMENT SMOOTHER
 {
-    let timer = x ? xTimer : yTimer; // Choose the correct timer
-    let axis = x ? 'x' : 'y'; // Choose the correct axis
-    let decreaseAmount = character.body.velocity[ axis ] / ( timeToStop * 60 ); // 60 is the number of frames per second
+    let timer = x ? xTimer : yTimer; // IT CHOOSES THE TIMER TO USE
+    let axis = x ? 'x' : 'y'; // IT CHOOSES THE AXIS TO STOP
+    let decreaseAmount = character.body.velocity[ axis ] / ( timeToStop * 60 ); // 60 IS THE FRAMES PER SECOND
 
-    timer.loop( 1 / 60 * 1000 , function() { // 1/60 * 1000 to convert frames per second to milliseconds
-        character.body.velocity[ axis ] -= decreaseAmount;
-        if ( Math.abs( character.body.velocity[ axis ] ) < Math.abs( decreaseAmount ) )
+    timer.loop( 1 / 60 * 1000 , // 1/60 * 1000 TO CONVERT SECONDS TO MILLISECONDS
+        function() { 
+        character.body.velocity[ axis ] -= decreaseAmount; // DECREASE THE VELOCITY ALONG THE SPECIFIED AXIS
+
+        // CHECKS IF THE ABSOLUTE VALUE OF THE VELOCITY OF A CHARACTER ALONG A SPECIFIC AXIS IS LESS THAN THE ABSOLUTE VALUE OF A SPECIFIED DECREASE AMOUNT
+        let isStopped = Math.abs( character.body.velocity[ axis ] ) < Math.abs( decreaseAmount );
+
+        if ( isStopped )
         {
             character.body.velocity[ axis ] = 0;
             timer.stop();
@@ -128,67 +152,65 @@ function SmoothStopping ( x , timeToStop )
     timer.start();
 }
 
-function RotateTowardsMouse ()
+function RotateTowardsMouse () // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 {
-    let angle = game.physics.arcade.angleToPointer( character );
-    character.rotation = angle + Phaser.Math.degToRad( 90 );
+    let angle = game.physics.arcade.angleToPointer( character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
+    character.rotation = angle + Phaser.Math.degToRad( 90 ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 }
 
-function Sprint ()
+function Sprint () // SPRINT FUNCTIONALITY
 {
-    sprintLeft--;
+    sprintLeft--; // DECREASE THE SPRINT LEFT
 
-    if ( sprintLeft == 0 )
+    let outOfSprint = sprintLeft == 0;
+
+    if ( outOfSprint ) // IF THE SPRINT IS OUT, DISABLE IT AND START THE COOLDOWN
     {
-        canSprint = false;
+        sprintEnabled = false;
         sprintLeft = totalSprint;
         setTimeout(function() {
-            canSprint = true;
+            sprintEnabled = true;
         }, sprintCooldown * 1000);
     }
 }
 
-
-//crea las propiedas iniciales de la pistola inical
-function createWeaponPistol()
+function createWeaponPistol () // CREATES THE PISTOL WEAPON. ANY WEAPON CAN BE CREATED HERE
 {
-    pistol = game.add.weapon(6, 'bullet');
-    pistol.trackSprite(character, 25, -25, true);
-    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
-    pistol.bulletKillDistance = 300;
-    pistol.bulletSpeed = 250;
-    pistol.fireRate = 100;
-    pistol.bulletAngleVariance = 20;
+    pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
+    pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
+    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
+    pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
+    pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
+    pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
+    pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
 }
 
-//dispara la pistola, un solo click dispara las 6 balas
-function shootPistol()
+function shootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
 {
+    let nbullets = pistol.shots; // GET THE NUMBER OF BULLETS SHOT
+
+    // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
+    // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
     
-    let nbullets = pistol.shots; 
-    if (game.input.activePointer.leftButton.isDown && nbullets == 0)
+    let canShoot = game.input.activePointer.leftButton.isDown && nbullets == 0;
+    let isShooting = nbullets > 0 && nbullets < 6;
+    let needsReload = nbullets == 6;
+
+    if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
     {
-        
-        pistol.fireAtPointer(game.input.activePointer);
-        
-    }else if (nbullets > 0 && nbullets < 6)
+        pistol.fireAtPointer( game.input.activePointer );  
+    }
+    else if ( isShooting )
     {
-        
-        pistol.fireAtPointer(game.input.activePointer);
-    }else if (nbullets == 6)
+        pistol.fireAtPointer( game.input.activePointer );
+    }
+    else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
     {
         nbullets = pistol.resetShots();
     }
 }
 
-//sinceramente esto ni putas pero funciona
-function fullBullets(weapon)
+function fullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
 {
     weapon.quantity = -1;
 }
-
-/*
-function startHOF() {
-    game.state.start('hof');
-}
-*/
