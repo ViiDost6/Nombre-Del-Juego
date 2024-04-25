@@ -18,7 +18,7 @@ WORLD_WIDTH = 2400 ,
 WORLD_HEIGHT = 3200;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
-sprintBar , hudGroup , sprintHolder;
+sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
 
 let playState = { // GAME PHASES
     preload: PreloadPlay,
@@ -36,10 +36,10 @@ let playState = { // GAME PHASES
 // CreatePlay()
 // UpdatePlay()
 // CreateTimers()
+// CreateImages()
 // CreateBackground()
 // CreateCharacter()
 // CreateHUD()
-// CreateImages()
 
 // HUD FUNCTIONS
 
@@ -90,6 +90,17 @@ function CreateTimers ()
     yTimer = game.time.create( false );
 }
 
+function CreateImages ()
+{
+    game.load.image( 'craft' , 'assets/imgs/craft.png' );
+    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
+    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
+    game.load.image( 'background' , 'assets/imgs/background.png' );
+    game.load.image('sprintHolder' , 'assets/imgs/sprint_holder.png');
+    game.load.image('sprintBar' , 'assets/imgs/sprint_bar.png');
+    game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
+}
+
 function CreateBackground ()
 {
     game.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -122,17 +133,10 @@ function CreateHUD ()
     sprintBar.anchor.setTo( 0 , 1 );
     sprintHolder = hudGroup.create( 5 , 595 , 'sprintHolder' );
     sprintHolder.anchor.setTo( 0 , 1 );
+    checkDash = hudGroup.create( 5 , 350 , 'check_dash' );
+    checkDash.visible = false;
+    checkDash.anchor.setTo( 0 , 1 );
     hudGroup.fixedToCamera = true;
-}
-
-function CreateImages ()
-{
-    game.load.image( 'craft' , 'assets/imgs/craft.png' );
-    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
-    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
-    game.load.image( 'background' , 'assets/imgs/background.png' );
-    game.load.image('sprintHolder', 'assets/imgs/sprint_holder.png');
-    game.load.image('sprintBar', 'assets/imgs/sprint_bar.png');
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,6 +212,8 @@ function CheckDash () // DASH FUNCTIONALITY
             }, DASH_COOLDOWN * 1000 );
         }, DASH_DURATION * 1000 );
     }
+
+    canDash ? checkDash.visible = true : checkDash.visible = false;
 }
 
 function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
@@ -281,6 +287,18 @@ function Sprint () // SPRINT FUNCTIONALITY
         setTimeout(function() {
             sprintEnabled = true;
         }, SPRINT_COOLDOWN * 1000); // WE MULTIPLY BY 1000 TO GET SPRINT COOLDOWN IN SECONDS
+
+        if ( sprintTween )
+        {
+            sprintTween.stop();
+        }
+
+        sprintTween = game.add.tween(sprintBar.scale).to({
+            x: 1, // Assuming the full scale on x-axis represents the bar being completely filled
+            y: 1  // Assuming the full scale on y-axis represents the bar being completely filled
+        }, SPRINT_COOLDOWN * 1000, Phaser.Easing.Linear.None, true);
+
+        sprintTween.start();
     }
 
     UpdateSprintBar();
