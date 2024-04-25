@@ -12,7 +12,7 @@ TIME_TO_STOP = 1 ,
 FPS = 60
 FIXED_ANGLE = 90;
 
-let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , fixedAngle;
+let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol;
 
 let playState = { // GAME PHASES
     preload: preloadPlay,
@@ -44,16 +44,12 @@ function createPlay () // SET UP THE GAME
     // INITIALIZING TIMERS FOR SMOOTH STOPPING
     xTimer = game.time.create( false );
     yTimer = game.time.create( false );
-
-    
 }
 
 function updatePlay () // GAME LOOP
 {
     MoveCharacter();
     shootPistol();
-
-    console.log( sprintLeft );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +176,7 @@ function Sprint () // SPRINT FUNCTIONALITY
         sprintLeft = TOTAL_SPRINT;
         setTimeout(function() {
             sprintEnabled = true;
-        }, SPRINT_COOLDOWN * 1000); // WE MULTIPLY BY 100 TO GET SPRINT COOLDOWN IN SECONDS
+        }, SPRINT_COOLDOWN * 1000); // WE MULTIPLY BY 1000 TO GET SPRINT COOLDOWN IN SECONDS
     }
 }
 
