@@ -30,11 +30,12 @@ let playState = { // GAME PHASES
 // INDEX (YOU CAN USE CTRL+F3 TO FIND THE FUNCTIONS)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// CLASSES
+//// CLASSES
 
 // Enemy()
+// Weapon()
 
-// MAIN FUNCTIONS
+//// MAIN FUNCTIONS
 
 // PreloadPlay()
 // CreatePlay()
@@ -45,11 +46,11 @@ let playState = { // GAME PHASES
 // CreateCharacter()
 // CreateHUD()
 
-// HUD FUNCTIONS
+//// HUD FUNCTIONS
 
 // UpdateSprintBar()
 
-// MOVEMENT FUNCTIONS
+//// MOVEMENT FUNCTIONS
 
 // MoveCharacter()
 // CheckDash()
@@ -58,12 +59,6 @@ let playState = { // GAME PHASES
 // RotateTowardsMouse()
 // Sprint()
 // CheckBounds()
-
-// WEAPON FUNCTIONS
-
-// CreateWeaponPistol()
-// ShootPistol()
-// FullBullets()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -92,7 +87,7 @@ class Enemy
         Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
     }
 
-    static numberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
+    static NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
     {
         if ( Enemy.enemyGroup[ zoneNumber ] )
         {
@@ -102,6 +97,54 @@ class Enemy
         {
             return 0;
         }
+    }
+}
+
+class Weapon
+{
+    constructor ( x , y , sprite )
+    {
+        this.sprite = game.add.sprite( x , y , sprite );
+        game.physics.arcade.enable( this.sprite );
+        this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
+
+        pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
+        pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
+        pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
+        pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
+        pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
+        pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
+        pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
+    }
+
+    ShootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
+    {
+        let nbullets = pistol.shots; // GET THE NUMBER OF BULLETS SHOT
+
+        // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
+        // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
+        
+        let canShoot = game.input.activePointer.leftButton.isDown && nbullets == 0;
+        let isShooting = nbullets > 0 && nbullets < 6;
+        let needsReload = nbullets == 6;
+
+        if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
+        {
+            pistol.fireAtPointer( game.input.activePointer );  
+        }
+        else if ( isShooting )
+        {
+            pistol.fireAtPointer( game.input.activePointer );
+        }
+        else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
+        {
+            nbullets = pistol.resetShots();
+        }
+    }
+
+    FullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
+    {
+        weapon.quantity = -1;
     }
 }
 
@@ -367,49 +410,4 @@ function CheckBounds ()
     {
         character.y = WORLD_HEIGHT;
     }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// WEAPON FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function CreateWeaponPistol () // CREATES THE PISTOL WEAPON. ANY WEAPON CAN BE CREATED HERE
-{
-    pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
-    pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
-    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
-    pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
-    pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
-    pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
-    pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
-}
-
-function ShootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
-{
-    let nbullets = pistol.shots; // GET THE NUMBER OF BULLETS SHOT
-
-    // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
-    // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
-    
-    let canShoot = game.input.activePointer.leftButton.isDown && nbullets == 0;
-    let isShooting = nbullets > 0 && nbullets < 6;
-    let needsReload = nbullets == 6;
-
-    if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
-    {
-        pistol.fireAtPointer( game.input.activePointer );  
-    }
-    else if ( isShooting )
-    {
-        pistol.fireAtPointer( game.input.activePointer );
-    }
-    else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
-    {
-        nbullets = pistol.resetShots();
-    }
-}
-
-function FullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
-{
-    weapon.quantity = -1;
 }
