@@ -30,6 +30,10 @@ let playState = { // GAME PHASES
 // INDEX (YOU CAN USE CTRL+F3 TO FIND THE FUNCTIONS)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// CLASSES
+
+// Enemy()
+
 // MAIN FUNCTIONS
 
 // PreloadPlay()
@@ -60,6 +64,46 @@ let playState = { // GAME PHASES
 // CreateWeaponPistol()
 // ShootPistol()
 // FullBullets()
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CLASSES
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Enemy
+{
+    static enemyGroup = {};
+
+    constructor ( x , y , zoneNumber , sprite )
+    {
+        this.sprite = game.add.sprite( x , y , sprite );
+        game.physics.arcade.enable( this.sprite );
+        this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
+        this.zoneNumber = zoneNumber;
+
+        // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
+
+        let groupDoesntExist = ! Enemy.enemyGroup[ zoneNumber ];
+
+        if ( groupDoesntExist )
+        {
+            Enemy.enemyGroup[ zoneNumber ] = game.add.group();
+        }
+
+        Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
+    }
+
+    static numberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
+    {
+        if ( Enemy.enemyGroup[ zoneNumber ] )
+        {
+            return Enemy.enemyGroup[ zoneNumber ].countLiving();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -96,8 +140,8 @@ function CreateImages ()
     game.load.image( 'bullet' , 'assets/imgs/laser.png' );
     game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
     game.load.image( 'background' , 'assets/imgs/background.png' );
-    game.load.image('sprintHolder' , 'assets/imgs/sprint_holder.png');
-    game.load.image('sprintBar' , 'assets/imgs/sprint_bar.png');
+    game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
+    game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
 }
 
