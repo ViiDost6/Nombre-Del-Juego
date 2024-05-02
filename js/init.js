@@ -1,50 +1,51 @@
-const TEXT_OFFSET_HOR = 40;
-const TEXT_OFFSET_VER = 40;
-const SHIP_OFFSET_HOR = 150;
-const SHIP_OFFSET_VER = 90;
-
-let btnStart;
-let imgUfo;
+let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB;
 
 let initState = {
     preload: preloadInit,
     create: createInit
 };
 
-function preloadInit () {
-    game.load.image('craft', 'assets/imgs/craft.png');
-    game.load.image('ufo', 'assets/imgs/ufo.png');
+function preloadInit()
+{
+    game.load.image('initialBackground', 'assets/imgs/initialBackground.png');
+    game.load.image('btnEasy', 'assets/imgs/btnEasy.png');
+    game.load.image('btnMedium', 'assets/imgs/btnMedium.png');
+    game.load.image('btnHard', 'assets/imgs/btnHard.png');
+    game.load.image('btnInstructions', 'assets/imgs/btnInstructions.png');
+    game.load.image('btnA', 'assets/imgs/btnA.png');
+    game.load.image('btnB', 'assets/imgs/btnB.png');
 }
 
-function createInit() {
-    let textI = 'Left and right cursors move the shooter,\n';
-    textI += 'and also horizontal movements of the mouse.\n';
-    textI += 'Spacebar and mouse clicks fire the laser cannons.';
-    textI += '\n\nClick on the spacecraft to start.';
-    let styleI = {font:'20px Arial', fill:'#FFFFFF'};
-    let instructions = game.add.text(TEXT_OFFSET_HOR, TEXT_OFFSET_VER, textI, styleI);
+function createInit()
+{
+    let background = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
+    let buttons = ['btnEasy', 'btnMedium', 'btnHard', 'btnInstructions', 'btnA', 'btnB'];
+    let yPosition = 100;
+    let xPositionA = game.world.width - 140; // Posición inicial para el botón A
+    let xPositionB = game.world.width - 60; // Posición inicial para el botón B
 
-    let textC = 'Credits:\n';
-    textC += '* Original craft pic created by "Fran" (Desarrollo XNA).\n';
-    textC += '* Original UFO pic created by "0melapics" (Freepik.com).\n';
-    textC += '* Original laser pic from Phaser tutorial "Invaders".\n';
-    textC += '* Blast animation from Phaser tutorial "Invaders".\n';
-    textC += '* Blast sound created by "dklon" (OpenGameArt.Com).\n';
-    textC += '* Laser sound created by "dklon" (OpenGameArt.Com).';
-    let styleC = {font:'16px Arial', fill:'#FF0000'};
-    let credits = game.add.text(TEXT_OFFSET_HOR, game.world.height-TEXT_OFFSET_VER, textC, styleC);
-    credits.anchor.setTo(0, 1);
+    buttons.forEach((button, index) => {
+        let xPosition = game.world.width - 100; // Posición inicial para los demás botones
+        let btnYPosition = game.world.height + 100;
 
-    let posX = game.world.width-SHIP_OFFSET_HOR;
-    let posY = game.world.height-SHIP_OFFSET_VER;
-    btnStart = game.add.button(posX, posY, 'craft', startPlay);
-    btnStart.anchor.setTo(0.5, 0.5);
-    btnStart.scale.setTo(2.0);
+        if (button === 'btnA' || button === 'btnB')
+        {
+            xPosition = button === 'btnA' ? xPositionA : xPositionB;
+        }
 
-    posY = game.world.centerY;
-    imgUfo = game.add.image(posX, posY, 'ufo');
-    imgUfo.anchor.setTo(0.5, 0.5);
-    imgUfo.scale.setTo(2.0);
+        let btn = game.add.button(xPosition, btnYPosition, button, startPlay, this);
+        btn.anchor.setTo(0.5);
+
+        if (button === 'btnA' || button === 'btnB')
+        {
+            game.add.tween(btn).to({y: yPosition}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
+        }
+        else
+        {
+            game.add.tween(btn).to({y: yPosition}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
+            yPosition += 100;
+        }
+    });
 }
 
 function startPlay() {

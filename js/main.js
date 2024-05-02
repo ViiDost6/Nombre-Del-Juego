@@ -11,5 +11,5 @@ function startGame() {
     game.state.add('play', playState);
     // game.state.add('hof', hofState);
 
-    game.state.start('play');
+    game.state.start('init');
 }

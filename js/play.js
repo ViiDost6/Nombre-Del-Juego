@@ -142,7 +142,6 @@ function CreateTimers ()
 
 function CreateImages ()
 {
-    game.load.image( 'craft' , 'assets/imgs/craft.png' );
     game.load.image( 'bullet' , 'assets/imgs/laser.png' );
     game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
     game.load.image( 'background' , 'assets/imgs/background.png' );
@@ -374,14 +373,15 @@ function CheckBounds ()
         character.y = WORLD_HEIGHT;
     }
 }
-function CreateWeaponPistol (){
-pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
-pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
-pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
-pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
-pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
-pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
-pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
+function CreateWeaponPistol ()
+{
+    pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
+    pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
+    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
+    pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
+    pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
+    pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
+    pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
 }   
 
 function ShootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
