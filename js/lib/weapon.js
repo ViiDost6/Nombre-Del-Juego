@@ -169,8 +169,8 @@ class Enemy
         this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
         this.zoneNumber = zoneNumber;
 
-        let posx = this.sprite.x;
-        let posy = this.sprite.y;
+        this.posx = this.sprite.x;
+        this.posy = this.sprite.y;
 
         // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
 

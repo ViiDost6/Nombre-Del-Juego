@@ -102,8 +102,9 @@ class Enemy
 
 class Weapon
 {
-    constructor ( nbullets, sprite, distance, speed, rate, variance)
+    constructor (nbullets, sprite, distance, speed, rate, variance)
     {
+        
         this.core = game.add.weapon( nbullets , sprite ); // 6 IS THE NUMBER OF BULLETS
         this.core.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
         this.core.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
@@ -168,6 +169,7 @@ function UpdatePlay () // GAME LOOP
 {
     MoveCharacter();
     pistol.Shoot();
+    
 }
 
 function CreateTimers ()
@@ -201,12 +203,12 @@ function CreateCharacter ()
 {
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
+    
     game.physics.arcade.enable( character );
     sprintEnabled = true;
     sprintLeft = TOTAL_SPRINT;
     canDash = true;
     isDashing = false;
-    CreateWeaponPistol();
 
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( character );
@@ -358,6 +360,7 @@ function RotateTowardsMouse () // ROTATE THE CHARACTER ORIENTATION TOWARDS THE M
 {
     let angle = game.physics.arcade.angleToPointer( character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
     character.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
+    
 }
 
 function Sprint () // SPRINT FUNCTIONALITY
@@ -410,43 +413,4 @@ function CheckBounds ()
         character.y = WORLD_HEIGHT;
     }
 }
-function CreateWeaponPistol ()
-{
-    pistol = game.add.weapon( 6 , 'bullet' ); // 6 IS THE NUMBER OF BULLETS
-    pistol.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
-    pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
-    pistol.bulletKillDistance = 300; // THE DISTANCE TO KILL THE BULLET
-    pistol.bulletSpeed = 250; // THE SPEED OF THE BULLET
-    pistol.fireRate = 100; // THE FIRE RATE OF THE BULLET
-    pistol.bulletAngleVariance = 20; // THE VARIANCE OF THE ANGLE OF THE BULLET
-}   
 
-function ShootPistol () // SHOOT THE PISTOL. A SINGLE CLICK SHOOTS THE 6 BULLETS
-{
-    let nbullets = pistol.shots; // GET THE NUMBER OF BULLETS SHOT
-
-    // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
-    // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
-        
-    let canShoot = game.input.activePointer.leftButton.isDown && nbullets == 0;
-    let isShooting = nbullets > 0 && nbullets < 6;
-    let needsReload = nbullets == 6;
-
-    if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
-    {
-        pistol.fireAtPointer( game.input.activePointer );  
-    }
-    else if ( isShooting )
-    {
-        pistol.fireAtPointer( game.input.activePointer );
-    }
-    else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
-    {
-        nbullets = pistol.resetShots();
-    }
-}
-
-function FullBullets ( weapon ) // RELOAD ALL THE BULLETS OF EVERY TYPE OF WEAPON
-{
-    weapon.quantity = -1;
-}
