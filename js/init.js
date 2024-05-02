@@ -43,6 +43,10 @@ function createInit()
         {
             btn = game.add.button(xPosition, btnYPosition, button, startInstructions, this);
         }
+        else
+        {
+            btn = game.add.button(xPosition, btnYPosition, button, () => {}, this);
+        }
 
         btn.anchor.setTo(0.5);
 
