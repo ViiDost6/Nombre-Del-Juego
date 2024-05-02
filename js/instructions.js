@@ -29,6 +29,7 @@ function nextInstruction() {
 
     if ( instructionIndex >= instructions.length ) {
         skipInstructions();
+        instructionIndex = 0;
         return;
     }
 

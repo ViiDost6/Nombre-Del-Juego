@@ -20,45 +20,39 @@ function createInit()
 {
     game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
     let buttons = ['btnEasy', 'btnMedium', 'btnHard', 'btnInstructions', 'btnA', 'btnB'];
-    let yPosition = 100;
-    let xPositionA = game.world.width - 140; // Posición inicial para el botón A
-    let xPositionB = game.world.width - 60; // Posición inicial para el botón B
 
-    buttons.forEach((button, index) => {
-        let xPosition = game.world.width - 100; // Posición inicial para los demás botones
-        let btnYPosition = game.world.height + 100;
-
-        if (button === 'btnA' || button === 'btnB')
-        {
-            xPosition = button === 'btnA' ? xPositionA : xPositionB;
-        }
-
+    buttons.forEach((button, index) =>
+    {
         let btn;
 
-        if ( button === 'btnEasy' || button === 'btnMedium' || button === 'btnHard' || button === 'btnA')
+        // Define the final positions for the buttons
+        let positions = {
+            'btnEasy': {x: 50, y: 100},
+            'btnMedium': {x: 300, y: 100},
+            'btnHard': {x: 550, y: 100},
+            'btnInstructions': {x: 100, y: 250},
+            'btnA': {x: 200, y: 400},
+            'btnB': {x: 450, y: 400}
+        };
+
+        // Create the button at the final x position and a negative y position
+        if ( button === 'btnInstructions' )
         {
-            btn = game.add.button(xPosition, btnYPosition, button, startPlay, this);
+            btn = game.add.button(positions[button].x, -100, button, startInstructions, this);
         }
-        else if ( button === 'btnInstructions' )
+        else if ( button === 'btnB' )
         {
-            btn = game.add.button(xPosition, btnYPosition, button, startInstructions, this);
+            btn = game.add.button(positions[button].x, -100, button, null , this);
         }
         else
         {
-            btn = game.add.button(xPosition, btnYPosition, button, () => {}, this);
+            btn = game.add.button(positions[button].x, -100, button, startPlay, this);
         }
 
-        btn.anchor.setTo(0.5);
+        btn.anchor.setTo(0);
 
-        if (button === 'btnA' || button === 'btnB')
-        {
-            game.add.tween(btn).to({y: yPosition}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
-        }
-        else
-        {
-            game.add.tween(btn).to({y: yPosition}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
-            yPosition += 100;
-        }
+        // Create a tween to animate the button to the final y position
+        game.add.tween(btn).to({y: positions[button].y}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
     });
 }
 
