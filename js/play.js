@@ -15,7 +15,23 @@ DASH_DURATION = 0.15 ,
 DASH_COOLDOWN = 1.5 ,
 DASH_MULTIPLIER = 5 ,
 WORLD_WIDTH = 2400 ,
-WORLD_HEIGHT = 3200;
+WORLD_HEIGHT = 3200 , 
+SCROLL_FACTOR = 0.7 , 
+BULLET_SPRITE_X = 26 ,
+BULLET_SPRITE_Y = 25 , 
+WEAPON_OFFSET_X = 25 ,
+WEAPON_OFFSET_Y = -25 ,
+DEFAULT_NUMBER_BULLETS = 6 ,
+BULLET_KILL_DISTANCE = 300 ,
+BULLET_SPEED = 250 ,
+FIRE_RATE = 100 , 
+BULLET_ANGLE_VARIANCE = 20 , 
+SPRINT_BAR_X = 5 ,
+SPRINT_BAR_Y = 595 ,
+HUD_ANCHOR_X = 0 ,
+HUD_ANCHOR_Y = 1 ,
+DASH_INDICATOR_X = 5 ,
+DASH_INDICATOR_Y = 350;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
@@ -59,6 +75,7 @@ let playState = { // GAME PHASES
 // RotateTowardsMouse()
 // Sprint()
 // CheckBounds()
+// CheckMovement()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -105,7 +122,7 @@ class Weapon
     constructor ( nbullets , sprite , distance , speed , rate , variance )
     {
         this.core = game.add.weapon( nbullets , sprite ); // CREATE THE WEAPON
-        this.core.trackSprite( character , 25 , -25 , true ); // TRACK THE CHARACTER
+        this.core.trackSprite( character , WEAPON_OFFSET_X , WEAPON_OFFSET_Y , true ); // TRACK THE CHARACTER
         this.core.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
         this.core.bulletKillDistance = distance; // THE DISTANCE TO KILL THE BULLET
         this.core.bulletSpeed = speed; // THE SPEED OF THE BULLET
@@ -184,7 +201,7 @@ function CreateImages ()
     game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
     game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
-    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , 26 , 25 );
+    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
 }
 
 function CreateBackground ()
@@ -192,9 +209,9 @@ function CreateBackground ()
     game.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
     // SMOOTH SCROLLING
-    let background = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'background');
-    background.scrollFactorX = 0.7;
-    background.scrollFactorY = 0.7;
+    let background = game.add.tileSprite( 0 , 0 , game.world.width , game.world.height , 'background' );
+    background.scrollFactorX = SCROLL_FACTOR;
+    background.scrollFactorY = SCROLL_FACTOR;
 }
 
 function CreateCharacter ()
@@ -212,19 +229,19 @@ function CreateCharacter ()
     game.camera.follow( character );
 
     // SET UP THE WEAPON FOR THE CHARACTER
-    pistol = new Weapon( 6 , 'bullets' , 300 , 250 , 100 , 20 );
+    pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE );
 }
 
 function CreateHUD ()
 {
     hudGroup = game.add.group(); // GROUP FOR THE HUD
-    sprintBar = hudGroup.create( 5 , 595 , 'sprintBar' ); // SPRINT BAR
-    sprintBar.anchor.setTo( 0 , 1 ); // ANCHOR THE SPRINT BAR
-    sprintHolder = hudGroup.create( 5 , 595 , 'sprintHolder' ); // SPRINT HOLDER
-    sprintHolder.anchor.setTo( 0 , 1 ); // ANCHOR THE SPRINT HOLDER
-    checkDash = hudGroup.create( 5 , 350 , 'check_dash' ); // CHECK DASH
+    sprintBar = hudGroup.create( SPRINT_BAR_X , SPRINT_BAR_Y , 'sprintBar' ); // SPRINT BAR
+    sprintBar.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE SPRINT BAR
+    sprintHolder = hudGroup.create( SPRINT_BAR_X , SPRINT_BAR_Y , 'sprintHolder' ); // SPRINT HOLDER
+    sprintHolder.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE SPRINT HOLDER
+    checkDash = hudGroup.create( DASH_INDICATOR_X , DASH_INDICATOR_Y , 'check_dash' ); // CHECK DASH
     checkDash.visible = false; // HIDE THE CHECK DASH
-    checkDash.anchor.setTo( 0 , 1 ); // ANCHOR THE CHECK DASH
+    checkDash.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
 
@@ -243,46 +260,9 @@ function UpdateSprintBar ()
 
 function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 {
-    let canMoveLeftwards = game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A );
-    let canMoveRightwards = game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D );
-    let canMoveUpwards = game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W );
-    let canMoveDownwards = game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S );
-
     CheckBounds(); // CHECKS IF THE CHARACTER IS WITHIN THE BOUNDS OF THE WORLD
     CheckDash(); // CHECKS IF THE CHARACTER DASHES
-
-    if ( canMoveLeftwards )
-    {
-        CheckSprint( 'left' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
-    }
-    else if ( canMoveRightwards )
-    {
-        CheckSprint( 'right' ); // CHECKS IF THE CHARACTER SPRINTS TO THE RIGHT
-        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
-    }
-    else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
-    {
-        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
-        SmoothStopping( true , TIME_TO_STOP ); // THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
-    }
-
-    if ( canMoveUpwards  )
-    {
-        CheckSprint( 'up' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
-    }
-    else if ( canMoveDownwards )
-    {
-        CheckSprint( 'down' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
-    }
-    else
-    {
-        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
-        SmoothStopping( false , TIME_TO_STOP ); // THE FIRST PARAMETER IS A BOOL THAT CHECKS WHETHER IT IS A HORIZONTAL INPUT OR NOT, AND THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
-    }
-
+    CheckMovement(); // CHECKS IF THE CHARACTER MOVES
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
     pistol.Shoot(); // SHOOT THE BULLET
 }
@@ -299,11 +279,11 @@ function CheckDash () // DASH FUNCTIONALITY
             isDashing = false;
             setTimeout( function() {
                 canDash = true;
-            }, DASH_COOLDOWN * 1000 );
-        }, DASH_DURATION * 1000 );
+            }, DASH_COOLDOWN * 1000 ); // WE MULTIPLY BY 1000 TO GET DASH COOLDOWN IN SECONDS
+        }, DASH_DURATION * 1000 ); // WE MULTIPLY BY 1000 TO GET DASH DURATION IN SECONDS
     }
 
-    canDash ? checkDash.visible = true : checkDash.visible = false;
+    canDash ? checkDash.visible = true : checkDash.visible = false; // SHOW THE CHECK DASH IF THE CHARACTER CAN DASH
 }
 
 function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
@@ -362,7 +342,6 @@ function RotateTowardsMouse () // ROTATE THE CHARACTER ORIENTATION TOWARDS THE M
 {
     let angle = game.physics.arcade.angleToPointer( character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
     character.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
-    
 }
 
 function Sprint () // SPRINT FUNCTIONALITY
@@ -397,21 +376,61 @@ function Sprint () // SPRINT FUNCTIONALITY
 
 function CheckBounds ()
 {
-    if ( character.x < 0 )
+    if ( character.x < 0 ) // IF THE CHARACTER IS OUT OF THE BOUNDS OF THE WORLD, SET IT TO THE BOUNDS
     {
         character.x = 0;
     }
-    else if ( character.x > WORLD_WIDTH )
+    else if ( character.x > WORLD_WIDTH ) // IF THE CHARACTER IS OUT OF THE BOUNDS OF THE WORLD, SET IT TO THE BOUNDS
     {
         character.x = WORLD_WIDTH;
     }
 
-    if ( character.y < 0 )
+    if ( character.y < 0 ) // IF THE CHARACTER IS OUT OF THE BOUNDS OF THE WORLD, SET IT TO THE BOUNDS
     {
         character.y = 0;
     }
-    else if ( character.y > WORLD_HEIGHT )
+    else if ( character.y > WORLD_HEIGHT ) // IF THE CHARACTER IS OUT OF THE BOUNDS OF THE WORLD, SET IT TO THE BOUNDS
     {
         character.y = WORLD_HEIGHT;
+    }
+}
+
+function CheckMovement ()
+{
+    let canMoveLeftwards = game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A );
+    let canMoveRightwards = game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D );
+    let canMoveUpwards = game.input.keyboard.isDown( Phaser.Keyboard.UP ) || game.input.keyboard.isDown( Phaser.Keyboard.W );
+    let canMoveDownwards = game.input.keyboard.isDown( Phaser.Keyboard.DOWN ) || game.input.keyboard.isDown( Phaser.Keyboard.S );
+
+    if ( canMoveLeftwards )
+    {
+        CheckSprint( 'left' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
+        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+    }
+    else if ( canMoveRightwards )
+    {
+        CheckSprint( 'right' ); // CHECKS IF THE CHARACTER SPRINTS TO THE RIGHT
+        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+    }
+    else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
+    {
+        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
+        SmoothStopping( true , TIME_TO_STOP ); // THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
+    }
+
+    if ( canMoveUpwards  )
+    {
+        CheckSprint( 'up' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
+        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+    }
+    else if ( canMoveDownwards )
+    {
+        CheckSprint( 'down' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
+        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+    }
+    else
+    {
+        // START THE COROUTINE TO GRADUALLY DECREASE THE SPEED
+        SmoothStopping( false , TIME_TO_STOP ); // THE FIRST PARAMETER IS A BOOL THAT CHECKS WHETHER IT IS A HORIZONTAL INPUT OR NOT, AND THE SECOND PARAMETER IS THE TIME TO STOP IN SECONDS
     }
 }
