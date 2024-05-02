@@ -113,12 +113,12 @@ class Weapon
         core.bulletAngleVariance = variance; // THE VARIANCE OF THE ANGLE OF THE BULLET
     }
 
-    Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
+    static Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
     {
         let bulletsshoots = core.shots; // GET THE NUMBER OF BULLETS SHOT
 
-    // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
-    // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
+        // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
+        // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
         
         let canShoot = game.input.activePointer.leftButton.isDown && bulletsshoots == 0;
         let isShooting = bulletsshoots > 0 && bulletsshoots < nbullets;
