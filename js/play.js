@@ -2,6 +2,12 @@
 // CONSTANTS, GLOBAL VARIABLES AND PHASES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+let playState = { // GAME PHASES
+    preload: PreloadPlay,
+    create: CreatePlay,
+    update: UpdatePlay
+};
+
 const CHARACTER_SPEED = 150 , 
 TOTAL_SPRINT = 500 , 
 SPRINT_COOLDOWN = 2.5 , 
@@ -31,16 +37,17 @@ SPRINT_BAR_Y = 595 ,
 HUD_ANCHOR_X = 0 ,
 HUD_ANCHOR_Y = 1 ,
 DASH_INDICATOR_X = 5 ,
-DASH_INDICATOR_Y = 350;
+DASH_INDICATOR_Y = 350 , 
+ZONE_1_MAX_ENEMIES = 5 ,
+ZONE_2_MAX_ENEMIES = 7 ,
+ZONE_3_MAX_ENEMIES = 10 ,
+ZONE_4_MAX_ENEMIES = 15 ,
+ZONE_5_MAX_ENEMIES = 20;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
 
-let playState = { // GAME PHASES
-    preload: PreloadPlay,
-    create: CreatePlay,
-    update: UpdatePlay
-};
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // INDEX (YOU CAN USE CTRL+F3 TO FIND THE FUNCTIONS)
@@ -83,7 +90,7 @@ let playState = { // GAME PHASES
 
 class Enemy
 {
-    static enemyGroup = {};
+    static enemyGroups = {};
 
     constructor ( x , y , zoneNumber , sprite )
     {
@@ -94,21 +101,21 @@ class Enemy
 
         // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
 
-        let groupDoesntExist = ! Enemy.enemyGroup[ zoneNumber ];
+        let groupDoesntExist = ! Enemy.enemyGroups[ zoneNumber ];
 
         if ( groupDoesntExist )
         {
-            Enemy.enemyGroup[ zoneNumber ] = game.add.group();
+            Enemy.enemyGroups[ zoneNumber ] = game.add.group();
         }
 
-        Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
+        Enemy.enemyGroups[ zoneNumber ].add( this.sprite );
     }
 
     static NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
     {
-        if ( Enemy.enemyGroup[ zoneNumber ] )
+        if ( Enemy.enemyGroups[ zoneNumber ] )
         {
-            return Enemy.enemyGroup[ zoneNumber ].countLiving();
+            return Enemy.enemyGroups[ zoneNumber ].countLiving();
         }
         else
         {

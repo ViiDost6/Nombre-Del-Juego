@@ -1,4 +1,4 @@
-let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB;
+let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB , difficultyMultiplier = 0;
 
 let initState = {
     preload: preloadInit,
@@ -34,6 +34,21 @@ function createInit()
             'btnA': {x: 200, y: 400},
             'btnB': {x: 450, y: 400}
         };
+
+        switch ( button ) // SET DIFFICULTY MULTIPLIER
+        {
+            case 'btnEasy':
+                difficultyMultiplier = 1;
+                break;
+            case 'btnMedium':
+                difficultyMultiplier = 2;
+                break;
+            case 'btnHard':
+                difficultyMultiplier = 3;
+                break;
+            default:
+                break;
+        }
 
         // Create the button at the final x position and a negative y position
         if ( button === 'btnInstructions' )
