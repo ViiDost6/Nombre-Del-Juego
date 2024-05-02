@@ -42,10 +42,13 @@ ZONE_1_MAX_ENEMIES = 5 ,
 ZONE_2_MAX_ENEMIES = 7 ,
 ZONE_3_MAX_ENEMIES = 10 ,
 ZONE_4_MAX_ENEMIES = 15 ,
-ZONE_5_MAX_ENEMIES = 20;
+ZONE_5_MAX_ENEMIES = 20 , 
+BASIC_ENEMIES_ANCHOR_X = 0.5 ,
+BASIC_ENEMIES_ANCHOR_Y = 1;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
-sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
+sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
+basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5;
 
 
 
@@ -55,7 +58,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
 
 //// CLASSES
 
-// Enemy()
+// BasicEnemy()
 // Weapon()
 
 //// MAIN FUNCTIONS
@@ -68,6 +71,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
 // CreateBackground()
 // CreateCharacter()
 // CreateHUD()
+// CreateEnemies()
 
 //// HUD FUNCTIONS
 
@@ -88,11 +92,13 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash;
 // CLASSES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Enemy
+/*
+
+class BasicEnemy
 {
     static enemyGroups = {};
 
-    constructor ( x , y , zoneNumber , sprite )
+    constructor ( x , y , zoneNumber )
     {
         this.sprite = game.add.sprite( x , y , sprite );
         game.physics.arcade.enable( this.sprite );
@@ -123,6 +129,8 @@ class Enemy
         }
     }
 }
+
+*/
 
 class Weapon
 {
@@ -209,6 +217,7 @@ function CreateImages ()
     game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
     game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
+    game.load.image( 'basicEnemy' , 'assets/imgs/Base_Enemy.png' );
 }
 
 function CreateBackground ()
@@ -250,6 +259,45 @@ function CreateHUD ()
     checkDash.visible = false; // HIDE THE CHECK DASH
     checkDash.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
+}
+
+function CreateEnemies ()
+{
+    basicEnemiesZone1 = game.add.group();
+    basicEnemiesZone2 = game.add.group();
+    basicEnemiesZone3 = game.add.group();
+    basicEnemiesZone4 = game.add.group();
+    basicEnemiesZone5 = game.add.group();
+
+    basicEnemiesZone1.enableBody = true;
+    basicEnemiesZone2.enableBody = true;
+    basicEnemiesZone3.enableBody = true;
+    basicEnemiesZone4.enableBody = true;
+    basicEnemiesZone5.enableBody = true;
+
+    basicEnemiesZone1.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
+    basicEnemiesZone2.createMultiple( ZONE_2_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
+    basicEnemiesZone3.createMultiple( ZONE_3_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
+    basicEnemiesZone4.createMultiple( ZONE_4_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
+    basicEnemiesZone5.createMultiple( ZONE_5_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
+
+    basicEnemiesZone1.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+    basicEnemiesZone2.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+    basicEnemiesZone3.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+    basicEnemiesZone4.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+    basicEnemiesZone5.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+
+    basicEnemiesZone1.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+    basicEnemiesZone2.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+    basicEnemiesZone3.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+    basicEnemiesZone4.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+    basicEnemiesZone5.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+
+    basicEnemiesZone1.setAll( 'checkWorldBounds' , true );
+    basicEnemiesZone2.setAll( 'checkWorldBounds' , true );
+    basicEnemiesZone3.setAll( 'checkWorldBounds' , true );
+    basicEnemiesZone4.setAll( 'checkWorldBounds' , true );
+    basicEnemiesZone5.setAll( 'checkWorldBounds' , true );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
