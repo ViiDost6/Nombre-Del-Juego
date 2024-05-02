@@ -184,7 +184,7 @@ function CreateImages ()
     game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
     game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
-    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , 26 , 25 );
+    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , 27 , 25 );
 }
 
 function CreateBackground ()
