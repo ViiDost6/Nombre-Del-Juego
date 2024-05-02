@@ -18,7 +18,7 @@ function preloadInit()
 
 function createInit()
 {
-    let background = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
+    game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
     let buttons = ['btnEasy', 'btnMedium', 'btnHard', 'btnInstructions', 'btnA', 'btnB'];
     let yPosition = 100;
     let xPositionA = game.world.width - 140; // Posición inicial para el botón A
@@ -33,7 +33,17 @@ function createInit()
             xPosition = button === 'btnA' ? xPositionA : xPositionB;
         }
 
-        let btn = game.add.button(xPosition, btnYPosition, button, startPlay, this);
+        let btn;
+
+        if ( button === 'btnEasy' || button === 'btnMedium' || button === 'btnHard' || button === 'btnA')
+        {
+            btn = game.add.button(xPosition, btnYPosition, button, startPlay, this);
+        }
+        else if ( button === 'btnInstructions' )
+        {
+            btn = game.add.button(xPosition, btnYPosition, button, startInstructions, this);
+        }
+
         btn.anchor.setTo(0.5);
 
         if (button === 'btnA' || button === 'btnB')
@@ -48,6 +58,12 @@ function createInit()
     });
 }
 
-function startPlay() {
+function startPlay()
+{
     game.state.start('play');
+}
+
+function startInstructions()
+{
+    game.state.start('instructions');
 }

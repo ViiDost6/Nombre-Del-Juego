@@ -9,7 +9,6 @@ window.onload = startGame;
 function startGame() {
     game.state.add('init', initState);
     game.state.add('play', playState);
-    // game.state.add('hof', hofState);
-
+    game.state.add('instructions', instructionsState);
     game.state.start('init');
 }
