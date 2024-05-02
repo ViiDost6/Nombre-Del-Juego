@@ -52,7 +52,7 @@ let playState = { // GAME PHASES
 
 //// MOVEMENT FUNCTIONS
 
-// MoveCharacter()
+// UpdateCharacter()
 // CheckDash()
 // CheckSprint()
 // SmoothStopping()
@@ -102,51 +102,52 @@ class Enemy
 
 class Weapon
 {
-    constructor (nbullets, sprite, distance, speed, rate, variance)
+    constructor ( nbullets , sprite , distance , speed , rate , variance )
     {
-        
-        this.core = game.add.weapon( nbullets , sprite ); // 6 IS THE NUMBER OF BULLETS
-        this.core.trackSprite( character , 25 , -25 , true ); // 25, -25 IS THE OFFSET OF THE BULLET RESPECT TO THE CHARACTER
+        this.core = game.add.weapon( nbullets , sprite ); // CREATE THE WEAPON
+        this.core.trackSprite( character , 25 , -25 , true ); // TRACK THE CHARACTER
         this.core.bulletKillType = Phaser.Weapon.KILL_DISTANCE; // KILL THE BULLET WHEN IT REACHES A CERTAIN DISTANCE
         this.core.bulletKillDistance = distance; // THE DISTANCE TO KILL THE BULLET
         this.core.bulletSpeed = speed; // THE SPEED OF THE BULLET
         this.core.fireRate = rate; // THE FIRE RATE OF THE BULLET
         this.core.bulletAngleVariance = variance; // THE VARIANCE OF THE ANGLE OF THE BULLET
         this.core.setBulletFrames( 0 , nbullets - 1 , true ); // SET THE FRAMES OF THE BULLET
-        this.nbullets = nbullets;
+        this.nbullets = nbullets; // THE NUMBER OF BULLETS
     }
 
     Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
     {
-        let bulletsshoots = this.core.shots; // GET THE NUMBER OF BULLETS SHOT
+        let shotsThatHaveBeenShot = this.core.shots; // GET THE NUMBER OF BULLETS SHOT
 
         // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
         // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
         
-        let canShoot = game.input.activePointer.leftButton.isDown && bulletsshoots == 0;
-        let isShooting = bulletsshoots > 0 && bulletsshoots < this.nbullets;
-        let needsReload = bulletsshoots == this.nbullets;
+        let canShoot = game.input.activePointer.leftButton.isDown && shotsThatHaveBeenShot == 0;
+        let isShooting = shotsThatHaveBeenShot > 0 && shotsThatHaveBeenShot < this.nbullets;
+        let needsReload = shotsThatHaveBeenShot == this.nbullets;
 
-        console.log( bulletsshoots );
-        console.log( "max = ", this.nbullets );
+        // console.log( shotsThatHaveBeenShot );
+        // console.log( "max = ", this.nbullets );
+
         if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
         {
             this.core.fireAtPointer( game.input.activePointer );  
-            console.log( 'shoot' );
+            // console.log( 'shoot' );
         }
         else if ( isShooting )
         {
             this.core.fireAtPointer( game.input.activePointer );
-            console.log( 'shoot loop' );
+            // console.log( 'shoot loop' );
         }   
         else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
         {
-            bulletsshoots = this.core.resetShots();
-            console.log( 'reload' );
+            shotsThatHaveBeenShot = this.core.resetShots();
+            // console.log( 'reload' );
         }
     }
 
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,14 +163,11 @@ function CreatePlay () // SET UP THE GAME
     CreateBackground();
     CreateCharacter();
     CreateHUD();
-    pistol = new Weapon( 6 , 'bullets' , 300 , 250 , 100 , 20 );
 }
 
 function UpdatePlay () // GAME LOOP
 {
-    MoveCharacter();
-    pistol.Shoot();
-    
+    UpdateCharacter();    
 }
 
 function CreateTimers ()
@@ -212,19 +210,22 @@ function CreateCharacter ()
 
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( character );
+
+    // SET UP THE WEAPON FOR THE CHARACTER
+    pistol = new Weapon( 6 , 'bullets' , 300 , 250 , 100 , 20 );
 }
 
 function CreateHUD ()
 {
-    hudGroup = game.add.group();
-    sprintBar = hudGroup.create( 5 , 595 , 'sprintBar' );
-    sprintBar.anchor.setTo( 0 , 1 );
-    sprintHolder = hudGroup.create( 5 , 595 , 'sprintHolder' );
-    sprintHolder.anchor.setTo( 0 , 1 );
-    checkDash = hudGroup.create( 5 , 350 , 'check_dash' );
-    checkDash.visible = false;
-    checkDash.anchor.setTo( 0 , 1 );
-    hudGroup.fixedToCamera = true;
+    hudGroup = game.add.group(); // GROUP FOR THE HUD
+    sprintBar = hudGroup.create( 5 , 595 , 'sprintBar' ); // SPRINT BAR
+    sprintBar.anchor.setTo( 0 , 1 ); // ANCHOR THE SPRINT BAR
+    sprintHolder = hudGroup.create( 5 , 595 , 'sprintHolder' ); // SPRINT HOLDER
+    sprintHolder.anchor.setTo( 0 , 1 ); // ANCHOR THE SPRINT HOLDER
+    checkDash = hudGroup.create( 5 , 350 , 'check_dash' ); // CHECK DASH
+    checkDash.visible = false; // HIDE THE CHECK DASH
+    checkDash.anchor.setTo( 0 , 1 ); // ANCHOR THE CHECK DASH
+    hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,14 +234,14 @@ function CreateHUD ()
 
 function UpdateSprintBar ()
 {
-    sprintBar.scale.y = sprintLeft / TOTAL_SPRINT;
+    sprintBar.scale.y = sprintLeft / TOTAL_SPRINT; // SCALE THE SPRINT BAR
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MOVEMENT FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
+function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 {
     let canMoveLeftwards = game.input.keyboard.isDown( Phaser.Keyboard.LEFT ) || game.input.keyboard.isDown( Phaser.Keyboard.A );
     let canMoveRightwards = game.input.keyboard.isDown( Phaser.Keyboard.RIGHT ) || game.input.keyboard.isDown( Phaser.Keyboard.D );
@@ -283,6 +284,7 @@ function MoveCharacter () // MOVEMENT AND SPRINT OF THE CHARACTER
     }
 
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
+    pistol.Shoot(); // SHOOT THE BULLET
 }
 
 function CheckDash () // DASH FUNCTIONALITY
@@ -413,4 +415,3 @@ function CheckBounds ()
         character.y = WORLD_HEIGHT;
     }
 }
-
