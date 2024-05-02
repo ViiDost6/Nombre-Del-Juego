@@ -111,8 +111,8 @@ class Weapon
         this.core.bulletSpeed = speed; // THE SPEED OF THE BULLET
         this.core.fireRate = rate; // THE FIRE RATE OF THE BULLET
         this.core.bulletAngleVariance = variance; // THE VARIANCE OF THE ANGLE OF THE BULLET
+        this.core.setBulletFrames( 0 , nbullets - 1 , true ); // SET THE FRAMES OF THE BULLET
         this.nbullets = nbullets;
-        
     }
 
     Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
@@ -161,7 +161,7 @@ function CreatePlay () // SET UP THE GAME
     CreateBackground();
     CreateCharacter();
     CreateHUD();
-    pistol = new Weapon( 6 , 'bullet' , 300 , 250 , 100 , 20 );
+    pistol = new Weapon( 6 , 'bullets' , 300 , 250 , 100 , 20 );
 }
 
 function UpdatePlay () // GAME LOOP
@@ -184,6 +184,7 @@ function CreateImages ()
     game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
     game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
+    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , 25 , 25 );
 }
 
 function CreateBackground ()
