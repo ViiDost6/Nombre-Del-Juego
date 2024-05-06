@@ -38,15 +38,16 @@ HUD_ANCHOR_X = 0 ,
 HUD_ANCHOR_Y = 1 ,
 DASH_INDICATOR_X = 5 ,
 DASH_INDICATOR_Y = 350 , 
-ZONE_1_MAX_ENEMIES = 5 ,
-ZONE_2_MAX_ENEMIES = 7 ,
+ZONE_1_MAX_ENEMIES = 20 ,
+ZONE_2_MAX_ENEMIES = 15 ,
 ZONE_3_MAX_ENEMIES = 10 ,
-ZONE_4_MAX_ENEMIES = 15 ,
-ZONE_5_MAX_ENEMIES = 20 , 
+ZONE_4_MAX_ENEMIES = 7 ,
+ZONE_5_MAX_ENEMIES = 5 , 
 BASIC_ENEMIES_ANCHOR_X = 0.5 ,
 BASIC_ENEMIES_ANCHOR_Y = 1 , 
 TIMER_BASIC_ENEMY_SPAWN = 0.1 * Phaser.Timer.SECOND , 
-PROBABILITY_BASIC_ENEMY_SPAWN = 0.2;
+PROBABILITY_BASIC_ENEMY_SPAWN = 0.2 , 
+ZONES_HEIGHT = 600;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
@@ -108,41 +109,31 @@ class SpawnerBasicEnemy
                 basicEnemiesZone1 = game.add.group();
                 basicEnemiesZone1.enableBody = true;
                 basicEnemiesZone1.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , sprite );
-                basicEnemiesZone1.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
                 basicEnemiesZone1.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-                basicEnemiesZone1.setAll( 'checkWorldBounds' , true );
                 break;
             case 2:
                 basicEnemiesZone2 = game.add.group();
                 basicEnemiesZone2.enableBody = true;
                 basicEnemiesZone2.createMultiple( ZONE_2_MAX_ENEMIES * difficultyMultiplier , sprite );
-                basicEnemiesZone2.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
                 basicEnemiesZone2.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-                basicEnemiesZone2.setAll( 'checkWorldBounds' , true );
                 break;
             case 3:
                 basicEnemiesZone3 = game.add.group();
                 basicEnemiesZone3.enableBody = true;
                 basicEnemiesZone3.createMultiple( ZONE_3_MAX_ENEMIES * difficultyMultiplier , sprite );
-                basicEnemiesZone3.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
                 basicEnemiesZone3.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-                basicEnemiesZone3.setAll( 'checkWorldBounds' , true );
                 break;
             case 4:
                 basicEnemiesZone4 = game.add.group();
                 basicEnemiesZone4.enableBody = true;
                 basicEnemiesZone4.createMultiple( ZONE_4_MAX_ENEMIES * difficultyMultiplier , sprite );
-                basicEnemiesZone4.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
                 basicEnemiesZone4.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-                basicEnemiesZone4.setAll( 'checkWorldBounds' , true );
                 break;
             case 5:
                 basicEnemiesZone5 = game.add.group();
                 basicEnemiesZone5.enableBody = true;
                 basicEnemiesZone5.createMultiple( ZONE_5_MAX_ENEMIES * difficultyMultiplier , sprite );
-                basicEnemiesZone5.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
                 basicEnemiesZone5.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-                basicEnemiesZone5.setAll( 'checkWorldBounds' , true );
                 break;
             default:
                 break;
@@ -161,26 +152,218 @@ class SpawnerBasicEnemy
         }
     }
 
-    basicPatrol(margenx1, margeny1, margenx2, margeny2, velocity = 100)
+    basicPatrol(zoneNumber, velocity = 100)
     {
-        if (posx == this.sprite.x && posy == this.sprite.y)
+        switch (zoneNumber)
         {
-            posx = Math.random() * (margenx2 - margenx1);
-            posy = Math.random() * (margeny2 - margeny1);
-        }
-        else{
-            this.physics.arcade.moveToXY(this.sprite, posx, posy, velocity);
+            case 1:
+                forEach (enemy in basicEnemiesZone1)
+                {
+                    if (posx == enemy.sprite.x && posy == enemy.sprite.y)
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        posx = enemy.body.width / 2 + xRandomSpawnCoordinate;
+                        
+                        let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                        let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        let yRandomSpawnCoordinate;
+
+                        do
+                        {
+                            yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                        } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                        posy = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    }
+                    else{
+                        enemy.physics.arcade.moveToXY(enemy.sprite, posx, posy, velocity);
+                    }
+                }
+                break;
+            case 2:
+                forEach (enemy in basicEnemiesZone2)
+                {
+                    if (posx == enemy.sprite.x && posy == enemy.sprite.y)
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        posx = enemy.body.width / 2 + xRandomSpawnCoordinate;
+                        
+                        let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                        let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        let yRandomSpawnCoordinate;
+
+                        do
+                        {
+                            yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                        } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                        posy = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    }
+                    else{
+                        enemy.physics.arcade.moveToXY(enemy.sprite, posx, posy, velocity);
+                    }
+                }
+                break;
+            case 3:
+                forEach (enemy in basicEnemiesZone3)
+                {
+                    if (posx == enemy.sprite.x && posy == enemy.sprite.y)
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        posx = enemy.body.width / 2 + xRandomSpawnCoordinate;
+                        
+                        let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                        let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        let yRandomSpawnCoordinate;
+
+                        do
+                        {
+                            yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                        } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                        posy = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    }
+                    else{
+                        enemy.physics.arcade.moveToXY(enemy.sprite, posx, posy, velocity);
+                    }
+                }
+                break;
+            case 4:
+                forEach (enemy in basicEnemiesZone4)
+                {
+                    if (posx == enemy.sprite.x && posy == enemy.sprite.y)
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        posx = enemy.body.width / 2 + xRandomSpawnCoordinate;
+                        
+                        let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                        let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        let yRandomSpawnCoordinate;
+
+                        do
+                        {
+                            yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                        } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                        posy = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    }
+                    else{
+                        enemy.physics.arcade.moveToXY(enemy.sprite, posx, posy, velocity);
+                    }
+                }
+                break;
+            case 5:
+                forEach (enemy in basicEnemiesZone5)
+                {
+                    if (posx == enemy.sprite.x && posy == enemy.sprite.y)
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        posx = enemy.body.width / 2 + xRandomSpawnCoordinate;
+                        
+                        let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                        let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        let yRandomSpawnCoordinate;
+
+                        do
+                        {
+                            yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                        } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                        posy = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    }
+                    else{
+                        enemy.physics.arcade.moveToXY(enemy.sprite, posx, posy, velocity);
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
 
-    moveEnemy (player, distance = 200,  velocity = 100)
+    moveEnemy (zoneNumber,player, distance = 200,  velocity = 100)
     {
-        if (game.physics.arcade.distanceBetween(player, this.sprite) < distance)
+        switch ( zoneNumber )
         {
-            game.physics.arcade.moveToObject(this.sprite, player, velocity);
-        }else {
-            this.basicPatrol(0, 600*zoneNumber, 2400, 600*(zoneNumber+1), velocity);
+            case 1:
+                basicEnemiesZone1.forEach( CheckDistance , this );
+                forEach (enemy in basicEnemiesZone1)
+                {
+                    if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+                    {
+                        game.physics.arcade.moveToObject(enemy, player, velocity);
+                    }else {
+                        this.basicPatrol(1, velocity);
+                    }
+                }
+                break;
+            case 2:
+                forEach (enemy in basicEnemiesZone2)
+                {
+                    if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+                    {
+                        game.physics.arcade.moveToObject(enemy, player, velocity);
+                    }else {
+                        this.basicPatrol(2, velocity);
+                    }
+                }
+                break;
+            case 3:
+                forEach (enemy in basicEnemiesZone3)
+                {
+                    if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+                    {
+                        game.physics.arcade.moveToObject(enemy, player, velocity);
+                    }else {
+                        this.basicPatrol(3, velocity);
+                    }
+                }
+                break;
+            case 4:
+                forEach (enemy in basicEnemiesZone4)
+                {
+                    if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+                    {
+                        game.physics.arcade.moveToObject(enemy, player, velocity);
+                    }else {
+                        this.basicPatrol(4, velocity);
+                    }
+                }
+                break;
+            case 5:
+                forEach (enemy in basicEnemiesZone5)
+                {
+                    if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+                    {
+                        game.physics.arcade.moveToObject(enemy, player, velocity);
+                    }else {
+                        this.basicPatrol(5, velocity);
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
     
@@ -196,59 +379,18 @@ class SpawnerBasicEnemy
             {
                 case 1:
                     enemy = basicEnemiesZone1.getFirstExists( false );
-
-                    if ( enemy )
-                    {
-                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
-                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
-                        let xSpawnCoordinate = enemy.body.width / 2 + xRandomSpawnCoordinate;
-
-                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
-
-                        enemy.reset( xSpawnCoordinate , Math.random() * WORLD_HEIGHT );
-                        enemy.body.velocity.x = 0;
-                        enemy.body.velocity.y = 0;
-                    }
                     break;
                 case 2:
                     enemy = basicEnemiesZone2.getFirstExists( false );
-
-                    if ( enemy )
-                    {
-                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
-                        enemy.body.velocity.x = 0;
-                        enemy.body.velocity.y = 0;
-                    }
                     break;
                 case 3:
                     enemy = basicEnemiesZone3.getFirstExists( false );
-
-                    if ( enemy )
-                    {
-                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
-                        enemy.body.velocity.x = 0;
-                        enemy.body.velocity.y = 0;
-                    }
                     break;
                 case 4:
                     enemy = basicEnemiesZone4.getFirstExists( false );
-
-                    if ( enemy )
-                    {
-                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
-                        enemy.body.velocity.x = 0;
-                        enemy.body.velocity.y = 0;
-                    }
                     break;
                 case 5:
                     enemy = basicEnemiesZone5.getFirstExists( false );
-
-                    if ( enemy )
-                    {
-                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
-                        enemy.body.velocity.x = 0;
-                        enemy.body.velocity.y = 0;
-                    }
                     break;
                 default:
                     break;
@@ -256,9 +398,25 @@ class SpawnerBasicEnemy
 
             if ( enemy )
             {
-                enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
-                enemy.body.velocity.x = 0;
-                enemy.body.velocity.y = 0;
+                let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                let xSpawnCoordinate = enemy.body.width / 2 + xRandomSpawnCoordinate;
+
+                let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                let yRandomSpawnCoordinate;
+
+                do
+                {
+                    yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                let ySpawnCoordinate = enemy.body.height / 2 + yRandomSpawnCoordinate;
+
+                enemy.reset( xSpawnCoordinate , ySpawnCoordinate );
             }
         }
     }
@@ -333,7 +491,11 @@ function CreatePlay () // SET UP THE GAME
 function UpdatePlay () // GAME LOOP
 {
     UpdateCharacter();
-    UpdateEnemies();   
+    spawn1.moveEnemy(1,character);
+    spawn2.moveEnemy(2,character);
+    spawn3.moveEnemy(3,character);
+    spawn4.moveEnemy(4,character);
+    spawn5.moveEnemy(5,character);
 }
 
 function CreateEnemies ()
@@ -344,15 +506,12 @@ function CreateEnemies ()
     spawn4 = new SpawnerBasicEnemy( 4 , 'basicEnemy' );
     spawn5 = new SpawnerBasicEnemy( 5 , 'basicEnemy' );
 
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies( 1 ) , this );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies( 2 ) , this );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies( 3 ) , this );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies( 4 ) , this );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies( 5 ) , this );
-}
-
-function UpdateEnemies ()
-{
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies , this , 1 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies , this , 2 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies , this , 3 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
+    
 }
 
 function CreateTimers ()
@@ -385,7 +544,7 @@ function CreateBackground ()
 
 function CreateCharacter ()
 {
-    character = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'player' );
+    character = game.add.sprite( GAME_STAGE_WIDTH / 2 , 2900 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     
     game.physics.arcade.enable( character );
