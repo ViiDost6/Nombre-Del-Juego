@@ -47,7 +47,9 @@ BASIC_ENEMIES_ANCHOR_X = 0.5 ,
 BASIC_ENEMIES_ANCHOR_Y = 1 , 
 TIMER_BASIC_ENEMY_SPAWN = 0.1 * Phaser.Timer.SECOND , 
 PROBABILITY_BASIC_ENEMY_SPAWN = 0.2 , 
-ZONES_HEIGHT = 600;
+ZONES_HEIGHT = 600 , 
+DISTANCE_DETECTION_ENEMY = 200 , 
+DEFAULT_VELOCITY_ENEMY = 100;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
@@ -56,46 +58,6 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-
-class BasicEnemy
-{
-    static enemyGroups = {};
-
-    constructor ( x , y , zoneNumber )
-    {
-        this.sprite = game.add.sprite( x , y , sprite );
-        game.physics.arcade.enable( this.sprite );
-        this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
-        this.zoneNumber = zoneNumber;
-
-        // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
-
-        let groupDoesntExist = ! Enemy.enemyGroups[ zoneNumber ];
-
-        if ( groupDoesntExist )
-        {
-            Enemy.enemyGroups[ zoneNumber ] = game.add.group();
-        }
-
-        Enemy.enemyGroups[ zoneNumber ].add( this.sprite );
-    }
-
-    static NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
-    {
-        if ( Enemy.enemyGroups[ zoneNumber ] )
-        {
-            return Enemy.enemyGroups[ zoneNumber ].countLiving();
-        }
-        else
-        {
-            return 0;
-        }
-    }
-}
-
-*/
 
 class SpawnerBasicEnemy
 {
@@ -152,78 +114,49 @@ class SpawnerBasicEnemy
         }
     }
 
-    basicPatrol(zoneNumber, velocity = 100)
+    MoveEnemies ( zoneNumber )
     {
         switch (zoneNumber)
         {
             case 1:
-                basicEnemiesZone1.forEach( MoveEnemy , this , zoneNumber , velocity);
+                basicEnemiesZone1.forEach( this.MoveSingleEnemy , this , zoneNumber);
                 break;
             case 2:
-                basicEnemiesZone2.forEach( MoveEnemy , this , zoneNumber , velocity);
+                basicEnemiesZone2.forEach( this.MoveSingleEnemy , this , zoneNumber);
                 break;
             case 3:
-                basicEnemiesZone3.forEach( MoveEnemy , this , zoneNumber , velocity);
+                basicEnemiesZone3.forEach( this.MoveSingleEnemy , this , zoneNumber);
                 break;
             case 4:
-                basicEnemiesZone4.forEach( MoveEnemy , this , zoneNumber , velocity);
+                basicEnemiesZone4.forEach( this.MoveSingleEnemy , this , zoneNumber);
                 break;
             case 5:
-                basicEnemiesZone5.forEach( MoveEnemy , this , zoneNumber , velocity);
+                basicEnemiesZone5.forEach( this.MoveSingleEnemy , this , zoneNumber);
                 break;
             default:
                 break;
         }
     }
 
-    MoveEnemy ( enemy , zoneNumber , velocity )
+    MoveSingleEnemy ( enemy , zoneNumber )
     {
-        let minusOrPlusX = Math.floor( Math.random() * 2 );
-        let minusOrPlusY = Math.floor( Math.random() * 2 );
-
-        minusOrPlusX = minusOrPlusX == 0 ? -1 : 1;
-        minusOrPlusY = minusOrPlusY == 0 ? -1 : 1;
-
-        let enemyVelocityX = Math.floor( Math.random() * velocity * minusOrPlusX );
-        let enemyVelocityY = Math.floor( Math.random() * velocity * minusOrPlusY );
-
-        enemy.body.velocity.x = enemyVelocityX;
-        enemy.body.velocity.y = enemyVelocityY;
-
-
-    }
-
-    CheckDistance ( enemy , zoneNumber , player , distance , velocity )
-    {
-        if (game.physics.arcade.distanceBetween(player, enemy) < distance)
+        if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
         {
-            game.physics.arcade.moveToObject(enemy, player, velocity);
-        }else {
-            this.basicPatrol(zoneNumber, velocity);
+            game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
         }
-    }
-
-    moveEnemy (zoneNumber,player, distance = 200,  velocity = 100)
-    {
-        switch ( zoneNumber )
+        else
         {
-            case 1:
-                basicEnemiesZone1.forEach( (enemy) => this.CheckDistance(enemy, zoneNumber, player, distance, velocity) );
-                break;
-            case 2:
-                basicEnemiesZone2.forEach( (enemy) => this.CheckDistance(enemy, zoneNumber, player, distance, velocity) );
-                break;
-            case 3:
-                basicEnemiesZone3.forEach( (enemy) => this.CheckDistance(enemy, zoneNumber, player, distance, velocity) );
-                break;
-            case 4:
-                basicEnemiesZone4.forEach( (enemy) => this.CheckDistance(enemy, zoneNumber, player, distance, velocity) );
-                break;
-            case 5:
-                basicEnemiesZone5.forEach( (enemy) => this.CheckDistance(enemy, zoneNumber, player, distance, velocity) );
-                break;
-            default:
-                break;
+            let minusOrPlusX = Math.floor( Math.random() * 2 );
+            let minusOrPlusY = Math.floor( Math.random() * 2 );
+
+            minusOrPlusX = minusOrPlusX == 0 ? -1 : 1;
+            minusOrPlusY = minusOrPlusY == 0 ? -1 : 1;
+
+            let enemyVelocityX = Math.floor( Math.random() * velocity * minusOrPlusX );
+            let enemyVelocityY = Math.floor( Math.random() * velocity * minusOrPlusY );
+
+            enemy.body.velocity.x = enemyVelocityX;
+            enemy.body.velocity.y = enemyVelocityY;
         }
     }
     
@@ -351,11 +284,16 @@ function CreatePlay () // SET UP THE GAME
 function UpdatePlay () // GAME LOOP
 {
     UpdateCharacter();
-    spawn1.basicPatrol(1,character);
-    spawn2.basicPatrol(2,character);
-    spawn3.basicPatrol(3,character);
-    spawn4.basicPatrol(4,character);
-    spawn5.basicPatrol(5,character);
+    UpdateEnemies();
+}
+
+function UpdateEnemies ()
+{
+    spawn1.MoveEnemies(1,character);
+    spawn2.MoveEnemies(2,character);
+    spawn3.MoveEnemies(3,character);
+    spawn4.MoveEnemies(4,character);
+    spawn5.MoveEnemies(5,character);
 }
 
 function CreateEnemies ()
