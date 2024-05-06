@@ -132,6 +132,69 @@ class BasicEnemy
 
 */
 
+class Enemy
+{
+    enemyGroup = {};
+
+    constructor ( x , y , zoneNumber , sprite )
+    {
+        this.sprite = game.add.sprite( x , y , sprite );
+        game.physics.arcade.enable( this.sprite );
+        this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
+        this.zoneNumber = zoneNumber;
+
+        this.posx = this.sprite.x; 
+        this.posy = this.sprite.y;
+
+        // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
+
+        let groupDoesntExist = ! Enemy.enemyGroup[ zoneNumber ];
+
+        if ( groupDoesntExist )
+        {
+            Enemy.enemyGroup[ zoneNumber ] = game.add.group();
+        }
+
+        Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
+    }
+
+    NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
+    {
+        if ( Enemy.enemyGroup[ zoneNumber ] )
+        {
+            return Enemy.enemyGroup[ zoneNumber ].countLiving();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    basicPatrol(margenx1, margeny1, margenx2, margeny2, velocity = 100)
+    {
+        if (posx == this.sprite.x && posy == this.sprite.y)
+        {
+            posx = Math.random() * (margenx2 - margenx1);
+            posy = Math.random() * (margeny2 - margeny1);
+        }
+        else{
+            this.physics.arcade.moveToXY(this.sprite, posx, posy, velocity);
+        }
+    }
+
+
+    moveEnemy (player, distance = 200,  velocity = 100)
+    {
+        if (game.physics.arcade.distanceBetween(player, this.sprite) < distance)
+        {
+            game.physics.arcade.moveToObject(this.sprite, player, velocity);
+        }else {
+            this.basicPatrol(0, 600*zoneNumber, 2400, 600*(zoneNumber+1), velocity);
+        }
+    }
+    
+}
+
 class Weapon
 {
     constructor ( nbullets , sprite , distance , speed , rate , variance )

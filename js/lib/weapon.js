@@ -160,7 +160,7 @@ class Weapon
 
 class Enemy
 {
-    static enemyGroup = {};
+    enemyGroup = {};
 
     constructor ( x , y , zoneNumber , sprite )
     {
@@ -169,7 +169,7 @@ class Enemy
         this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
         this.zoneNumber = zoneNumber;
 
-        this.posx = this.sprite.x;
+        this.posx = this.sprite.x; 
         this.posy = this.sprite.y;
 
         // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
@@ -184,7 +184,7 @@ class Enemy
         Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
     }
 
-    static NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
+    NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
     {
         if ( Enemy.enemyGroup[ zoneNumber ] )
         {
@@ -196,7 +196,7 @@ class Enemy
         }
     }
 
-    static basicPatrol(margenx1, margeny1, margenx2, margeny2, velocity = 100)
+    basicPatrol(margenx1, margeny1, margenx2, margeny2, velocity = 100)
     {
         if (posx == this.sprite.x && posy == this.sprite.y)
         {
@@ -209,7 +209,7 @@ class Enemy
     }
 
 
-    static moveEnemy (player, distance = 200,  velocity = 100)
+    moveEnemy (player, distance = 200,  velocity = 100)
     {
         if (game.physics.arcade.distanceBetween(player, this.sprite) < distance)
         {
