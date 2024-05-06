@@ -44,49 +44,13 @@ ZONE_3_MAX_ENEMIES = 10 ,
 ZONE_4_MAX_ENEMIES = 15 ,
 ZONE_5_MAX_ENEMIES = 20 , 
 BASIC_ENEMIES_ANCHOR_X = 0.5 ,
-BASIC_ENEMIES_ANCHOR_Y = 1;
+BASIC_ENEMIES_ANCHOR_Y = 1 , 
+TIMER_BASIC_ENEMY_SPAWN = 0.1 * Phaser.Timer.SECOND , 
+PROBABILITY_BASIC_ENEMY_SPAWN = 0.2;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
-basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5;
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// INDEX (YOU CAN USE CTRL+F3 TO FIND THE FUNCTIONS)
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//// CLASSES
-
-// BasicEnemy()
-// Weapon()
-
-//// MAIN FUNCTIONS
-
-// PreloadPlay()
-// CreatePlay()
-// UpdatePlay()
-// CreateTimers()
-// CreateImages()
-// CreateBackground()
-// CreateCharacter()
-// CreateHUD()
-// CreateEnemies()
-
-//// HUD FUNCTIONS
-
-// UpdateSprintBar()
-
-//// MOVEMENT FUNCTIONS
-
-// UpdateCharacter()
-// CheckDash()
-// CheckSprint()
-// SmoothStopping()
-// RotateTowardsMouse()
-// Sprint()
-// CheckBounds()
-// CheckMovement()
+basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -132,30 +96,57 @@ class BasicEnemy
 
 */
 
-class Enemy
+class SpawnerBasicEnemy
 {
-    enemyGroup = {};
-
-    constructor ( x , y , zoneNumber , sprite )
+    constructor ( zoneNumber , sprite )
     {
-        this.sprite = game.add.sprite( x , y , sprite );
-        game.physics.arcade.enable( this.sprite );
-        this.sprite.anchor.setTo( ANCHOR_X , ANCHOR_Y );
-        this.zoneNumber = zoneNumber;
-
-        this.posx = this.sprite.x; 
-        this.posy = this.sprite.y;
-
         // IT ADDS THE ENEMY TO THE GROUP OF THE SPECIFIED ZONE
 
-        let groupDoesntExist = ! Enemy.enemyGroup[ zoneNumber ];
-
-        if ( groupDoesntExist )
+        switch ( zoneNumber )
         {
-            Enemy.enemyGroup[ zoneNumber ] = game.add.group();
+            case 1:
+                basicEnemiesZone1 = game.add.group();
+                basicEnemiesZone1.enableBody = true;
+                basicEnemiesZone1.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , sprite );
+                basicEnemiesZone1.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+                basicEnemiesZone1.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone1.setAll( 'checkWorldBounds' , true );
+                break;
+            case 2:
+                basicEnemiesZone2 = game.add.group();
+                basicEnemiesZone2.enableBody = true;
+                basicEnemiesZone2.createMultiple( ZONE_2_MAX_ENEMIES * difficultyMultiplier , sprite );
+                basicEnemiesZone2.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+                basicEnemiesZone2.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone2.setAll( 'checkWorldBounds' , true );
+                break;
+            case 3:
+                basicEnemiesZone3 = game.add.group();
+                basicEnemiesZone3.enableBody = true;
+                basicEnemiesZone3.createMultiple( ZONE_3_MAX_ENEMIES * difficultyMultiplier , sprite );
+                basicEnemiesZone3.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+                basicEnemiesZone3.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone3.setAll( 'checkWorldBounds' , true );
+                break;
+            case 4:
+                basicEnemiesZone4 = game.add.group();
+                basicEnemiesZone4.enableBody = true;
+                basicEnemiesZone4.createMultiple( ZONE_4_MAX_ENEMIES * difficultyMultiplier , sprite );
+                basicEnemiesZone4.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+                basicEnemiesZone4.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone4.setAll( 'checkWorldBounds' , true );
+                break;
+            case 5:
+                basicEnemiesZone5 = game.add.group();
+                basicEnemiesZone5.enableBody = true;
+                basicEnemiesZone5.createMultiple( ZONE_5_MAX_ENEMIES * difficultyMultiplier , sprite );
+                basicEnemiesZone5.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
+                basicEnemiesZone5.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone5.setAll( 'checkWorldBounds' , true );
+                break;
+            default:
+                break;
         }
-
-        Enemy.enemyGroup[ zoneNumber ].add( this.sprite );
     }
 
     NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
@@ -193,6 +184,84 @@ class Enemy
         }
     }
     
+    SpawnEnemies ( zoneNumber )
+    {
+        let canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN;
+
+        if ( canSpawn )
+        {
+            let enemy;
+
+            switch ( zoneNumber )
+            {
+                case 1:
+                    enemy = basicEnemiesZone1.getFirstExists( false );
+
+                    if ( enemy )
+                    {
+                        let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                        let xSpawnCoordinate = enemy.body.width / 2 + xRandomSpawnCoordinate;
+
+                        let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+
+                        enemy.reset( xSpawnCoordinate , Math.random() * WORLD_HEIGHT );
+                        enemy.body.velocity.x = 0;
+                        enemy.body.velocity.y = 0;
+                    }
+                    break;
+                case 2:
+                    enemy = basicEnemiesZone2.getFirstExists( false );
+
+                    if ( enemy )
+                    {
+                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
+                        enemy.body.velocity.x = 0;
+                        enemy.body.velocity.y = 0;
+                    }
+                    break;
+                case 3:
+                    enemy = basicEnemiesZone3.getFirstExists( false );
+
+                    if ( enemy )
+                    {
+                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
+                        enemy.body.velocity.x = 0;
+                        enemy.body.velocity.y = 0;
+                    }
+                    break;
+                case 4:
+                    enemy = basicEnemiesZone4.getFirstExists( false );
+
+                    if ( enemy )
+                    {
+                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
+                        enemy.body.velocity.x = 0;
+                        enemy.body.velocity.y = 0;
+                    }
+                    break;
+                case 5:
+                    enemy = basicEnemiesZone5.getFirstExists( false );
+
+                    if ( enemy )
+                    {
+                        enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
+                        enemy.body.velocity.x = 0;
+                        enemy.body.velocity.y = 0;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if ( enemy )
+            {
+                enemy.reset( Math.random() * WORLD_WIDTH , Math.random() * WORLD_HEIGHT );
+                enemy.body.velocity.x = 0;
+                enemy.body.velocity.y = 0;
+            }
+        }
+    }
 }
 
 class Weapon
@@ -258,11 +327,32 @@ function CreatePlay () // SET UP THE GAME
     CreateBackground();
     CreateCharacter();
     CreateHUD();
+    CreateEnemies();
 }
 
 function UpdatePlay () // GAME LOOP
 {
-    UpdateCharacter();    
+    UpdateCharacter();
+    UpdateEnemies();   
+}
+
+function CreateEnemies ()
+{
+    spawn1 = new SpawnerBasicEnemy( 1 , 'basicEnemy' );
+    spawn2 = new SpawnerBasicEnemy( 2 , 'basicEnemy' );
+    spawn3 = new SpawnerBasicEnemy( 3 , 'basicEnemy' );
+    spawn4 = new SpawnerBasicEnemy( 4 , 'basicEnemy' );
+    spawn5 = new SpawnerBasicEnemy( 5 , 'basicEnemy' );
+
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies( 1 ) , this );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies( 2 ) , this );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies( 3 ) , this );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies( 4 ) , this );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies( 5 ) , this );
+}
+
+function UpdateEnemies ()
+{
 }
 
 function CreateTimers ()
@@ -322,45 +412,6 @@ function CreateHUD ()
     checkDash.visible = false; // HIDE THE CHECK DASH
     checkDash.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
-}
-
-function CreateEnemies ()
-{
-    basicEnemiesZone1 = game.add.group();
-    basicEnemiesZone2 = game.add.group();
-    basicEnemiesZone3 = game.add.group();
-    basicEnemiesZone4 = game.add.group();
-    basicEnemiesZone5 = game.add.group();
-
-    basicEnemiesZone1.enableBody = true;
-    basicEnemiesZone2.enableBody = true;
-    basicEnemiesZone3.enableBody = true;
-    basicEnemiesZone4.enableBody = true;
-    basicEnemiesZone5.enableBody = true;
-
-    basicEnemiesZone1.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
-    basicEnemiesZone2.createMultiple( ZONE_2_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
-    basicEnemiesZone3.createMultiple( ZONE_3_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
-    basicEnemiesZone4.createMultiple( ZONE_4_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
-    basicEnemiesZone5.createMultiple( ZONE_5_MAX_ENEMIES * difficultyMultiplier , 'basicEnemy' );
-
-    basicEnemiesZone1.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
-    basicEnemiesZone2.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
-    basicEnemiesZone3.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
-    basicEnemiesZone4.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
-    basicEnemiesZone5.callAll( 'events.onOutOfBounds.add' , 'events.onOutOfBounds' , resetMember );
-
-    basicEnemiesZone1.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-    basicEnemiesZone2.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-    basicEnemiesZone3.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-    basicEnemiesZone4.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-    basicEnemiesZone5.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-
-    basicEnemiesZone1.setAll( 'checkWorldBounds' , true );
-    basicEnemiesZone2.setAll( 'checkWorldBounds' , true );
-    basicEnemiesZone3.setAll( 'checkWorldBounds' , true );
-    basicEnemiesZone4.setAll( 'checkWorldBounds' , true );
-    basicEnemiesZone5.setAll( 'checkWorldBounds' , true );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
