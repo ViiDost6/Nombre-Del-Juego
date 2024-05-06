@@ -119,26 +119,26 @@ class SpawnerBasicEnemy
         switch (zoneNumber)
         {
             case 1:
-                basicEnemiesZone1.forEach( this.MoveSingleEnemy , this , zoneNumber);
+                basicEnemiesZone1.forEach( this.MoveSingleEnemy , this);
                 break;
             case 2:
-                basicEnemiesZone2.forEach( this.MoveSingleEnemy , this , zoneNumber);
+                basicEnemiesZone2.forEach( this.MoveSingleEnemy , this);
                 break;
             case 3:
-                basicEnemiesZone3.forEach( this.MoveSingleEnemy , this , zoneNumber);
+                basicEnemiesZone3.forEach( this.MoveSingleEnemy , this);
                 break;
             case 4:
-                basicEnemiesZone4.forEach( this.MoveSingleEnemy , this , zoneNumber);
+                basicEnemiesZone4.forEach( this.MoveSingleEnemy , this);
                 break;
             case 5:
-                basicEnemiesZone5.forEach( this.MoveSingleEnemy , this , zoneNumber);
+                basicEnemiesZone5.forEach( this.MoveSingleEnemy , this);
                 break;
             default:
                 break;
         }
     }
 
-    MoveSingleEnemy ( enemy , zoneNumber )
+    MoveSingleEnemy ( enemy )
     {
         if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
         {
@@ -152,8 +152,8 @@ class SpawnerBasicEnemy
             minusOrPlusX = minusOrPlusX == 0 ? -1 : 1;
             minusOrPlusY = minusOrPlusY == 0 ? -1 : 1;
 
-            let enemyVelocityX = Math.floor( Math.random() * velocity * minusOrPlusX );
-            let enemyVelocityY = Math.floor( Math.random() * velocity * minusOrPlusY );
+            let enemyVelocityX = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusX );
+            let enemyVelocityY = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusY );
 
             enemy.body.velocity.x = enemyVelocityX;
             enemy.body.velocity.y = enemyVelocityY;
@@ -309,7 +309,6 @@ function CreateEnemies ()
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies , this , 3 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
-    
 }
 
 function CreateTimers ()
