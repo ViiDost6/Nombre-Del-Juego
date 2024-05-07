@@ -119,30 +119,37 @@ class SpawnerBasicEnemy
         switch (zoneNumber)
         {
             case 1:
-                basicEnemiesZone1.forEach( this.MoveSingleEnemy , this);
+                basicEnemiesZone1.forEach( this.MoveSingleEnemy , this , zoneNumber );
                 break;
             case 2:
-                basicEnemiesZone2.forEach( this.MoveSingleEnemy , this);
+                basicEnemiesZone2.forEach( this.MoveSingleEnemy , this , zoneNumber );
                 break;
             case 3:
-                basicEnemiesZone3.forEach( this.MoveSingleEnemy , this);
+                basicEnemiesZone3.forEach( this.MoveSingleEnemy , this , zoneNumber );
                 break;
             case 4:
-                basicEnemiesZone4.forEach( this.MoveSingleEnemy , this);
+                basicEnemiesZone4.forEach( this.MoveSingleEnemy , this , zoneNumber );
                 break;
             case 5:
-                basicEnemiesZone5.forEach( this.MoveSingleEnemy , this);
+                basicEnemiesZone5.forEach( this.MoveSingleEnemy , this , zoneNumber );
                 break;
             default:
                 break;
         }
     }
 
-    MoveSingleEnemy ( enemy )
+    MoveSingleEnemy ( enemy , zoneNumber )
     {
-        if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
+        if ( enemy.x == character.x && enemy.y == character.y )
         {
-            game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+            enemy.body.velocity.x = 0;
+            enemy.body.velocity.y = 0;
+        }
+        else if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
+        {
+            enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+
+            enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
         }
         else
         {
@@ -155,8 +162,8 @@ class SpawnerBasicEnemy
             let enemyVelocityX = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusX );
             let enemyVelocityY = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusY );
 
-            enemy.body.velocity.x = enemyVelocityX;
-            enemy.body.velocity.y = enemyVelocityY;
+            enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x = -enemyVelocityX : enemy.body.velocity.x = enemyVelocityX;
+            enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
         }
     }
     
@@ -284,16 +291,15 @@ function CreatePlay () // SET UP THE GAME
 function UpdatePlay () // GAME LOOP
 {
     UpdateCharacter();
-    UpdateEnemies();
 }
 
 function UpdateEnemies ()
 {
-    spawn1.MoveEnemies(1,character);
-    spawn2.MoveEnemies(2,character);
-    spawn3.MoveEnemies(3,character);
-    spawn4.MoveEnemies(4,character);
-    spawn5.MoveEnemies(5,character);
+    spawn1.MoveEnemies(1);
+    spawn2.MoveEnemies(2);
+    spawn3.MoveEnemies(3);
+    spawn4.MoveEnemies(4);
+    spawn5.MoveEnemies(5);
 }
 
 function CreateEnemies ()
@@ -309,6 +315,8 @@ function CreateEnemies ()
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies , this , 3 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
+
+    setInterval( UpdateEnemies , 1000 );
 }
 
 function CreateTimers ()
@@ -327,6 +335,7 @@ function CreateImages ()
     game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
     game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
     game.load.image( 'basicEnemy' , 'assets/imgs/Base_Enemy.png' );
+    game.load.image( 'barrier' , 'assets/imgs/barrier.png' );
 }
 
 function CreateBackground ()
@@ -337,6 +346,31 @@ function CreateBackground ()
     let background = game.add.tileSprite( 0 , 0 , game.world.width , game.world.height , 'background' );
     background.scrollFactorX = SCROLL_FACTOR;
     background.scrollFactorY = SCROLL_FACTOR;
+
+    // BARRIERS
+    let barriers = game.add.group();
+    for ( let i = 1; i <= 5; i++ )
+    {
+        barriers.createMultiple( 0 , ZONES_HEIGHT * i , 'barrier' );
+    }
+
+    barriers.enableBody = true;
+    barriers.immovable = true;
+    barriers.allowGravity = false;
+    this.physics.arcade.enable( barriers );
+    this.physics.add.collider( basicEnemiesZone1 , barriers );
+    this.physics.add.collider( basicEnemiesZone2 , barriers );
+    this.physics.add.collider( basicEnemiesZone3 , barriers );
+    this.physics.add.collider( basicEnemiesZone4 , barriers );
+    this.physics.add.collider( basicEnemiesZone5 , barriers );
+
+    /*
+    let barriers = { barrier1: null , barrier2: null , barrier3: null , barrier4: null , barrier5: null };
+    for ( let i = 1; i <= 5; i++ )
+    {
+        barriers[ 'barrier' + i ] = game.add.sprite( 0 , ZONES_HEIGHT * i , 'barrier' );
+    }
+    */
 }
 
 function CreateCharacter ()
