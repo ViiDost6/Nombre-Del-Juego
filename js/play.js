@@ -350,11 +350,8 @@ function UpdateRotations ()
 
 function RotateSingleEnemy ( enemy )
 {
-    if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
-    {
-        let angle = game.physics.arcade.angleBetween( enemy , character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
-        enemy.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
-    }
+    let angle = game.physics.arcade.angleBetween( enemy , character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
+    enemy.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
 }
 
 function UpdateCollisions ()
