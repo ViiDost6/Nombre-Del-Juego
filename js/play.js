@@ -73,33 +73,55 @@ class SpawnerBasicEnemy
                 basicEnemiesZone1.enableBody = true;
                 basicEnemiesZone1.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , sprite );
                 basicEnemiesZone1.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone1.maxEnemies = this.getMaxEnemies(zoneNumber);
+                basicEnemiesZone1.currentEnemies = 0;
                 break;
             case 2:
                 basicEnemiesZone2 = game.add.group();
                 basicEnemiesZone2.enableBody = true;
                 basicEnemiesZone2.createMultiple( ZONE_2_MAX_ENEMIES * difficultyMultiplier , sprite );
                 basicEnemiesZone2.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone2.maxEnemies = this.getMaxEnemies(zoneNumber);
+                basicEnemiesZone2.currentEnemies = 0;
                 break;
             case 3:
                 basicEnemiesZone3 = game.add.group();
                 basicEnemiesZone3.enableBody = true;
                 basicEnemiesZone3.createMultiple( ZONE_3_MAX_ENEMIES * difficultyMultiplier , sprite );
                 basicEnemiesZone3.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone3.maxEnemies = this.getMaxEnemies(zoneNumber);
+                basicEnemiesZone3.currentEnemies = 0;
                 break;
             case 4:
                 basicEnemiesZone4 = game.add.group();
                 basicEnemiesZone4.enableBody = true;
                 basicEnemiesZone4.createMultiple( ZONE_4_MAX_ENEMIES * difficultyMultiplier , sprite );
                 basicEnemiesZone4.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone4.maxEnemies = this.getMaxEnemies(zoneNumber);
+                basicEnemiesZone4.currentEnemies = 0;
                 break;
             case 5:
                 basicEnemiesZone5 = game.add.group();
                 basicEnemiesZone5.enableBody = true;
                 basicEnemiesZone5.createMultiple( ZONE_5_MAX_ENEMIES * difficultyMultiplier , sprite );
                 basicEnemiesZone5.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
+                basicEnemiesZone5.maxEnemies = this.getMaxEnemies(zoneNumber);
+                basicEnemiesZone5.currentEnemies = 0;
                 break;
             default:
                 break;
+        }
+    }
+
+    getMaxEnemies ( zoneNumber )
+    {
+        switch (zoneNumber) {
+            case 1: return 20 * difficultyMultiplier;
+            case 2: return 15 * difficultyMultiplier;
+            case 3: return 10 * difficultyMultiplier;
+            case 4: return 7 * difficultyMultiplier;
+            case 5: return 5 * difficultyMultiplier;
+            default: return 0;
         }
     }
 
@@ -170,7 +192,28 @@ class SpawnerBasicEnemy
     
     SpawnEnemies ( zoneNumber )
     {
-        let canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN;
+        let canSpawn;
+
+        switch ( zoneNumber )
+        {
+            case 1: 
+                canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN && basicEnemiesZone1.currentEnemies < basicEnemiesZone1.maxEnemies;
+                break;
+            case 2:
+                canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN && basicEnemiesZone2.currentEnemies < basicEnemiesZone2.maxEnemies;
+                break;
+            case 3:
+                canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN && basicEnemiesZone3.currentEnemies < basicEnemiesZone3.maxEnemies;
+                break;
+            case 4:
+                canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN && basicEnemiesZone4.currentEnemies < basicEnemiesZone4.maxEnemies;
+                break;
+            case 5:
+                canSpawn = Math.random() < PROBABILITY_BASIC_ENEMY_SPAWN && basicEnemiesZone5.currentEnemies < basicEnemiesZone5.maxEnemies;
+                break;
+            default:
+                break;
+        }
 
         if ( canSpawn )
         {
@@ -293,6 +336,25 @@ function UpdatePlay () // GAME LOOP
 {
     UpdateCharacter();
     UpdateCollisions();
+    UpdateRotations();
+}
+
+function UpdateRotations ()
+{
+    basicEnemiesZone1.forEach( RotateSingleEnemy , this );
+    basicEnemiesZone2.forEach( RotateSingleEnemy , this );
+    basicEnemiesZone3.forEach( RotateSingleEnemy , this );
+    basicEnemiesZone4.forEach( RotateSingleEnemy , this );
+    basicEnemiesZone5.forEach( RotateSingleEnemy , this );
+}
+
+function RotateSingleEnemy ( enemy )
+{
+    if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
+    {
+        let angle = game.physics.arcade.angleBetween( enemy , character ); // GET THE ANGLE BETWEEN THE CHARACTER AND THE MOUSE CURSOR
+        enemy.rotation = angle + Phaser.Math.degToRad( FIXED_ANGLE ); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
+    }
 }
 
 function UpdateCollisions ()
