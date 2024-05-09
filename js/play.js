@@ -49,12 +49,17 @@ TIMER_BASIC_ENEMY_SPAWN = 0.1 * Phaser.Timer.SECOND ,
 PROBABILITY_BASIC_ENEMY_SPAWN = 0.2 , 
 ZONES_HEIGHT = 600 , 
 DISTANCE_DETECTION_ENEMY = 200 , 
-DEFAULT_VELOCITY_ENEMY = 100;
+DEFAULT_VELOCITY_ENEMY = 100 , 
+DEFAULT_CHARACTER_HEALTH = 100 , 
+ANCHOR_X_LIFEBAR = 1 ,
+ANCHOR_Y_LIFEBAR = 1 , 
+DISTANCE_INTERACT = 125;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
-barriers;
+barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
+red_tint_counter , blue_tint_counter , btnInteract;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -337,6 +342,24 @@ function UpdatePlay () // GAME LOOP
     UpdateCharacter();
     UpdateCollisions();
     UpdateRotations();
+    UpdateSprites();
+
+    console.log( totalRedTint , totalBlueTint );
+}
+
+function UpdateSprites ()
+{
+    basicEnemiesZone1.forEach( UpdateSpriteSingleEnemy , this );
+    basicEnemiesZone2.forEach( UpdateSpriteSingleEnemy , this );
+    basicEnemiesZone3.forEach( UpdateSpriteSingleEnemy , this );
+    basicEnemiesZone4.forEach( UpdateSpriteSingleEnemy , this );
+    basicEnemiesZone5.forEach( UpdateSpriteSingleEnemy , this );
+}
+
+function UpdateSpriteSingleEnemy ( enemy )
+{
+    game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY ? enemy.loadTexture('basicEnemyDirty', 0) : enemy.loadTexture('basicEnemy', 0);
+    
 }
 
 function UpdateRotations ()
@@ -363,6 +386,127 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone3, barriers);
     game.physics.arcade.collide(basicEnemiesZone4, barriers);
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
+
+    // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
+    game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
+        bullet.kill();
+    });
+
+    // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
+    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+    });
+
+    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+    });
+
+    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+    });
+
+    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+    });
+
+    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+    });
+
+    // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
+    basicEnemiesZone1.forEach( EnemyCollideWithCharacter , this );
+    basicEnemiesZone2.forEach( EnemyCollideWithCharacter , this );
+    basicEnemiesZone3.forEach( EnemyCollideWithCharacter , this );
+    basicEnemiesZone4.forEach( EnemyCollideWithCharacter , this );
+    basicEnemiesZone5.forEach( EnemyCollideWithCharacter , this );
+
+    // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
+    inkBags.forEach( InkBagCollideWithCharacter , this );
+}
+
+function InkBagCollideWithCharacter ( inkBag )
+{
+    game.physics.arcade.overlap(character, inkBag, function() {
+        if ( inkBag.key == 'red_tint' )
+        {
+            totalRedTint += 100;
+            red_tint_counter.text = totalRedTint;
+        }
+        else
+        {
+            totalBlueTint += 100;
+            blue_tint_counter.text = totalBlueTint;
+        }
+
+        inkBag.kill();
+    });
+}
+
+function DropInkBag ( enemy )
+{
+    let randomNumber = Math.random();
+    let inkBag;
+
+    if (randomNumber < 0.6) {
+        // Drop blue ink
+        inkBag = inkBags.create(enemy.x, enemy.y, 'blue_tint');
+    } else {
+        // Drop red ink
+        inkBag = inkBags.create(enemy.x, enemy.y, 'red_tint');
+    }
+
+    // Add a cool tween
+    game.add.tween(inkBag).to({y: inkBag.y + 10}, 500, Phaser.Easing.Bounce.Out, true);
+}
+
+function EnemyCollideWithCharacter ( enemy )
+{
+    if ( canReceiveDamage )
+    {
+        game.physics.arcade.overlap(character, enemy, function() {
+            character_health -= 10;
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+    
+            // Stop the enemy
+            enemy.body.velocity.x = 0;
+            enemy.body.velocity.y = 0;
+    
+            // Create a tween to make the enemy smaller
+            let shrinkTween = game.add.tween(enemy.scale).to({x: 0.01, y: 0.01}, 500, Phaser.Easing.Linear.None, true);
+    
+            // When the tween completes, kill the enemy
+            shrinkTween.onComplete.add(function() {
+                enemy.kill();
+            }, this);
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+    
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+    
+            lifeTween.start();
+        });
+    }
 }
 
 function UpdateEnemies ()
@@ -389,6 +533,9 @@ function CreateEnemies ()
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
 
     setInterval( UpdateEnemies , 1000 );
+
+    inkBags = game.add.group();
+    inkBags.enableBody = true;
 }
 
 function CreateTimers ()
@@ -408,6 +555,11 @@ function CreateImages ()
     game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
     game.load.image( 'basicEnemy' , 'assets/imgs/Base_Enemy.png' );
     game.load.image( 'barrier' , 'assets/imgs/barrier.png' );
+    game.load.image( 'life_bar' , 'assets/imgs/life_bar.png' );
+    game.load.image( 'basicEnemyDirty' , 'assets/imgs/Base_PlayerDirty.png' );
+    game.load.image( 'red_tint' , 'assets/imgs/red_tint.png' );
+    game.load.image( 'blue_tint' , 'assets/imgs/blue_tint.png' );
+    game.load.image( 'btnE' , 'assets/imgs/btnE.png' );
 }
 
 function CreateBackground ()
@@ -434,6 +586,8 @@ function CreateCharacter ()
 {
     character = game.add.sprite( GAME_STAGE_WIDTH / 2 , 2900 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
+    character_health = DEFAULT_CHARACTER_HEALTH;
+    canReceiveDamage = true;
     
     game.physics.arcade.enable( character );
     sprintEnabled = true;
@@ -446,6 +600,13 @@ function CreateCharacter ()
 
     // SET UP THE WEAPON FOR THE CHARACTER
     pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE );
+
+    totalRedTint = 0;
+    totalBlueTint = 0;
+
+    btnInteract = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'btnE' );
+    btnInteract.anchor.setTo( 0.5 , 0.5 );
+    btnInteract.visible = false;
 }
 
 function CreateHUD ()
@@ -458,6 +619,25 @@ function CreateHUD ()
     checkDash = hudGroup.create( DASH_INDICATOR_X , DASH_INDICATOR_Y , 'check_dash' ); // CHECK DASH
     checkDash.visible = false; // HIDE THE CHECK DASH
     checkDash.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
+    life_bar = hudGroup.create( 5 , 50 , 'life_bar' );
+    life_bar.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
+    life_bar.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
+    life_holder = hudGroup.create( 5 , 50 , 'sprintHolder' );
+    life_holder.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
+    life_holder.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
+    red_tint = hudGroup.create( SPRINT_BAR_X + 65 , SPRINT_BAR_Y - 65 , 'red_tint' );
+    red_tint.anchor.setTo( 0.5 , 0.5 );
+    blue_tint = hudGroup.create( SPRINT_BAR_X + 65 , SPRINT_BAR_Y - 25 , 'blue_tint' );
+    blue_tint.anchor.setTo( 0.5 , 0.5 );
+
+    // Add text for red_tint and blue_tint counters
+    red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Arial", fill: "#ff0000" });
+    blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Arial", fill: "#0000ff" });
+
+    // Add the counters to the HUD group
+    hudGroup.add(red_tint_counter);
+    hudGroup.add(blue_tint_counter);
+
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
 
@@ -481,6 +661,39 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     CheckMovement(); // CHECKS IF THE CHARACTER MOVES
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
     pistol.Shoot(); // SHOOT THE BULLET
+
+    btnInteract.x = character.x;
+    btnInteract.y = character.y - 60;
+
+    if ( character_health <= 0 )
+    {
+        game.state.start('endscreen');
+    }
+
+    if ( ( character.y < 0 + DISTANCE_INTERACT ) || ( character.y > 600 - DISTANCE_INTERACT && character.y < 600 + DISTANCE_INTERACT ) || ( character.y > 1200 - DISTANCE_INTERACT && character.y < 1200 + DISTANCE_INTERACT ) || ( character.y > 1800 - DISTANCE_INTERACT && character.y < 1800 + DISTANCE_INTERACT ) || ( character.y > 2400 - DISTANCE_INTERACT && character.y < 2400 + DISTANCE_INTERACT ) || ( character.y > 3000 - DISTANCE_INTERACT ) )
+    {
+        btnInteract.visible = true;
+    }
+    else
+    {
+        btnInteract.visible = false;
+    }
+
+    //barriers.forEach( CheckDistanceWithBarriers , this );
+}
+
+function CheckDistanceWithBarriers ( barrier )
+{
+    let distance = game.physics.arcade.distanceBetween( character , barrier );
+
+    if ( distance < 300 )
+    {
+        btnInteract.visible = true;
+    }
+    else
+    {
+        btnInteract.visible = false;
+    }
 }
 
 function CheckDash () // DASH FUNCTIONALITY
