@@ -53,7 +53,8 @@ DEFAULT_VELOCITY_ENEMY = 100;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
-basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5;
+basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
+barriers;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -291,6 +292,18 @@ function CreatePlay () // SET UP THE GAME
 function UpdatePlay () // GAME LOOP
 {
     UpdateCharacter();
+    UpdateCollisions();
+}
+
+function UpdateCollisions ()
+{
+    // MAKE THE CHARACTER AND ENEMIES COLLIDE WITH THE BARRIERS
+    game.physics.arcade.collide(character, barriers);
+    game.physics.arcade.collide(basicEnemiesZone1, barriers);
+    game.physics.arcade.collide(basicEnemiesZone2, barriers);
+    game.physics.arcade.collide(basicEnemiesZone3, barriers);
+    game.physics.arcade.collide(basicEnemiesZone4, barriers);
+    game.physics.arcade.collide(basicEnemiesZone5, barriers);
 }
 
 function UpdateEnemies ()
@@ -348,29 +361,14 @@ function CreateBackground ()
     background.scrollFactorY = SCROLL_FACTOR;
 
     // BARRIERS
-    let barriers = game.add.group();
+    barriers = game.add.group();
+    barriers.enableBody = true; // Enable physics for the barriers
+
     for ( let i = 1; i <= 5; i++ )
     {
-        barriers.createMultiple( 0 , ZONES_HEIGHT * i , 'barrier' );
+        let barrier = barriers.create( 0 , ZONES_HEIGHT * i , 'barrier' );
+        barrier.body.immovable = true; // Make the barrier immovable
     }
-
-    barriers.enableBody = true;
-    barriers.immovable = true;
-    barriers.allowGravity = false;
-    this.physics.arcade.enable( barriers );
-    this.physics.add.collider( basicEnemiesZone1 , barriers );
-    this.physics.add.collider( basicEnemiesZone2 , barriers );
-    this.physics.add.collider( basicEnemiesZone3 , barriers );
-    this.physics.add.collider( basicEnemiesZone4 , barriers );
-    this.physics.add.collider( basicEnemiesZone5 , barriers );
-
-    /*
-    let barriers = { barrier1: null , barrier2: null , barrier3: null , barrier4: null , barrier5: null };
-    for ( let i = 1; i <= 5; i++ )
-    {
-        barriers[ 'barrier' + i ] = game.add.sprite( 0 , ZONES_HEIGHT * i , 'barrier' );
-    }
-    */
 }
 
 function CreateCharacter ()
