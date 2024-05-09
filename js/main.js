@@ -2,19 +2,18 @@ const GAME_STAGE_WIDTH = 800;
 const GAME_STAGE_HEIGHT = 600;
 
 let game = new Phaser.Game( GAME_STAGE_WIDTH , GAME_STAGE_HEIGHT , Phaser.CANVAS , 'gamestage' );
-/*
+
 let wfConfig = {
     active: function() { startGame(); },
-    custom: {
-        families: ['Kalam'],
-        urls: ['https://fonts.google.com/specimen/Kalam']
+    google: {
+        families: ['Kalam']
     }
 };
 
 WebFont.load(wfConfig);
-*/
+
 // Entry point
-window.onload = startGame;
+//window.onload = startGame;
 
 function startGame()
 {

@@ -333,8 +333,8 @@ function CreatePlay () // SET UP THE GAME
     CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackground();
     CreateCharacter();
-    CreateHUD();
     CreateEnemies();
+    CreateHUD();
 }
 
 function UpdatePlay () // GAME LOOP
@@ -631,8 +631,8 @@ function CreateHUD ()
     blue_tint.anchor.setTo( 0.5 , 0.5 );
 
     // Add text for red_tint and blue_tint counters
-    red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Arial", fill: "#ff0000" });
-    blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Arial", fill: "#0000ff" });
+    red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Kalam", fill: "#ff0000" });
+    blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Kalam", fill: "#0000ff" });
 
     // Add the counters to the HUD group
     hudGroup.add(red_tint_counter);
