@@ -60,7 +60,7 @@ let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash ,
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
-red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney;
+red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -441,7 +441,8 @@ function UpdateCollisions ()
             let barrier = barriers.getFirstAlive(true);
 
             if ( barrier )
-            {   
+            {
+                // Lo subiremos a [6500 , 4000 , 2000 , 500]
                 let costs = [ 300 , 200 , 100 , 0 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
@@ -455,6 +456,7 @@ function UpdateCollisions ()
                 else
                 {
                     textNoMoney.visible = true;
+                    console.log( "You don't have enough tint, CAPITALISM WINS" );
                     setTimeout( function() {
                         textNoMoney.visible = false;
                     }, 2000 );
@@ -506,7 +508,16 @@ function EnemyCollideWithCharacter ( enemy )
     if ( canReceiveDamage )
     {
         game.physics.arcade.overlap(character, enemy, function() {
-            character_health -= 10;
+            if ( isDashing )
+            {
+                character_health -= 0;
+                inkBagsDropSwitch = true;
+            }
+            else
+            {
+                character_health -= 10;
+                inkBagsDropSwitch = false;
+            }
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -522,21 +533,26 @@ function EnemyCollideWithCharacter ( enemy )
             // When the tween completes, kill the enemy
             shrinkTween.onComplete.add(function() {
                 enemy.kill();
+                inkBagsDropSwitch ? DropInkBag( enemy ) : null;
+                inkBagsDropSwitch = false;
             }, this);
 
-            // Update the life bar
-            if ( lifeTween )
+            if ( ! isDashing )
             {
-                lifeTween.stop();
+                // Update the life bar
+                if ( lifeTween )
+                {
+                    lifeTween.stop();
+                }
+    
+                let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+        
+                lifeTween = game.add.tween(life_bar.scale).to({
+                    y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+                }, 1000, Phaser.Easing.Linear.None, true);
+        
+                lifeTween.start();
             }
-
-            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
-    
-            lifeTween = game.add.tween(life_bar.scale).to({
-                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, 1000, Phaser.Easing.Linear.None, true);
-    
-            lifeTween.start();
         });
     }
 }
@@ -647,6 +663,7 @@ function CreateCharacter ()
     btnInteract.visible = false;
 
     globalScore = 0;
+    inkBagsDropSwitch = true;
 }
 
 function CreateHUD ()
@@ -674,7 +691,7 @@ function CreateHUD ()
     red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Kalam", fill: "#ff0000" });
     blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Kalam", fill: "#0000ff" });
 
-    textNoMoney = game.add.text( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT - 25 , "You don't have enough tint, CAPITALISM WINS" , { font: "16px Kalam" , fill: "#000000" } );
+    textNoMoney = game.add.text( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT - 100 , "You don't have enough tint, CAPITALISM WINS" , { font: "16px Kalam" , fill: "#000000" } );
     textNoMoney.visible = false;
 
     // Add the counters to the HUD group
@@ -747,6 +764,7 @@ function CheckDash () // DASH FUNCTIONALITY
     {
         isDashing = true;
         canDash = false;
+
         setTimeout( function() {
             isDashing = false;
             setTimeout( function() {

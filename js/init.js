@@ -53,19 +53,19 @@ function startPlay()
 
 function startPlayEasy()
 {
-    difficultyMultiplier = 1;
+    difficultyMultiplier = 3;
     game.state.start('play');
 }
 
 function startPlayMedium()
 {
-    difficultyMultiplier = 2;
+    difficultyMultiplier = 4;
     game.state.start('play');
 }
 
 function startPlayHard()
 {
-    difficultyMultiplier = 3;
+    difficultyMultiplier = 5;
     game.state.start('play');
 }
 
