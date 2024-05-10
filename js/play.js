@@ -53,13 +53,14 @@ DEFAULT_VELOCITY_ENEMY = 100 ,
 DEFAULT_CHARACTER_HEALTH = 100 , 
 ANCHOR_X_LIFEBAR = 1 ,
 ANCHOR_Y_LIFEBAR = 1 , 
-DISTANCE_INTERACT = 125;
+DISTANCE_INTERACT = 125 , 
+DISTANCE_DETECTION_INKBAG = 100;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
-red_tint_counter , blue_tint_counter , btnInteract;
+red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -344,7 +345,7 @@ function UpdatePlay () // GAME LOOP
     UpdateRotations();
     UpdateSprites();
 
-    console.log( totalRedTint , totalBlueTint );
+    
 }
 
 function UpdateSprites ()
@@ -432,6 +433,35 @@ function UpdateCollisions ()
 
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
     inkBags.forEach( InkBagCollideWithCharacter , this );
+
+    if ( btnInteract.visible && closeToBarrier && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+    {
+        if ( barriers.countLiving() > 0 )
+        {
+            let barrier = barriers.getFirstAlive(true);
+
+            if ( barrier )
+            {   
+                let costs = [ 300 , 200 , 100 , 0 ];
+                let cost = costs[ barriers.countLiving() - 1 ];
+
+
+                if ( totalRedTint >= cost )
+                {
+                    totalRedTint -= cost;
+                    barrier.kill();
+                    red_tint_counter.text = totalRedTint;
+                }
+                else
+                {
+                    textNoMoney.visible = true;
+                    setTimeout( function() {
+                        textNoMoney.visible = false;
+                    }, 2000 );
+                }
+            }
+        }
+    }
 }
 
 function InkBagCollideWithCharacter ( inkBag )
@@ -440,11 +470,13 @@ function InkBagCollideWithCharacter ( inkBag )
         if ( inkBag.key == 'red_tint' )
         {
             totalRedTint += 100;
+            globalScore += 120;
             red_tint_counter.text = totalRedTint;
         }
         else
         {
             totalBlueTint += 100;
+            globalScore += 80;
             blue_tint_counter.text = totalBlueTint;
         }
 
@@ -575,11 +607,17 @@ function CreateBackground ()
     barriers = game.add.group();
     barriers.enableBody = true; // Enable physics for the barriers
 
-    for ( let i = 1; i <= 5; i++ )
-    {
-        let barrier = barriers.create( 0 , ZONES_HEIGHT * i , 'barrier' );
-        barrier.body.immovable = true; // Make the barrier immovable
-    }
+    let barrierBetween4And5 = barriers.create( 0 , ZONES_HEIGHT * 4 , 'barrier' );
+    barrierBetween4And5.body.immovable = true; // Make the barrier immovable
+
+    let barrierBetween3And4 = barriers.create( 0 , ZONES_HEIGHT * 3 , 'barrier' );
+    barrierBetween3And4.body.immovable = true; // Make the barrier immovable
+
+    let barrierBetween2And3 = barriers.create( 0 , ZONES_HEIGHT * 2 , 'barrier' );
+    barrierBetween2And3.body.immovable = true; // Make the barrier immovable
+
+    let barrierBetween1And2 = barriers.create( 0 , ZONES_HEIGHT , 'barrier' );
+    barrierBetween1And2.body.immovable = true; // Make the barrier immovable
 }
 
 function CreateCharacter ()
@@ -607,6 +645,8 @@ function CreateCharacter ()
     btnInteract = game.add.sprite( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT / 2 , 'btnE' );
     btnInteract.anchor.setTo( 0.5 , 0.5 );
     btnInteract.visible = false;
+
+    globalScore = 0;
 }
 
 function CreateHUD ()
@@ -633,6 +673,9 @@ function CreateHUD ()
     // Add text for red_tint and blue_tint counters
     red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Kalam", fill: "#ff0000" });
     blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Kalam", fill: "#0000ff" });
+
+    textNoMoney = game.add.text( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT - 25 , "You don't have enough tint, CAPITALISM WINS" , { font: "16px Kalam" , fill: "#000000" } );
+    textNoMoney.visible = false;
 
     // Add the counters to the HUD group
     hudGroup.add(red_tint_counter);
@@ -670,29 +713,29 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
         game.state.start('endscreen');
     }
 
-    if ( ( character.y < 0 + DISTANCE_INTERACT ) || ( character.y > 600 - DISTANCE_INTERACT && character.y < 600 + DISTANCE_INTERACT ) || ( character.y > 1200 - DISTANCE_INTERACT && character.y < 1200 + DISTANCE_INTERACT ) || ( character.y > 1800 - DISTANCE_INTERACT && character.y < 1800 + DISTANCE_INTERACT ) || ( character.y > 2400 - DISTANCE_INTERACT && character.y < 2400 + DISTANCE_INTERACT ) || ( character.y > 3000 - DISTANCE_INTERACT ) )
-    {
-        btnInteract.visible = true;
-    }
-    else
-    {
-        btnInteract.visible = false;
-    }
+    barriers.forEach( CheckDistanceWithBarriers , this );
 
-    //barriers.forEach( CheckDistanceWithBarriers , this );
+    inkBags.forEach( InkBagFollowsCharacter , this );
+}
+
+function InkBagFollowsCharacter ( inkBag )
+{
+    if ( game.physics.arcade.distanceBetween( character , inkBag ) < DISTANCE_DETECTION_INKBAG )
+    {
+        game.physics.arcade.moveToObject( inkBag , character , 200 )
+    }
 }
 
 function CheckDistanceWithBarriers ( barrier )
 {
-    let distance = game.physics.arcade.distanceBetween( character , barrier );
-
-    if ( distance < 300 )
+    if ( game.physics.arcade.overlap(character, barrier ) )
     {
         btnInteract.visible = true;
-    }
-    else
-    {
-        btnInteract.visible = false;
+        closeToBarrier = true;
+        setTimeout( function() {
+            closeToBarrier = false;
+            btnInteract.visible = false;
+        }, 1000 );
     }
 }
 

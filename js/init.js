@@ -1,4 +1,4 @@
-let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB , difficultyMultiplier = 0;
+let difficultyMultiplier = 0;
 
 let initState = {
     preload: preloadInit,
@@ -19,60 +19,53 @@ function preloadInit()
 function createInit()
 {
     game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
-    let buttons = ['btnEasy', 'btnMedium', 'btnHard', 'btnInstructions', 'btnA', 'btnB'];
+    let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB;
 
-    buttons.forEach((button, index) =>
-    {
-        let btn;
+    btnEasy = game.add.button(50, -100, 'btnEasy', startPlayEasy, this, 'btnEasy');
+    btnEasy.anchor.setTo(0);
+    game.add.tween(btnEasy).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-        // Define the final positions for the buttons
-        let positions = {
-            'btnEasy': {x: 50, y: 100},
-            'btnMedium': {x: 300, y: 100},
-            'btnHard': {x: 550, y: 100},
-            'btnInstructions': {x: 100, y: 250},
-            'btnA': {x: 200, y: 400},
-            'btnB': {x: 450, y: 400}
-        };
+    btnMedium = game.add.button(300, -100, 'btnMedium', startPlayMedium, this, 'btnMedium');
+    btnMedium.anchor.setTo(0);
+    game.add.tween(btnMedium).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-        switch ( button ) // SET DIFFICULTY MULTIPLIER
-        {
-            case 'btnEasy':
-                difficultyMultiplier = 1;
-                break;
-            case 'btnMedium':
-                difficultyMultiplier = 2;
-                break;
-            case 'btnHard':
-                difficultyMultiplier = 3;
-                break;
-            default:
-                break;
-        }
+    btnHard = game.add.button(550, -100, 'btnHard', startPlayHard, this, 'btnHard');
+    btnHard.anchor.setTo(0);
+    game.add.tween(btnHard).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-        // Create the button at the final x position and a negative y position
-        if ( button === 'btnInstructions' )
-        {
-            btn = game.add.button(positions[button].x, -100, button, startInstructions, this);
-        }
-        else if ( button === 'btnB' )
-        {
-            btn = game.add.button(positions[button].x, -100, button, null , this);
-        }
-        else
-        {
-            btn = game.add.button(positions[button].x, -100, button, startPlay, this);
-        }
+    btnInstructions = game.add.button(100, -100, 'btnInstructions', startInstructions, this);
+    btnInstructions.anchor.setTo(0);
+    game.add.tween(btnInstructions).to({y: 250}, 1000, Phaser.Easing.Bounce.Out, true);
 
-        btn.anchor.setTo(0);
+    btnA = game.add.button(200, -100, 'btnA', startPlay, this, null);
+    btnA.anchor.setTo(0);
+    game.add.tween(btnA).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
-        // Create a tween to animate the button to the final y position
-        game.add.tween(btn).to({y: positions[button].y}, 1000, Phaser.Easing.Bounce.Out, true, index * 200);
-    });
+    btnB = game.add.button(450, -100, 'btnB', null, this);
+    btnB.anchor.setTo(0);
+    game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 }
 
 function startPlay()
 {
+    game.state.start('play');
+}
+
+function startPlayEasy()
+{
+    difficultyMultiplier = 1;
+    game.state.start('play');
+}
+
+function startPlayMedium()
+{
+    difficultyMultiplier = 2;
+    game.state.start('play');
+}
+
+function startPlayHard()
+{
+    difficultyMultiplier = 3;
     game.state.start('play');
 }
 
