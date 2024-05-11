@@ -54,13 +54,15 @@ DEFAULT_CHARACTER_HEALTH = 100 ,
 ANCHOR_X_LIFEBAR = 1 ,
 ANCHOR_Y_LIFEBAR = 1 , 
 DISTANCE_INTERACT = 125 , 
-DISTANCE_DETECTION_INKBAG = 100;
+DISTANCE_DETECTION_INKBAG = 100 , 
+DISTANCE_DETECTION_RAE = 150;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
-red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time;
+red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
+barrierSafeZoneGroup , raeGroup;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -359,11 +361,9 @@ function UpdateSprites ()
 
     // Calculate new scale and position
     let newScale = 3 + 1.5 * Math.sin(time / 2000); // Reduced from 0.1 to 0.01
-    let newPosition = rae.y + 0.025 * Math.sin(time / 2000); // Reduced from 10 to 1
 
     // Apply new scale and position
     shine_rae.scale.set(newScale);
-    rae.y = newPosition;
 }
 
 function UpdateSpriteSingleEnemy ( enemy )
@@ -396,9 +396,15 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone3, barriers);
     game.physics.arcade.collide(basicEnemiesZone4, barriers);
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
+    game.physics.arcade.collide(character, barrierSafeZone);
+    game.physics.arcade.collide(character, rae);
 
     // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
     game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(pistol.core.bullets, barrierSafeZoneGroup, function(bullet) {
         bullet.kill();
     });
 
@@ -618,10 +624,12 @@ function CreateEnemies ()
     shine_rae = game.add.sprite( WORLD_WIDTH / 2 , 300 , 'shine_rae' );
     shine_rae.anchor.setTo( 0.5 );
     shine_rae.scale.setTo( 2 );
-    shine_rae.enableBody = true;
-    rae = game.add.sprite( WORLD_WIDTH / 2 , 300 , 'rae' );
+
+    raeGroup = game.add.group();
+    raeGroup.enableBody = true;
+    rae = raeGroup.create( WORLD_WIDTH / 2 , 300 , 'rae' );
     rae.anchor.setTo( 0.5 );
-    rae.enableBody = true;
+    rae.body.immovable = true;
 
     time = 0;
 }
@@ -651,6 +659,7 @@ function CreateImages ()
     game.load.image( 'bam' , 'assets/imgs/bam.png' );
     game.load.image( 'rae' , 'assets/imgs/santa_rae.png' );
     game.load.image( 'shine_rae' , 'assets/imgs/shine.png' );
+    game.load.image( 'safe_zone_closed' , 'assets/imgs/safe_barrier_close.png' );
 }
 
 function CreateBackground ()
@@ -677,11 +686,17 @@ function CreateBackground ()
 
     let barrierBetween1And2 = barriers.create( 0 , ZONES_HEIGHT , 'barrier' );
     barrierBetween1And2.body.immovable = true; // Make the barrier immovable
+
+    barrierSafeZoneGroup = game.add.group();
+    barrierSafeZoneGroup.enableBody = true;
+
+    barrierSafeZone = barrierSafeZoneGroup.create( 0 , ZONES_HEIGHT * 5 , 'safe_zone_closed' );
+    barrierSafeZone.body.immovable = true;
 }
 
 function CreateCharacter ()
 {
-    character = game.add.sprite( GAME_STAGE_WIDTH / 2 , 2900 , 'player' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2900 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -776,6 +791,19 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     barriers.forEach( CheckDistanceWithBarriers , this );
 
     inkBags.forEach( InkBagFollowsCharacter , this );
+
+    if ( game.physics.arcade.distanceBetween( character , shine_rae ) < DISTANCE_DETECTION_RAE )
+    {
+        btnInteract.visible = true;
+
+        if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+        {
+            if ( totalBlueTint >= 0 )
+            {
+                game.state.start('win');
+            }
+        }
+    }
 }
 
 function InkBagFollowsCharacter ( inkBag )

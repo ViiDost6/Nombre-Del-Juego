@@ -12,14 +12,12 @@ let wfConfig = {
 
 WebFont.load(wfConfig);
 
-// Entry point
-//window.onload = startGame;
-
 function startGame()
 {
     game.state.add( 'init' , initState );
     game.state.add( 'play' , playState );
     game.state.add( 'instructions' , instructionsState );
     game.state.add( 'endscreen' , gameOverState );
+    game.state.add( 'win' , winState );
     game.state.start( 'init' );
 }
