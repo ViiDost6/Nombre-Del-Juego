@@ -55,18 +55,39 @@ ANCHOR_X_LIFEBAR = 1 ,
 ANCHOR_Y_LIFEBAR = 1 , 
 DISTANCE_INTERACT = 125 , 
 DISTANCE_DETECTION_INKBAG = 100 , 
-DISTANCE_DETECTION_RAE = 150;
+DISTANCE_DETECTION_RAE = 150 , 
+BASIC_WEAPON_MAX_RELOAD = 3 , 
+RELOAD_COST = 100;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ReloadZone
+{
+    constructor ( x , y )
+    {
+        this.x = x;
+        this.y = y;
+        this.sprite = game.add.sprite( this.x , this.y , 'rec_ammo' );
+        this.sprite.anchor.setTo( 0.5 , 0.5 );
+        this.sprite.scale.setTo( 1.5 );
+    }
+
+    ReloadCharacter (weapon)
+    {
+        weapon.numberOfReloads = 0;
+        totalBlueTint -= RELOAD_COST;
+        blue_tint_counter.text = totalBlueTint;
+    }
+}
 
 class SpawnerBasicEnemy
 {
@@ -295,6 +316,7 @@ class Weapon
         this.core.bulletAngleVariance = variance; // THE VARIANCE OF THE ANGLE OF THE BULLET
         this.core.setBulletFrames( 0 , nbullets - 1 , true ); // SET THE FRAMES OF THE BULLET
         this.nbullets = nbullets; // THE NUMBER OF BULLETS
+        this.numberOfReloads = 0; // THE NUMBER OF RELOADS
     }
 
     Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
@@ -311,20 +333,24 @@ class Weapon
         // console.log( shotsThatHaveBeenShot );
         // console.log( "max = ", this.nbullets );
 
-        if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
+        if ( this.numberOfReloads < BASIC_WEAPON_MAX_RELOAD )
         {
-            this.core.fireAtPointer( game.input.activePointer );  
-            // console.log( 'shoot' );
-        }
-        else if ( isShooting )
-        {
-            this.core.fireAtPointer( game.input.activePointer );
-            // console.log( 'shoot loop' );
-        }   
-        else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
-        {
-            shotsThatHaveBeenShot = this.core.resetShots();
-            // console.log( 'reload' );
+            if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
+            {
+                this.core.fireAtPointer( game.input.activePointer );  
+                // console.log( 'shoot' );
+            }
+            else if ( isShooting )
+            {
+                this.core.fireAtPointer( game.input.activePointer );
+                // console.log( 'shoot loop' );
+            }   
+            else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
+            {
+                shotsThatHaveBeenShot = this.core.resetShots();
+                this.numberOfReloads++;
+                // console.log( 'reload' );
+            }
         }
     }
 
@@ -406,6 +432,7 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
     game.physics.arcade.collide(character, barrierSafeZone);
     game.physics.arcade.collide(character, rae);
+    game.physics.arcade.collide(character, rec_ammo);
 
     // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
     game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
@@ -679,6 +706,8 @@ function CreateImages ()
     game.load.image( 'safeZoneCounter2' , 'assets/imgs/countdown/count2.png' );
     game.load.image( 'safeZoneCounter1' , 'assets/imgs/countdown/count1.png' );
     game.load.image( 'rec_life' , 'assets/imgs/rec_life.png' );
+    game.load.image( 'rec_ammo' , 'assets/imgs/rec_ammo.png' );
+    game.load.image( 'player_pistol' , 'assets/imgs/PlayerPistol.png' );
 }
 
 function CreateBackground ()
@@ -723,7 +752,7 @@ function CreateBackground ()
 
 function CreateCharacter ()
 {
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_pistol' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -752,6 +781,9 @@ function CreateCharacter ()
 
     safeZoneSecondsCounter = 0;
     canEnterSafeZone = true;
+
+    rec_ammo = new ReloadZone( WORLD_WIDTH / 2 , 2700 );
+    console.log(rec_ammo.sprite.x, rec_ammo.sprite.y);
 }
 
 function CreateHUD ()
@@ -898,6 +930,14 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     }
 
     rec_life.forEach( CheckDistanceWithRecLife , this );
+
+    game.physics.arcade.collide(character, rec_ammo, function() {
+        btnInteract.visible = true;
+        if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) && totalBlueTint >= RELOAD_COST )
+        {
+            rec_ammo.ReloadCharacter(pistol);
+        }
+    });
 }
 
 function CheckDistanceWithRecLife ( recLife )
