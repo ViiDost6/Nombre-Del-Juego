@@ -62,7 +62,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -178,9 +178,12 @@ class SpawnerBasicEnemy
         }
         else if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
         {
-            enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+            if ( enemy.y < 2850 )
+            {
+                enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
 
-            enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+                enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+            }
         }
         else
         {
@@ -195,6 +198,11 @@ class SpawnerBasicEnemy
 
             enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x = -enemyVelocityX : enemy.body.velocity.x = enemyVelocityX;
             enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
+        }
+
+        if ( enemy.y > 2850 )
+        {
+            enemy.body.velocity.y *= -1;
         }
     }
     
@@ -257,7 +265,7 @@ class SpawnerBasicEnemy
                 let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
                 let barrierBelow = ZONES_HEIGHT * zoneNumber;
 
-                let possibleYCoordinates = WORLD_HEIGHT - enemy.body.height;
+                let possibleYCoordinates = 2750;
 
                 let yRandomSpawnCoordinate;
 
@@ -456,7 +464,7 @@ function UpdateCollisions ()
 
     if ( btnInteract.visible && closeToBarrier && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
     {
-        if ( barriers.countLiving() > 0 )
+        if ( barriers.countLiving() > 0 && character.y < 2850)
         {
             let barrier = barriers.getFirstAlive(true);
 
@@ -660,6 +668,17 @@ function CreateImages ()
     game.load.image( 'rae' , 'assets/imgs/santa_rae.png' );
     game.load.image( 'shine_rae' , 'assets/imgs/shine.png' );
     game.load.image( 'safe_zone_closed' , 'assets/imgs/safe_barrier_close.png' );
+    game.load.image( 'safe_zone_opened' , 'assets/imgs/safe_barrier_open.png' );
+    game.load.image( 'safeZoneCounter10' , 'assets/imgs/countdown/count10.png' );
+    game.load.image( 'safeZoneCounter9' , 'assets/imgs/countdown/count9.png' );
+    game.load.image( 'safeZoneCounter8' , 'assets/imgs/countdown/count8.png' );
+    game.load.image( 'safeZoneCounter7' , 'assets/imgs/countdown/count7.png' );
+    game.load.image( 'safeZoneCounter6' , 'assets/imgs/countdown/count6.png' );
+    game.load.image( 'safeZoneCounter5' , 'assets/imgs/countdown/count5.png' );
+    game.load.image( 'safeZoneCounter4' , 'assets/imgs/countdown/count4.png' );
+    game.load.image( 'safeZoneCounter3' , 'assets/imgs/countdown/count3.png' );
+    game.load.image( 'safeZoneCounter2' , 'assets/imgs/countdown/count2.png' );
+    game.load.image( 'safeZoneCounter1' , 'assets/imgs/countdown/count1.png' );
 }
 
 function CreateBackground ()
@@ -690,13 +709,13 @@ function CreateBackground ()
     barrierSafeZoneGroup = game.add.group();
     barrierSafeZoneGroup.enableBody = true;
 
-    barrierSafeZone = barrierSafeZoneGroup.create( 0 , ZONES_HEIGHT * 5 , 'safe_zone_closed' );
+    barrierSafeZone = barrierSafeZoneGroup.create( 0 , 2900 , 'safe_zone_closed' );
     barrierSafeZone.body.immovable = true;
 }
 
 function CreateCharacter ()
 {
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2900 , 'player' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -722,6 +741,9 @@ function CreateCharacter ()
 
     globalScore = 0;
     inkBagsDropSwitch = true;
+
+    safeZoneSecondsCounter = 0;
+    canEnterSafeZone = true;
 }
 
 function CreateHUD ()
@@ -744,6 +766,9 @@ function CreateHUD ()
     red_tint.anchor.setTo( 0.5 , 0.5 );
     blue_tint = hudGroup.create( SPRINT_BAR_X + 65 , SPRINT_BAR_Y - 25 , 'blue_tint' );
     blue_tint.anchor.setTo( 0.5 , 0.5 );
+    safeZoneSecondsCounter = hudGroup.create( 795 , 5 , 'safeZoneCounter10' );
+    safeZoneSecondsCounter.anchor.setTo( 1 , 0 );
+    safeZoneSecondsCounter.visible = false;
 
     // Add text for red_tint and blue_tint counters
     red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 17, totalRedTint, { font: "30px Kalam", fill: "#ff0000" });
@@ -798,10 +823,68 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( totalBlueTint >= 0 )
+            if ( totalBlueTint >= 0 ) // 10000
             {
                 game.state.start('win');
             }
+        }
+    }
+
+    barrierSafeZoneGroup.forEach( CheckDistanceWithBarriers , this );
+
+    if ( closeToBarrier && btnInteract.visible && character.y > 2850 && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+    {
+        if ( canEnterSafeZone )
+        {
+            barrierSafeZoneGroup.forEach(function(barrier) {
+                barrier.loadTexture('safe_zone_opened', 0);
+                safeZoneSecondsCounter.visible = true;
+                canEnterSafeZone = false;
+        
+                // Iniciar el contador de tiempo
+                let counter = 10;
+                safeZoneSecondsCounter.loadTexture('safeZoneCounter' + counter, 0);
+                let timer = setInterval(function() {
+                    counter--;
+                    if (counter >= 1) {
+                        // Cambiar el sprite del contador
+                        safeZoneSecondsCounter.loadTexture('safeZoneCounter' + counter, 0);
+                    } else {
+                        // Detener el contador y ocultarlo
+                        clearInterval(timer);
+                        safeZoneSecondsCounter.loadTexture('safeZoneCounter1', 0);
+                        safeZoneSecondsCounter.visible = false;
+                    }
+                }, 1000);
+        
+                setTimeout(function() {
+                    barrier.loadTexture('safe_zone_closed', 0);
+                    barrierSafeZoneGroup.setAll('body.enable', true);
+                    if (character.y > 2900) {
+                        game.state.start('endscreen');
+                    }
+        
+                    // Iniciar el contador de cooldown
+                    counter = 1;
+                    safeZoneSecondsCounter.visible = true;
+                    timer = setInterval(function() {
+                        counter++;
+                        if (counter <= 10) {
+                            // Cambiar el sprite del contador
+                            safeZoneSecondsCounter.loadTexture('safeZoneCounter' + counter, 0);
+                        } else {
+                            // Detener el contador y ocultarlo
+                            clearInterval(timer);
+                            safeZoneSecondsCounter.loadTexture('safeZoneCounter10', 0);
+                            safeZoneSecondsCounter.visible = false;
+                            canEnterSafeZone = true;
+                        }
+                    }, 1000);
+                }, 10000);
+            });
+    
+            // Desactivar la colisión para todos los hijos del grupo
+            barrierSafeZoneGroup.setAll('body.enable', false);
         }
     }
 }
@@ -810,7 +893,7 @@ function InkBagFollowsCharacter ( inkBag )
 {
     if ( game.physics.arcade.distanceBetween( character , inkBag ) < DISTANCE_DETECTION_INKBAG )
     {
-        game.physics.arcade.moveToObject( inkBag , character , 200 )
+        game.physics.arcade.moveToObject( inkBag , character , 200 );
     }
 }
 
