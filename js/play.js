@@ -62,7 +62,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -484,7 +484,6 @@ function UpdateCollisions ()
                 else
                 {
                     textNoMoney.visible = true;
-                    console.log( "You don't have enough tint, CAPITALISM WINS" );
                     setTimeout( function() {
                         textNoMoney.visible = false;
                     }, 2000 );
@@ -679,6 +678,7 @@ function CreateImages ()
     game.load.image( 'safeZoneCounter3' , 'assets/imgs/countdown/count3.png' );
     game.load.image( 'safeZoneCounter2' , 'assets/imgs/countdown/count2.png' );
     game.load.image( 'safeZoneCounter1' , 'assets/imgs/countdown/count1.png' );
+    game.load.image( 'rec_life' , 'assets/imgs/rec_life.png' );
 }
 
 function CreateBackground ()
@@ -711,6 +711,11 @@ function CreateBackground ()
 
     barrierSafeZone = barrierSafeZoneGroup.create( 0 , 2900 , 'safe_zone_closed' );
     barrierSafeZone.body.immovable = true;
+
+    // SAFE ZONE LIFE RECOVERY
+    rec_life = game.add.sprite( 100 , 3075 , 'rec_life' );
+    rec_life.anchor.setTo( 0.5 , 0.5 );
+    rec_life.enableBody = true;
 }
 
 function CreateCharacter ()
@@ -774,12 +779,13 @@ function CreateHUD ()
     red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 17, totalRedTint, { font: "30px Kalam", fill: "#ff0000" });
     blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 17, totalBlueTint, { font: "30px Kalam", fill: "#0000ff" });
 
-    textNoMoney = game.add.text( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT - 100 , "You don't have enough tint, CAPITALISM WINS" , { font: "16px Kalam" , fill: "#000000" } );
+    textNoMoney = game.add.text( 175 , 570 , "You don't have enough tint, CAPITALISM WINS" , { font: "25px Kalam" , fill: "#000000" } );
     textNoMoney.visible = false;
 
     // Add the counters to the HUD group
     hudGroup.add(red_tint_counter);
     hudGroup.add(blue_tint_counter);
+    hudGroup.add(textNoMoney);
 
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
@@ -887,6 +893,16 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             barrierSafeZoneGroup.setAll('body.enable', false);
         }
     }
+
+    game.physics.arcade.overlap(character, rec_life, function() {
+        if ( totalRedTint >= 500 )
+        {
+            totalRedTint -= 500;
+            red_tint_counter.text = totalRedTint;
+            character_health = DEFAULT_CHARACTER_HEALTH;
+            // life_bar.scale.y = 1;
+        }
+    });
 }
 
 function InkBagFollowsCharacter ( inkBag )
