@@ -29,7 +29,7 @@ WEAPON_OFFSET_X = 25 ,
 WEAPON_OFFSET_Y = -25 ,
 DEFAULT_NUMBER_BULLETS = 6 ,
 BULLET_KILL_DISTANCE = 300 ,
-BULLET_SPEED = 250 ,
+BULLET_SPEED = 700 ,
 FIRE_RATE = 100 , 
 BULLET_ANGLE_VARIANCE = 20 , 
 SPRINT_BAR_X = 5 ,
@@ -60,7 +60,7 @@ let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash ,
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
-red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch;
+red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -344,8 +344,6 @@ function UpdatePlay () // GAME LOOP
     UpdateCollisions();
     UpdateRotations();
     UpdateSprites();
-
-    
 }
 
 function UpdateSprites ()
@@ -355,6 +353,17 @@ function UpdateSprites ()
     basicEnemiesZone3.forEach( UpdateSpriteSingleEnemy , this );
     basicEnemiesZone4.forEach( UpdateSpriteSingleEnemy , this );
     basicEnemiesZone5.forEach( UpdateSpriteSingleEnemy , this );
+
+    // Increase time
+    time += game.time.elapsed;
+
+    // Calculate new scale and position
+    let newScale = 3 + 1.5 * Math.sin(time / 2000); // Reduced from 0.1 to 0.01
+    let newPosition = rae.y + 0.025 * Math.sin(time / 2000); // Reduced from 10 to 1
+
+    // Apply new scale and position
+    shine_rae.scale.set(newScale);
+    rae.y = newPosition;
 }
 
 function UpdateSpriteSingleEnemy ( enemy )
@@ -398,30 +407,35 @@ function UpdateCollisions ()
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
+        BlastAnimation( enemy );
     });
 
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
+        BlastAnimation( enemy );
     });
 
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
+        BlastAnimation( enemy );
     });
 
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
+        BlastAnimation( enemy );
     });
 
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
+        BlastAnimation( enemy );
     });
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
@@ -443,7 +457,7 @@ function UpdateCollisions ()
             if ( barrier )
             {
                 // Lo subiremos a [6500 , 4000 , 2000 , 500]
-                let costs = [ 300 , 200 , 100 , 0 ];
+                let costs = [ 0 , 0 , 0 , 0 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
 
@@ -464,6 +478,22 @@ function UpdateCollisions ()
             }
         }
     }
+}
+
+function BlastAnimation ( enemy )
+{
+    let blast = game.add.sprite( enemy.x , enemy.y , 'bam' );
+    blast.anchor.setTo( 0.5 , 0.5 );
+
+    // Random scale between 1 and 1.25
+    let randomScale = game.rnd.realInRange(5, 5.25);
+    blast.scale.setTo(randomScale, randomScale);
+
+    // Tween to make the sprite smaller and then disappear
+    let blastTween = game.add.tween(blast.scale).to({ x: 0, y: 0 }, 1000, Phaser.Easing.Linear.None, true);
+    blastTween.onComplete.add(function() {
+        blast.destroy();
+    }, this);
 }
 
 function InkBagCollideWithCharacter ( inkBag )
@@ -584,6 +614,16 @@ function CreateEnemies ()
 
     inkBags = game.add.group();
     inkBags.enableBody = true;
+
+    shine_rae = game.add.sprite( WORLD_WIDTH / 2 , 300 , 'shine_rae' );
+    shine_rae.anchor.setTo( 0.5 );
+    shine_rae.scale.setTo( 2 );
+    shine_rae.enableBody = true;
+    rae = game.add.sprite( WORLD_WIDTH / 2 , 300 , 'rae' );
+    rae.anchor.setTo( 0.5 );
+    rae.enableBody = true;
+
+    time = 0;
 }
 
 function CreateTimers ()
@@ -608,6 +648,9 @@ function CreateImages ()
     game.load.image( 'red_tint' , 'assets/imgs/red_tint.png' );
     game.load.image( 'blue_tint' , 'assets/imgs/blue_tint.png' );
     game.load.image( 'btnE' , 'assets/imgs/btnE.png' );
+    game.load.image( 'bam' , 'assets/imgs/bam.png' );
+    game.load.image( 'rae' , 'assets/imgs/santa_rae.png' );
+    game.load.image( 'shine_rae' , 'assets/imgs/shine.png' );
 }
 
 function CreateBackground ()
@@ -688,8 +731,8 @@ function CreateHUD ()
     blue_tint.anchor.setTo( 0.5 , 0.5 );
 
     // Add text for red_tint and blue_tint counters
-    red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 8, totalRedTint, { font: "16px Kalam", fill: "#ff0000" });
-    blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 8, totalBlueTint, { font: "16px Kalam", fill: "#0000ff" });
+    red_tint_counter = game.add.text(red_tint.x + 20, red_tint.y - 17, totalRedTint, { font: "30px Kalam", fill: "#ff0000" });
+    blue_tint_counter = game.add.text(blue_tint.x + 20, blue_tint.y - 17, totalBlueTint, { font: "30px Kalam", fill: "#0000ff" });
 
     textNoMoney = game.add.text( GAME_STAGE_WIDTH / 2 , GAME_STAGE_HEIGHT - 100 , "You don't have enough tint, CAPITALISM WINS" , { font: "16px Kalam" , fill: "#000000" } );
     textNoMoney.visible = false;
