@@ -713,9 +713,12 @@ function CreateBackground ()
     barrierSafeZone.body.immovable = true;
 
     // SAFE ZONE LIFE RECOVERY
-    rec_life = game.add.sprite( 100 , 3075 , 'rec_life' );
-    rec_life.anchor.setTo( 0.5 , 0.5 );
+    rec_life = game.add.group();
     rec_life.enableBody = true;
+
+
+    let recLife = rec_life.create( 100 , 3075 , 'rec_life' );
+    recLife.body.immovable = true;
 }
 
 function CreateCharacter ()
@@ -894,13 +897,19 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
         }
     }
 
-    game.physics.arcade.overlap(character, rec_life, function() {
-        if ( totalRedTint >= 500 )
+    rec_life.forEach( CheckDistanceWithRecLife , this );
+}
+
+function CheckDistanceWithRecLife ( recLife )
+{
+    game.physics.arcade.overlap(character, recLife, function() {
+        btnInteract.visible = true;
+        if ( totalRedTint >= 500 && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
             totalRedTint -= 500;
             red_tint_counter.text = totalRedTint;
             character_health = DEFAULT_CHARACTER_HEALTH;
-            // life_bar.scale.y = 1;
+            life_bar.scale.y = 1;
         }
     });
 }
