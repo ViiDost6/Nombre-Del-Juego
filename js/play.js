@@ -65,7 +65,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , R , E , L , O , A , D , I , N , G;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -197,38 +197,46 @@ class SpawnerBasicEnemy
 
     MoveSingleEnemy ( enemy , zoneNumber )
     {
-        if ( enemy.x == character.x && enemy.y == character.y )
+        if ( ! isBuyingReloads )
         {
-            enemy.body.velocity.x = 0;
-            enemy.body.velocity.y = 0;
-        }
-        else if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
-        {
-            if ( enemy.y < 2850 )
+            if ( enemy.x == character.x && enemy.y == character.y )
             {
-                enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
-
-                enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+                enemy.body.velocity.x = 0;
+                enemy.body.velocity.y = 0;
+            }
+            else if ( game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY )
+            {
+                if ( enemy.y < 2850 )
+                {
+                    enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+    
+                    enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y *= -1 : game.physics.arcade.moveToObject( enemy , character , DEFAULT_VELOCITY_ENEMY );
+                }
+            }
+            else
+            {
+                let minusOrPlusX = Math.floor( Math.random() * 2 );
+                let minusOrPlusY = Math.floor( Math.random() * 2 );
+    
+                minusOrPlusX = minusOrPlusX == 0 ? -1 : 1;
+                minusOrPlusY = minusOrPlusY == 0 ? -1 : 1;
+    
+                let enemyVelocityX = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusX );
+                let enemyVelocityY = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusY );
+    
+                enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x = -enemyVelocityX : enemy.body.velocity.x = enemyVelocityX;
+                enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
+            }
+    
+            if ( enemy.y > 2850 )
+            {
+                enemy.body.velocity.y *= -1;
             }
         }
         else
         {
-            let minusOrPlusX = Math.floor( Math.random() * 2 );
-            let minusOrPlusY = Math.floor( Math.random() * 2 );
-
-            minusOrPlusX = minusOrPlusX == 0 ? -1 : 1;
-            minusOrPlusY = minusOrPlusY == 0 ? -1 : 1;
-
-            let enemyVelocityX = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusX );
-            let enemyVelocityY = Math.floor( Math.random() * Math.floor(Math.random() * DEFAULT_VELOCITY_ENEMY) * minusOrPlusY );
-
-            enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x = -enemyVelocityX : enemy.body.velocity.x = enemyVelocityX;
-            enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
-        }
-
-        if ( enemy.y > 2850 )
-        {
-            enemy.body.velocity.y *= -1;
+            enemy.body.velocity.x = 0;
+            enemy.body.velocity.y = 0;
         }
     }
     
@@ -376,10 +384,13 @@ function CreatePlay () // SET UP THE GAME
 
 function UpdatePlay () // GAME LOOP
 {
-    UpdateCharacter();
-    UpdateCollisions();
-    UpdateRotations();
-    UpdateSprites();
+    if ( ! isBuyingReloads )
+    {
+        UpdateCharacter();
+        UpdateCollisions();
+        UpdateRotations();
+        UpdateSprites();
+    }
 }
 
 function UpdateSprites ()
@@ -708,6 +719,16 @@ function CreateImages ()
     game.load.image( 'rec_life' , 'assets/imgs/rec_life.png' );
     game.load.image( 'rec_ammo' , 'assets/imgs/rec_ammo.png' );
     game.load.image( 'player_pistol' , 'assets/imgs/PlayerPistol.png' );
+    game.load.image( 'B' , 'assets/imgs/B.png' );
+    game.load.image( 'C' , 'assets/imgs/C.png' );
+    game.load.image( 'E' , 'assets/imgs/E.png' );
+    game.load.image( 'H' , 'assets/imgs/H.png' );
+    game.load.image( 'K' , 'assets/imgs/K.png' );
+    game.load.image( 'L' , 'assets/imgs/L.png' );
+    game.load.image( 'O' , 'assets/imgs/O.png' );
+    game.load.image( 'S' , 'assets/imgs/S.png' );
+    game.load.image( 'T' , 'assets/imgs/T.png' );
+    game.load.image( 'U' , 'assets/imgs/U.png' );
 }
 
 function CreateBackground ()
@@ -860,6 +881,10 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     {
         btnInteract.visible = true;
 
+        setTimeout( function() {
+            btnInteract.visible = false;
+        }, 1000 );
+
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
             if ( totalBlueTint >= 0 ) // 10000
@@ -937,18 +962,49 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
     if ( game.physics.arcade.distanceBetween( character , rec_ammo ) < DISTANCE_DETECTION_REC_AMMO )
     {
         btnInteract.visible = true;
+        setTimeout( function() {
+            btnInteract.visible = false;
+        }, 1000 );
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) && totalBlueTint >= RELOAD_COST )
         {
             if ( needsToReload )
             {
                 ReloadZone.ReloadCharacter(pistol);
+                isBuyingReloads = true;
+                character.body.velocity.x = 0;
+                character.body.velocity.y = 0;
+
+                // Crear un sprite de texto y añadir un tween
+                B = game.add.sprite(-50, -50, 'B');
+                C = game.add.sprite(WORLD_WIDTH / 2, -50, 'C');
+                E = game.add.sprite(WORLD_WIDTH + 50, -50, 'E');
+                H = game.add.sprite(WORLD_WIDTH + 50, WORLD_HEIGHT / 4, 'H');
+                K = game.add.sprite(WORLD_WIDTH + 50, (3 * WORLD_HEIGHT) / 4, 'K');
+                L = game.add.sprite(WORLD_WIDTH + 50, WORLD_HEIGHT + 50, 'L');
+                O = game.add.sprite(WORLD_WIDTH / 2, WORLD_HEIGHT + 50, 'O');
+                S = game.add.sprite(-50, WORLD_HEIGHT + 50, 'S');
+                T = game.add.sprite(-50, (3 * WORLD_HEIGHT) / 4, 'T');
+                U = game.add.sprite(-50, WORLD_HEIGHT / 4, 'U');
+                
+                let letters = [B, C, E, H, K, L, O, S, T, U];
+
+                letters.forEach(function(letter) {
+                    let tween = game.add.tween(letter).to({ x: character.x, y: character.y }, 2000, Phaser.Easing.Linear.None, true);
+                    tween.onComplete.add(function() {
+                        letter.destroy();
+                    }, this);
+                });
+
+                setTimeout( function() {
+                    isBuyingReloads = false;
+                }, 2000 );
             }
         }
     }
-    else
+    /* else
     {
         btnInteract.visible = false;
-    }
+    } */
 }
 
 function CheckDistanceWithRecLife ( recLife )

@@ -37,7 +37,7 @@ function createInit()
     btnInstructions.anchor.setTo(0);
     game.add.tween(btnInstructions).to({y: 250}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnA = game.add.button(200, -100, 'btnA', startPlay, this, null);
+    btnA = game.add.button(200, -100, 'btnA', startPlayEasy, this, null);
     btnA.anchor.setTo(0);
     game.add.tween(btnA).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
@@ -46,10 +46,10 @@ function createInit()
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 }
 
-function startPlay()
+/* function startPlay()
 {
     game.state.start('play');
-}
+} */
 
 function startPlayEasy()
 {
