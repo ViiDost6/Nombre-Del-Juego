@@ -56,7 +56,6 @@ ANCHOR_Y_LIFEBAR = 1 ,
 DISTANCE_INTERACT = 125 , 
 DISTANCE_DETECTION_INKBAG = 100 , 
 DISTANCE_DETECTION_RAE = 150 , 
-BASIC_WEAPON_MAX_RELOAD = 3 , 
 RELOAD_COST = 100 , 
 DISTANCE_DETECTION_REC_AMMO = 100;
 
@@ -65,7 +64,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , R , E , L , O , A , D , I , N , G , black_background;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , MECAGOENDIOS = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -227,10 +226,10 @@ class SpawnerBasicEnemy
                 enemy.x < 0 || enemy.x > WORLD_WIDTH ? enemy.body.velocity.x = -enemyVelocityX : enemy.body.velocity.x = enemyVelocityX;
                 enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
             }
-    
-            if ( enemy.y > 2850 )
+
+            if ( enemy.y >= 2900 )
             {
-                enemy.body.velocity.y *= -1;
+                enemy.kill();
             }
         }
         else
@@ -318,7 +317,7 @@ class SpawnerBasicEnemy
 
 class Weapon
 {
-    constructor ( nbullets , sprite , distance , speed , rate , variance )
+    constructor ( nbullets , sprite , distance , speed , rate , variance , weaponType , maxMagazines )
     {
         this.core = game.add.weapon( nbullets , sprite ); // CREATE THE WEAPON
         this.core.trackSprite( character , WEAPON_OFFSET_X , WEAPON_OFFSET_Y , true ); // TRACK THE CHARACTER
@@ -327,14 +326,23 @@ class Weapon
         this.core.bulletSpeed = speed; // THE SPEED OF THE BULLET
         this.core.fireRate = rate; // THE FIRE RATE OF THE BULLET
         this.core.bulletAngleVariance = variance; // THE VARIANCE OF THE ANGLE OF THE BULLET
-        this.core.setBulletFrames( 0 , nbullets - 1 , true ); // SET THE FRAMES OF THE BULLET
         this.nbullets = nbullets; // THE NUMBER OF BULLETS
         this.numberOfReloads = 0; // THE NUMBER OF RELOADS
+        this.weaponType = weaponType; // THE TYPE OF WEAPON
+        this.maxMagazines = maxMagazines; // THE MAXIMUM NUMBER OF SHOTS
+        this.delayShoot = false; // THE DELAY TO SHOOT    
+
+        if ( this.weaponType != 'bow' )
+        {
+            this.core.setBulletFrames( 0 , nbullets - 1 , true ); // SET THE FRAMES OF THE BULLET
+        }
     }
 
     Shoot () // SHOOT. A SINGLE CLICK SHOOTS ALL BULLETS
     {
         let shotsThatHaveBeenShot = this.core.shots; // GET THE NUMBER OF BULLETS SHOT
+        // console.log( shotsThatHaveBeenShot );
+        console.log( this.numberOfReloads );
 
         // TO TRACK THE REMAINING BULLETS IN A ‘MAGAZINE’ IN PHASER, YOU MUST COUNT THE SHOTS. 
         // PHASER.WEAPON LACKS A FUNCTION FOR THIS, SO WE USE PISTOL.SHOTS, WHICH COUNTS THE SHOTS SINCE THE LAST RESET.
@@ -342,9 +350,10 @@ class Weapon
         let canShoot = game.input.activePointer.leftButton.isDown && shotsThatHaveBeenShot == 0;
         let isShooting = shotsThatHaveBeenShot > 0 && shotsThatHaveBeenShot < this.nbullets;
         let needsReload = shotsThatHaveBeenShot == this.nbullets;
-        needsToReload = this.numberOfReloads >= BASIC_WEAPON_MAX_RELOAD;
+        
+        needsToReload = this.numberOfReloads >= this.maxMagazines;
 
-        if ( this.numberOfReloads < BASIC_WEAPON_MAX_RELOAD )
+        if ( this.numberOfReloads < this.maxMagazines )
         {
             if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
             {
@@ -356,12 +365,28 @@ class Weapon
             }   
             else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
             {
-                shotsThatHaveBeenShot = this.core.resetShots();
-                this.numberOfReloads++;
+                if ( this.weaponType == 'pistol' )
+                {
+                    shotsThatHaveBeenShot = this.core.resetShots();
+                    this.numberOfReloads++;
+                }
+                else
+                {
+                    if ( ! this.delayShoot )
+                    {
+                        this.delayShoot = true;
+                        console.log( ++MECAGOENDIOS );
+                        // Weapon.ReloadCharacter( this );
+                        setTimeout( function() {
+                            this.numberOfReloads++;
+                            this.shotsThatHaveBeenShot = this.core.resetShots();
+                            this.delayShoot = false;
+                        }.bind(this), 1000 );   
+                    }
+                }
             }
         }
     }
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,12 +479,27 @@ function UpdateCollisions ()
         bullet.kill();
     });
 
+    game.physics.arcade.collide(shotgun.core.bullets, barriers, function(bullet) {
+        bullet.kill();
+    });
+
     game.physics.arcade.collide(pistol.core.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(shotgun.core.bullets, barrierSafeZoneGroup, function(bullet) {
         bullet.kill();
     });
 
     // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
@@ -473,7 +513,21 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
+    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
@@ -487,7 +541,21 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
+    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBag( enemy );
@@ -733,6 +801,8 @@ function CreateImages ()
     game.load.image( 'T' , 'assets/imgs/T.png' );
     game.load.image( 'U' , 'assets/imgs/U.png' );
     game.load.image( 'black_background' , 'assets/imgs/black_background.png' );
+    game.load.spritesheet( 'buckshot' , 'assets/imgs/buckshot.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
+    game.load.image( 'player_shotgun' , 'assets/imgs/PlayerShotgun.png' );
 }
 
 function CreateBackground ()
@@ -778,7 +848,7 @@ function CreateCharacter ()
 {
     ReloadZone.AddReloadZone( WORLD_WIDTH / 2 , 2700 );
 
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_pistol' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_shotgun' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -793,7 +863,8 @@ function CreateCharacter ()
     game.camera.follow( character );
 
     // SET UP THE WEAPON FOR THE CHARACTER
-    pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE );
+    pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE , 'pistol' , 10 );
+    shotgun = new Weapon( 8 , 'buckshot' , BULLET_KILL_DISTANCE / 2 , BULLET_SPEED / 1.5 , 0 , 40 , 'shotgun' , 4 );
 
     totalRedTint = 0;
     totalBlueTint = 0;
@@ -872,7 +943,8 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     CheckDash(); // CHECKS IF THE CHARACTER DASHES
     CheckMovement(); // CHECKS IF THE CHARACTER MOVES
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
-    pistol.Shoot(); // SHOOT THE BULLET
+    // pistol.Shoot(); // SHOOT THE BULLET
+    shotgun.Shoot(); // SHOOT THE BULLET
 
     btnInteract.x = character.x;
     btnInteract.y = character.y - 60;
@@ -978,7 +1050,7 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
         {
             if ( needsToReload )
             {
-                ReloadZone.ReloadCharacter(pistol);
+                ReloadZone.ReloadCharacter(shotgun);
                 isBuyingReloads = true;
                 black_background.visible = true;
 
