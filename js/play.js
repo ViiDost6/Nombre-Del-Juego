@@ -65,7 +65,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , R , E , L , O , A , D , I , N , G;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , R , E , L , O , A , D , I , N , G , black_background;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -391,6 +391,11 @@ function UpdatePlay () // GAME LOOP
         UpdateRotations();
         UpdateSprites();
     }
+    else
+    {
+        character.body.velocity.x = 0;
+        character.body.velocity.y = 0;
+    }
 }
 
 function UpdateSprites ()
@@ -443,7 +448,6 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
     game.physics.arcade.collide(character, barrierSafeZone);
     game.physics.arcade.collide(character, rae);
-    // game.physics.arcade.collide(character, rec_ammo_group1);
 
     // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
     game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
@@ -687,7 +691,6 @@ function CreateTimers ()
 
 function CreateImages ()
 {
-    game.load.image( 'bullet' , 'assets/imgs/laser.png' );
     game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
     game.load.image( 'background' , 'assets/imgs/background.png' );
     game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
@@ -729,6 +732,7 @@ function CreateImages ()
     game.load.image( 'S' , 'assets/imgs/S.png' );
     game.load.image( 'T' , 'assets/imgs/T.png' );
     game.load.image( 'U' , 'assets/imgs/U.png' );
+    game.load.image( 'black_background' , 'assets/imgs/black_background.png' );
 }
 
 function CreateBackground ()
@@ -840,6 +844,11 @@ function CreateHUD ()
     hudGroup.add(red_tint_counter);
     hudGroup.add(blue_tint_counter);
     hudGroup.add(textNoMoney);
+
+    black_background = hudGroup.create( 0 , 0 , 'black_background' );
+    black_background.anchor.setTo( 0 );
+    // black_background.alpha = 0.5;
+    black_background.visible = false;
 
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
@@ -971,20 +980,19 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
             {
                 ReloadZone.ReloadCharacter(pistol);
                 isBuyingReloads = true;
-                character.body.velocity.x = 0;
-                character.body.velocity.y = 0;
+                black_background.visible = true;
 
                 // Crear un sprite de texto y añadir un tween
-                B = game.add.sprite(-50, -50, 'B');
-                C = game.add.sprite(WORLD_WIDTH / 2, -50, 'C');
-                E = game.add.sprite(WORLD_WIDTH + 50, -50, 'E');
-                H = game.add.sprite(WORLD_WIDTH + 50, WORLD_HEIGHT / 4, 'H');
-                K = game.add.sprite(WORLD_WIDTH + 50, (3 * WORLD_HEIGHT) / 4, 'K');
-                L = game.add.sprite(WORLD_WIDTH + 50, WORLD_HEIGHT + 50, 'L');
-                O = game.add.sprite(WORLD_WIDTH / 2, WORLD_HEIGHT + 50, 'O');
-                S = game.add.sprite(-50, WORLD_HEIGHT + 50, 'S');
-                T = game.add.sprite(-50, (3 * WORLD_HEIGHT) / 4, 'T');
-                U = game.add.sprite(-50, WORLD_HEIGHT / 4, 'U');
+                B = game.add.sprite(character.x - 75, character.y - 75, 'B');
+                C = game.add.sprite(character.x, character.y - 100, 'C');
+                E = game.add.sprite(character.x + 75, character.y - 75, 'E');
+                H = game.add.sprite(character.x + 100, character.y - 50, 'H');
+                K = game.add.sprite(character.x + 100, character.y + 50, 'K');
+                L = game.add.sprite(character.x + 75, character.y + 75, 'L');
+                O = game.add.sprite(character.x, character.y + 100, 'O');
+                S = game.add.sprite(character.x - 75, character.y + 75, 'S');
+                T = game.add.sprite(character.x - 100, character.y + 50, 'T');
+                U = game.add.sprite(character.x - 100, character.y - 50, 'U');
                 
                 let letters = [B, C, E, H, K, L, O, S, T, U];
 
@@ -995,16 +1003,18 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
                     }, this);
                 });
 
+                let tween = game.add.tween(black_background).to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+                tween.onComplete.add(function() {
+                    black_background.visible = false;
+                    black_background.alpha = 1; // Restablecer la transparencia para la próxima vez
+                }, this);
+
                 setTimeout( function() {
                     isBuyingReloads = false;
                 }, 2000 );
             }
         }
     }
-    /* else
-    {
-        btnInteract.visible = false;
-    } */
 }
 
 function CheckDistanceWithRecLife ( recLife )
@@ -1026,6 +1036,11 @@ function InkBagFollowsCharacter ( inkBag )
     if ( game.physics.arcade.distanceBetween( character , inkBag ) < DISTANCE_DETECTION_INKBAG )
     {
         game.physics.arcade.moveToObject( inkBag , character , 200 );
+    }
+    else
+    {
+        inkBag.body.velocity.x = 0;
+        inkBag.body.velocity.y = 0;
     }
 }
 
