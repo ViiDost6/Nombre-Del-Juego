@@ -57,14 +57,15 @@ DISTANCE_INTERACT = 125 ,
 DISTANCE_DETECTION_INKBAG = 100 , 
 DISTANCE_DETECTION_RAE = 150 , 
 BASIC_WEAPON_MAX_RELOAD = 3 , 
-RELOAD_COST = 100;
+RELOAD_COST = 100 , 
+DISTANCE_DETECTION_REC_AMMO = 100;
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -72,20 +73,24 @@ barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , re
 
 class ReloadZone
 {
-    constructor ( x , y )
+    static AddReloadZone ( x , y )
     {
         this.x = x;
         this.y = y;
-        this.sprite = game.add.sprite( this.x , this.y , 'rec_ammo' );
-        this.sprite.anchor.setTo( 0.5 , 0.5 );
-        this.sprite.scale.setTo( 1.5 );
+        rec_ammo_group1 = game.add.group();
+        rec_ammo_group1.enableBody = true;
+        let rec_ammo = rec_ammo_group1.create( this.x , this.y , 'rec_ammo' );
+        rec_ammo.anchor.setTo( 0.5 , 0.5 );
+        rec_ammo.scale.setTo( 2 );
+        rec_ammo.body.immovable = true;
     }
 
-    ReloadCharacter (weapon)
+    static ReloadCharacter (weapon)
     {
         weapon.numberOfReloads = 0;
         totalBlueTint -= RELOAD_COST;
         blue_tint_counter.text = totalBlueTint;
+        needsToReload = false;
     }
 }
 
@@ -329,27 +334,22 @@ class Weapon
         let canShoot = game.input.activePointer.leftButton.isDown && shotsThatHaveBeenShot == 0;
         let isShooting = shotsThatHaveBeenShot > 0 && shotsThatHaveBeenShot < this.nbullets;
         let needsReload = shotsThatHaveBeenShot == this.nbullets;
-
-        // console.log( shotsThatHaveBeenShot );
-        // console.log( "max = ", this.nbullets );
+        needsToReload = this.numberOfReloads >= BASIC_WEAPON_MAX_RELOAD;
 
         if ( this.numberOfReloads < BASIC_WEAPON_MAX_RELOAD )
         {
             if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
             {
                 this.core.fireAtPointer( game.input.activePointer );  
-                // console.log( 'shoot' );
             }
             else if ( isShooting )
             {
                 this.core.fireAtPointer( game.input.activePointer );
-                // console.log( 'shoot loop' );
             }   
             else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
             {
                 shotsThatHaveBeenShot = this.core.resetShots();
                 this.numberOfReloads++;
-                // console.log( 'reload' );
             }
         }
     }
@@ -432,7 +432,7 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
     game.physics.arcade.collide(character, barrierSafeZone);
     game.physics.arcade.collide(character, rae);
-    game.physics.arcade.collide(character, rec_ammo);
+    // game.physics.arcade.collide(character, rec_ammo_group1);
 
     // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
     game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
@@ -745,13 +745,14 @@ function CreateBackground ()
     rec_life = game.add.group();
     rec_life.enableBody = true;
 
-
     let recLife = rec_life.create( 100 , 3075 , 'rec_life' );
     recLife.body.immovable = true;
 }
 
 function CreateCharacter ()
 {
+    ReloadZone.AddReloadZone( WORLD_WIDTH / 2 , 2700 );
+
     character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_pistol' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
@@ -781,9 +782,6 @@ function CreateCharacter ()
 
     safeZoneSecondsCounter = 0;
     canEnterSafeZone = true;
-
-    rec_ammo = new ReloadZone( WORLD_WIDTH / 2 , 2700 );
-    console.log(rec_ammo.sprite.x, rec_ammo.sprite.y);
 }
 
 function CreateHUD ()
@@ -931,13 +929,26 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
     rec_life.forEach( CheckDistanceWithRecLife , this );
 
-    game.physics.arcade.collide(character, rec_ammo, function() {
+    rec_ammo_group1.forEach( CheckDistanceWithRecAmmo , this );
+}
+
+function CheckDistanceWithRecAmmo ( rec_ammo )
+{
+    if ( game.physics.arcade.distanceBetween( character , rec_ammo ) < DISTANCE_DETECTION_REC_AMMO )
+    {
         btnInteract.visible = true;
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) && totalBlueTint >= RELOAD_COST )
         {
-            rec_ammo.ReloadCharacter(pistol);
+            if ( needsToReload )
+            {
+                ReloadZone.ReloadCharacter(pistol);
+            }
         }
-    });
+    }
+    else
+    {
+        btnInteract.visible = false;
+    }
 }
 
 function CheckDistanceWithRecLife ( recLife )
