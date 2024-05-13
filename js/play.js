@@ -64,7 +64,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -471,6 +471,8 @@ function UpdateCollisions ()
     game.physics.arcade.collide(basicEnemiesZone5, barriers);
     game.physics.arcade.collide(character, barrierSafeZone);
     game.physics.arcade.collide(character, rae);
+    game.physics.arcade.collide(character, shopGroup);
+    game.physics.arcade.collide(character, shopWeaponsGroup);
 
     // MAKE THE BULLETS COLLIDE WITH THE BARRIERS
     game.physics.arcade.collide(pistol.core.bullets, barriers, function(bullet) {
@@ -841,6 +843,9 @@ function CreateImages ()
     game.load.image( 'player_shotgun' , 'assets/imgs/PlayerShotgun.png' );
     game.load.image( 'arrow' , 'assets/imgs/arrow.png' );
     game.load.image( 'player_bow' , 'assets/imgs/PlayerBow.png' );
+    game.load.image( 'shop' , 'assets/imgs/Shop.png' );
+    game.load.image( 'shotgun' , 'assets/imgs/shotgun.png' );
+    game.load.image( 'bow' , 'assets/imgs/bow.png' );
 }
 
 function CreateBackground ()
@@ -880,13 +885,44 @@ function CreateBackground ()
 
     let recLife = rec_life.create( 100 , 3075 , 'rec_life' );
     recLife.body.immovable = true;
+
+    shopGroup = game.add.group();
+    shopGroup.enableBody = true;
+
+    let shop = shopGroup.create( 300 , 3015 , 'shop' );
+    shop.body.immovable = true;
+
+    shineShopGroup = game.add.group();
+    shineShopGroup.enableBody = true;
+
+    shopWeaponsGroup = game.add.group();
+    shopWeaponsGroup.enableBody = true;
+
+    
+
+    let shineShotgun = shineShopGroup.create( 600 , 3050 , 'shine_rae' );
+    shineShotgun.body.immovable = true;
+    shineShotgun.anchor.setTo( 0.5 , 0.5);
+    shineShotgun.scale.setTo( 0.75 );
+    let shopShotgun = shopWeaponsGroup.create( 600 , 3050 , 'shotgun' );
+    shopShotgun.body.immovable = true;
+    shopShotgun.anchor.setTo( 0.5 , 0.5);
+    shopShotgun.scale.setTo( 1.85 );
+
+    let shineBow = shineShopGroup.create( 600 , 3130 , 'shine_rae' );
+    shineBow.body.immovable = true;
+    shineBow.anchor.setTo( 0.5 , 0.5);
+    shineBow.scale.setTo( 0.75 );
+    let shopBow = shopWeaponsGroup.create( 600 , 3130 , 'bow' );
+    shopBow.body.immovable = true;
+    shopBow.anchor.setTo( 0.5 , 0.5);
 }
 
 function CreateCharacter ()
 {
     ReloadZone.AddReloadZone( WORLD_WIDTH / 2 , 2700 );
 
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_bow' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_pistol' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -918,9 +954,11 @@ function CreateCharacter ()
     safeZoneSecondsCounter = 0;
     canEnterSafeZone = true;
 
-    weaponSelected = 2;
+    weaponSelected = 0;
     hasBow = false;
     hasShotgun = false;
+
+    canSwitchBetweenWeapons = true;
 }
 
 function CreateHUD ()
@@ -989,7 +1027,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
     if ( game.input.keyboard.isDown( Phaser.Keyboard.Q ) )
     {
-        if ( hasBow || hasShotgun )
+        if ( ( hasBow || hasShotgun ) && canSwitchBetweenWeapons )
         {
             if ( weaponSelected == 0 && ! hasShotgun )
             {
@@ -1007,20 +1045,31 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             {
                 weaponSelected++;
             }
+
+            canSwitchBetweenWeapons = false;
+
+            setTimeout( function() {
+                canSwitchBetweenWeapons = true;
+            }, 500 );
         }
     }
 
-    if ( weaponSelected == 0 )
+    switch ( weaponSelected )
     {
-        pistol.Shoot();
-    }
-    else if ( weaponSelected == 1 )
-    {
-        shotgun.Shoot();
-    }
-    else if ( weaponSelected == 2 )
-    {
-        bow.Shoot();
+        case 0:
+            character.loadTexture( 'player_pistol' , 0 );
+            pistol.Shoot();
+            break;
+        case 1:
+            character.loadTexture( 'player_shotgun' , 0 );
+            shotgun.Shoot();
+            break;
+        case 2:
+            character.loadTexture( 'player_bow' , 0 );
+            bow.Shoot();
+            break;
+        default:
+            break;
     }
 
     btnInteract.x = character.x;
@@ -1113,6 +1162,32 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     rec_life.forEach( CheckDistanceWithRecLife , this );
 
     rec_ammo_group1.forEach( CheckDistanceWithRecAmmo , this );
+
+    shopWeaponsGroup.forEach( CheckDistanceWithShopWeapons , this );
+}
+
+function CheckDistanceWithShopWeapons ( shopWeapon )
+{
+    game.physics.arcade.collide(character, shopWeapon, function() {
+        btnInteract.visible = true;
+        if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+        {
+            if ( shopWeapon.key == 'shotgun' )
+            {
+                hasShotgun = true;
+            }
+            else if ( shopWeapon.key == 'bow' )
+            {
+                hasBow = true;
+            }
+
+            shopWeapon.kill();
+        }
+
+        setTimeout( function() {
+            btnInteract.visible = false;
+        }, 1000 );
+    });
 }
 
 function CheckDistanceWithRecAmmo ( rec_ammo )
