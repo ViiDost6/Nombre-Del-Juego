@@ -64,7 +64,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , MECAGOENDIOS = 0;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -375,8 +375,6 @@ class Weapon
                     if ( ! this.delayShoot )
                     {
                         this.delayShoot = true;
-                        console.log( ++MECAGOENDIOS );
-                        // Weapon.ReloadCharacter( this );
                         setTimeout( function() {
                             this.numberOfReloads++;
                             this.shotsThatHaveBeenShot = this.core.resetShots();
@@ -483,11 +481,19 @@ function UpdateCollisions ()
         bullet.kill();
     });
 
+    game.physics.arcade.collide(bow.core.bullets, barriers, function(bullet) {
+        bullet.kill();
+    });
+
     game.physics.arcade.collide(pistol.core.bullets, barrierSafeZoneGroup, function(bullet) {
         bullet.kill();
     });
 
     game.physics.arcade.collide(shotgun.core.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(bow.core.bullets, barrierSafeZoneGroup, function(bullet) {
         bullet.kill();
     });
 
@@ -501,6 +507,12 @@ function UpdateCollisions ()
 
     game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
         bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
         enemy.kill();
         DropInkBag( enemy );
         BlastAnimation( enemy );
@@ -520,6 +532,12 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
@@ -529,6 +547,12 @@ function UpdateCollisions ()
 
     game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
         bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
         enemy.kill();
         DropInkBag( enemy );
         BlastAnimation( enemy );
@@ -548,6 +572,12 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
     game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
@@ -557,6 +587,12 @@ function UpdateCollisions ()
 
     game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
         bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
         enemy.kill();
         DropInkBag( enemy );
         BlastAnimation( enemy );
@@ -803,6 +839,8 @@ function CreateImages ()
     game.load.image( 'black_background' , 'assets/imgs/black_background.png' );
     game.load.spritesheet( 'buckshot' , 'assets/imgs/buckshot.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
     game.load.image( 'player_shotgun' , 'assets/imgs/PlayerShotgun.png' );
+    game.load.image( 'arrow' , 'assets/imgs/arrow.png' );
+    game.load.image( 'player_bow' , 'assets/imgs/PlayerBow.png' );
 }
 
 function CreateBackground ()
@@ -848,7 +886,7 @@ function CreateCharacter ()
 {
     ReloadZone.AddReloadZone( WORLD_WIDTH / 2 , 2700 );
 
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_shotgun' );
+    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_bow' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -864,7 +902,8 @@ function CreateCharacter ()
 
     // SET UP THE WEAPON FOR THE CHARACTER
     pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE , 'pistol' , 10 );
-    shotgun = new Weapon( 8 , 'buckshot' , BULLET_KILL_DISTANCE / 2 , BULLET_SPEED / 1.5 , 0 , 40 , 'shotgun' , 4 );
+    shotgun = new Weapon( 8 , 'buckshot' , BULLET_KILL_DISTANCE / 2 , BULLET_SPEED / 1.5 , 0 , 40 , 'shotgun' , 5 );
+    bow = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE * 3 , BULLET_SPEED / 2 , FIRE_RATE / 2 , BULLET_ANGLE_VARIANCE + 10 , 'bow' , 4 );
 
     totalRedTint = 0;
     totalBlueTint = 0;
@@ -878,6 +917,10 @@ function CreateCharacter ()
 
     safeZoneSecondsCounter = 0;
     canEnterSafeZone = true;
+
+    weaponSelected = 2;
+    hasBow = false;
+    hasShotgun = false;
 }
 
 function CreateHUD ()
@@ -943,8 +986,42 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     CheckDash(); // CHECKS IF THE CHARACTER DASHES
     CheckMovement(); // CHECKS IF THE CHARACTER MOVES
     RotateTowardsMouse(); // ROTATE THE CHARACTER ORIENTATION TOWARDS THE MOUSE CURSOR
-    // pistol.Shoot(); // SHOOT THE BULLET
-    shotgun.Shoot(); // SHOOT THE BULLET
+
+    if ( game.input.keyboard.isDown( Phaser.Keyboard.Q ) )
+    {
+        if ( hasBow || hasShotgun )
+        {
+            if ( weaponSelected == 0 && ! hasShotgun )
+            {
+                weaponSelected = 2;
+            }
+            else if ( weaponSelected == 1 && ! hasBow )
+            {
+                weaponSelected = 0;
+            }
+            else if ( weaponSelected == 2 )
+            {
+                weaponSelected = 0;
+            }
+            else
+            {
+                weaponSelected++;
+            }
+        }
+    }
+
+    if ( weaponSelected == 0 )
+    {
+        pistol.Shoot();
+    }
+    else if ( weaponSelected == 1 )
+    {
+        shotgun.Shoot();
+    }
+    else if ( weaponSelected == 2 )
+    {
+        bow.Shoot();
+    }
 
     btnInteract.x = character.x;
     btnInteract.y = character.y - 60;
@@ -1050,7 +1127,19 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
         {
             if ( needsToReload )
             {
-                ReloadZone.ReloadCharacter(shotgun);
+                if ( weaponSelected == 0 )
+                {
+                    ReloadZone.ReloadCharacter(pistol);
+                }
+                else if ( weaponSelected == 1 )
+                {
+                    ReloadZone.ReloadCharacter(shotgun);
+                }
+                else if ( weaponSelected == 2 )
+                {
+                    ReloadZone.ReloadCharacter(bow);
+                }
+
                 isBuyingReloads = true;
                 black_background.visible = true;
 
