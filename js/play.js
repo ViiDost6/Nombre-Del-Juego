@@ -1172,16 +1172,16 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
         btnInteract.visible = true;
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( shopWeapon.key == 'shotgun' )
+            if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 100 )
             {
                 hasShotgun = true;
+                shopWeapon.kill();
             }
-            else if ( shopWeapon.key == 'bow' )
+            else if ( shopWeapon.key == 'bow' && totalBlueTint >= 200 )
             {
                 hasBow = true;
+                shopWeapon.kill();
             }
-
-            shopWeapon.kill();
         }
 
         setTimeout( function() {
