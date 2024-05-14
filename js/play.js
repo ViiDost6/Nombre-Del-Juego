@@ -64,7 +64,7 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -610,7 +610,7 @@ function UpdateCollisions ()
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
     inkBags.forEach( InkBagCollideWithCharacter , this );
 
-    if ( btnInteract.visible && closeToBarrier && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+    if ( btnInteract.visible && closeToBarrier )
     {
         if ( barriers.countLiving() > 0 && character.y < 2850)
         {
@@ -622,12 +622,24 @@ function UpdateCollisions ()
                 let costs = [ 0 , 0 , 0 , 0 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
+                costOfIt.text = "COST: " + cost;
+                costOfIt.x = btnInteract.x;
+                costOfIt.y = btnInteract.y - 100;
+                costOfIt.visible = true;
+
+                setTimeout( function() {
+                    costOfIt.visible = false;
+                }, 1000 );
+
 
                 if ( totalRedTint >= cost )
                 {
-                    totalRedTint -= cost;
-                    barrier.kill();
-                    red_tint_counter.text = totalRedTint;
+                    if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
+                    {
+                        totalRedTint -= cost;
+                        barrier.kill();
+                        red_tint_counter.text = totalRedTint;
+                    }
                 }
                 else
                 {
@@ -673,6 +685,8 @@ function InkBagCollideWithCharacter ( inkBag )
             blue_tint_counter.text = totalBlueTint;
         }
 
+        globalScoreText.text = "SCORE: " + globalScore;
+
         inkBag.kill();
     });
 }
@@ -701,7 +715,6 @@ function EnemyCollideWithCharacter ( enemy )
         game.physics.arcade.overlap(character, enemy, function() {
             if ( isDashing )
             {
-                character_health -= 0;
                 inkBagsDropSwitch = true;
             }
             else
@@ -992,14 +1005,44 @@ function CreateHUD ()
     textNoMoney = game.add.text( 175 , 570 , "You don't have enough tint, CAPITALISM WINS" , { font: "25px Kalam" , fill: "#000000" } );
     textNoMoney.visible = false;
 
+    globalScoreText = game.add.text( 325 , 10 , "SCORE: " + globalScore , { font: "30px Kalam" , fill: "#000000" } );
+
+    let difficulty;
+
+    switch ( difficultyMultiplier )
+    {
+        case 1:
+            difficulty = "EASY";
+            break;
+        case 2:
+            difficulty = "MEDIUM";
+            break;
+        case 3:
+            difficulty = "HARD";
+            break;
+        default:
+            break;
+    }
+
+    difficultyText = game.add.text( life_bar.x + 15 , life_bar.y + 10 , "DIFFICULTY: " + difficulty , { font: "20px Kalam" , fill: "#000000" } );
+
+    outOfAmmoText = game.add.text( 550 , 10 , "OUT OF AMMO" , { font: "30px Kalam" , fill: "#000000" } );
+    outOfAmmoText.visible = false;
+
+    costOfIt = game.add.text( WORLD_WIDTH , WORLD_HEIGHT , "No cost" , { font: "20px Kalam" , fill: "#000000" } );
+    costOfIt.visible = false;
+
     // Add the counters to the HUD group
     hudGroup.add(red_tint_counter);
     hudGroup.add(blue_tint_counter);
     hudGroup.add(textNoMoney);
+    hudGroup.add(globalScoreText);
+    hudGroup.add(difficultyText);
+    hudGroup.add(outOfAmmoText);
+    hudGroup.add(costOfIt);
 
     black_background = hudGroup.create( 0 , 0 , 'black_background' );
     black_background.anchor.setTo( 0 );
-    // black_background.alpha = 0.5;
     black_background.visible = false;
 
     hudGroup.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
@@ -1098,6 +1141,13 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             {
                 game.state.start('win');
             }
+            else
+            {
+                textNoMoney.visible = true;
+                setTimeout( function() {
+                    textNoMoney.visible = false;
+                }, 2000 );
+            }
         }
     }
 
@@ -1164,6 +1214,11 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     rec_ammo_group1.forEach( CheckDistanceWithRecAmmo , this );
 
     shopWeaponsGroup.forEach( CheckDistanceWithShopWeapons , this );
+
+    if ( needsToReload )
+    {
+        outOfAmmoText.visible = true;
+    }
 }
 
 function CheckDistanceWithShopWeapons ( shopWeapon )
@@ -1181,6 +1236,13 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
             {
                 hasBow = true;
                 shopWeapon.kill();
+            }
+            else
+            {
+                textNoMoney.visible = true;
+                setTimeout( function() {
+                    textNoMoney.visible = false;
+                }, 2000 );
             }
         }
 
@@ -1250,6 +1312,13 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
                 }, 2000 );
             }
         }
+        else
+        {
+            textNoMoney.visible = true;
+            setTimeout( function() {
+                textNoMoney.visible = false;
+            }, 2000 );
+        }
     }
 }
 
@@ -1263,6 +1332,13 @@ function CheckDistanceWithRecLife ( recLife )
             red_tint_counter.text = totalRedTint;
             character_health = DEFAULT_CHARACTER_HEALTH;
             life_bar.scale.y = 1;
+        }
+        else
+        {
+            textNoMoney.visible = true;
+            setTimeout( function() {
+                textNoMoney.visible = false;
+            }, 2000 );
         }
     });
 }
