@@ -5,7 +5,7 @@ let gameOverState = {
 
 function preloadEndScreen()
 {
-    game.load.image('endBackground', 'assets/imgs/initialBackground.png');
+    game.load.image('endBackground', 'assets/imgs/Dead.png');
     game.load.image('btnHome', 'assets/imgs/skipButton.png');
 }
 

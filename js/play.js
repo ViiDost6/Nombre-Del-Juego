@@ -64,7 +64,8 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
+advancedEnemiesGroup;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -312,6 +313,29 @@ class SpawnerBasicEnemy
                 enemy.reset( xSpawnCoordinate , ySpawnCoordinate );
             }
         }
+    }
+}
+
+class AdvancedEnemy
+{
+    constructor ( x , y , sprite , bulletSprite )
+    {
+        this.x = x;
+        this.y = y;
+        this.sprite = advancedEnemiesGroup.create( x , y , sprite )
+        this.sprite.anchor.setTo( 0.5 , 0.5 );
+        this.bulletSprite = bulletSprite;
+
+        this.enemyWeapon = game.add.weapon( 1000 , this.bulletSprite );
+        this.enemyWeapon.trackSprite( this.sprite , 0 , 0 , true );
+        this.enemyWeapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+        this.enemyWeapon.bulletSpeed = 800;
+        this.enemyWeapon.fireRate = 0;
+        this.enemyWeapon.bulletAngleVariance = 10;
+
+        setInterval( function() {
+            this.enemyWeapon.fire();
+        }.bind(this), 1000 );
     }
 }
 
@@ -623,8 +647,7 @@ function UpdateCollisions ()
                 let cost = costs[ barriers.countLiving() - 1 ];
 
                 costOfIt.text = "COST: " + cost;
-                costOfIt.x = btnInteract.x;
-                costOfIt.y = btnInteract.y - 100;
+                costOfIt.fill = "#ff0000";
                 costOfIt.visible = true;
 
                 setTimeout( function() {
@@ -800,6 +823,8 @@ function CreateEnemies ()
     rae.body.immovable = true;
 
     time = 0;
+
+    let enemy1 = new AdvancedEnemy( 100 , 2800 , 'basicEnemy' , 'S' );
 }
 
 function CreateTimers ()
@@ -972,6 +997,8 @@ function CreateCharacter ()
     hasShotgun = false;
 
     canSwitchBetweenWeapons = true;
+
+    advancedEnemiesGroup = game.add.group();
 }
 
 function CreateHUD ()
@@ -994,7 +1021,7 @@ function CreateHUD ()
     red_tint.anchor.setTo( 0.5 , 0.5 );
     blue_tint = hudGroup.create( SPRINT_BAR_X + 65 , SPRINT_BAR_Y - 25 , 'blue_tint' );
     blue_tint.anchor.setTo( 0.5 , 0.5 );
-    safeZoneSecondsCounter = hudGroup.create( 795 , 5 , 'safeZoneCounter10' );
+    safeZoneSecondsCounter = hudGroup.create( 795 , 50 , 'safeZoneCounter10' );
     safeZoneSecondsCounter.anchor.setTo( 1 , 0 );
     safeZoneSecondsCounter.visible = false;
 
@@ -1026,10 +1053,10 @@ function CreateHUD ()
 
     difficultyText = game.add.text( life_bar.x + 15 , life_bar.y + 10 , "DIFFICULTY: " + difficulty , { font: "20px Kalam" , fill: "#000000" } );
 
-    outOfAmmoText = game.add.text( 550 , 10 , "OUT OF AMMO" , { font: "30px Kalam" , fill: "#000000" } );
+    outOfAmmoText = game.add.text( 590 , 10 , "OUT OF AMMO" , { font: "30px Kalam" , fill: "#000000" } );
     outOfAmmoText.visible = false;
 
-    costOfIt = game.add.text( WORLD_WIDTH , WORLD_HEIGHT , "No cost" , { font: "20px Kalam" , fill: "#000000" } );
+    costOfIt = game.add.text( 345 , 45 , "No cost" , { font: "25px Kalam" , fill: "#000000" } );
     costOfIt.visible = false;
 
     // Add the counters to the HUD group
@@ -1135,6 +1162,14 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             btnInteract.visible = false;
         }, 1000 );
 
+        costOfIt.text = "COST: " + 0;
+        costOfIt.fill = "#0000ff";
+        costOfIt.visible = true;
+
+        setTimeout( function() {
+            costOfIt.visible = false;
+        }, 1000 );
+
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
             if ( totalBlueTint >= 0 ) // 10000
@@ -1219,12 +1254,47 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     {
         outOfAmmoText.visible = true;
     }
+    else
+    {
+        outOfAmmoText.visible = false;
+    }
+
+    advancedEnemiesGroup.forEach( RotateAdvancedEnemies , this );
+}
+
+function RotateAdvancedEnemies (enemy)
+{
+    if ( game.physics.arcade.distanceBetween( enemy , character ) < DISTANCE_DETECTION_ENEMY )
+    {
+        let angle = game.physics.arcade.angleBetween( enemy , character );
+        enemy.rotation = angle;
+    }
 }
 
 function CheckDistanceWithShopWeapons ( shopWeapon )
 {
     game.physics.arcade.collide(character, shopWeapon, function() {
         btnInteract.visible = true;
+
+        let cost;
+
+        if ( shopWeapon.key == 'shotgun' )
+        {
+            cost = 100;
+        }
+        else if ( shopWeapon.key == 'bow' )
+        {
+            cost = 200;
+        }
+
+        costOfIt.text = "COST: " + cost;
+        costOfIt.fill = "#0000ff";
+        costOfIt.visible = true;
+
+        setTimeout( function() {
+            costOfIt.visible = false;
+        }, 1000 );
+
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
             if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 100 )
@@ -1260,6 +1330,15 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
         setTimeout( function() {
             btnInteract.visible = false;
         }, 1000 );
+
+        costOfIt.text = "COST: " + RELOAD_COST;
+        costOfIt.fill = "#0000ff";
+        costOfIt.visible = true;
+
+        setTimeout( function() {
+            costOfIt.visible = false;
+        }, 1000 );
+
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) && totalBlueTint >= RELOAD_COST )
         {
             if ( needsToReload )
@@ -1326,6 +1405,15 @@ function CheckDistanceWithRecLife ( recLife )
 {
     game.physics.arcade.overlap(character, recLife, function() {
         btnInteract.visible = true;
+
+        costOfIt.text = "COST: " + 500;
+        costOfIt.fill = "#ff0000";
+        costOfIt.visible = true;
+
+        setTimeout( function() {
+            costOfIt.visible = false;
+        }, 1000 );
+
         if ( totalRedTint >= 500 && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
             totalRedTint -= 500;
