@@ -8,6 +8,8 @@ let playState = { // GAME PHASES
     update: UpdatePlay
 };
 
+// NORMAL CONSTANTS
+
 const CHARACTER_SPEED = 150 , 
 TOTAL_SPRINT = 500 , 
 SPRINT_COOLDOWN = 2.5 , 
@@ -16,12 +18,12 @@ ANCHOR_X = 0.5 ,
 ANCHOR_Y = 0.5 ,
 TIME_TO_STOP = 1 ,
 FPS = 60 ,
+WORLD_WIDTH = 2400 ,
+WORLD_HEIGHT = 3200 ,   
 FIXED_ANGLE = 90 ,
 DASH_DURATION = 0.15 ,
 DASH_COOLDOWN = 1.5 ,
 DASH_MULTIPLIER = 5 ,
-WORLD_WIDTH = 2400 ,
-WORLD_HEIGHT = 3200 , 
 SCROLL_FACTOR = 0.7 , 
 BULLET_SPRITE_X = 26 ,
 BULLET_SPRITE_Y = 25 , 
@@ -58,6 +60,11 @@ DISTANCE_DETECTION_INKBAG = 100 ,
 DISTANCE_DETECTION_RAE = 150 , 
 RELOAD_COST = 100 , 
 DISTANCE_DETECTION_REC_AMMO = 100;
+
+// LOCALIZATION CONSTANTS
+
+const MAX_POS_Y_ENEMIES = 2900;
+
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
 sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1 , basicEnemiesZone2 , 
@@ -159,7 +166,7 @@ class SpawnerBasicEnemy
         }
     }
 
-    NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
+    /* NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
     {
         if ( Enemy.enemyGroup[ zoneNumber ] )
         {
@@ -169,7 +176,7 @@ class SpawnerBasicEnemy
         {
             return 0;
         }
-    }
+    } */
 
     MoveEnemies ( zoneNumber )
     {
@@ -228,7 +235,7 @@ class SpawnerBasicEnemy
                 enemy.y < ZONES_HEIGHT * ( zoneNumber - 1 ) || enemy.y > ZONES_HEIGHT * zoneNumber ? enemy.body.velocity.y = -enemyVelocityY : enemy.body.velocity.y = enemyVelocityY;
             }
 
-            if ( enemy.y >= 2900 )
+            if ( enemy.y >= MAX_POS_Y_ENEMIES )
             {
                 enemy.kill();
             }
