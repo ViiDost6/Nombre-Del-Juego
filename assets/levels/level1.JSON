@@ -1,8 +1,35 @@
 {
-    "Zone1Limits":{"x1": 0, "y1" : 0, "x2": 2400, "y2": 600},
-    "Zone2Limits":{"x1": 0, "y1" : 600, "x2": 2400, "y2": 1200},
-    "Zone3Limits":{"x1": 0, "y1" : 1200, "x2": 2400, "y2": 1800},
-    "Zone4Limits":{"x1": 0, "y1" : 1800, "x2": 2400, "y2": 2400},
-    "Zone5Limits":{"x1": 0, "y1" : 2400, "x2": 2400, "y2": 3000},
-    "SafeZoneLimits":{"x1": 0, "y1" : 3000, "x2": 2400, "y2": 3200}
+    "Barrier1":{"x": 0, "y" : 600},
+    "Barrier2":{"x": 0, "y" : 1200},
+    "Barrier3":{"x": 0, "y" : 1800},
+    "Barrier4":{"x": 0, "y" : 2400},
+    "BarrierSafe":{"x": 0, "y" : 2900},
+
+    "EndZone1":{"x": 2400, "y" : 600},
+    "EndZone2":{"x": 2400, "y" : 1200},
+    "EndZone3":{"x": 2400, "y" : 1800},
+    "EndZone4":{"x": 2400, "y" : 2400},
+    "EndZone5":{"x": 2400, "y" : 2850},
+
+    "ShooterEnemy1":{"x": 0, "y" : 0},
+    "ShooterEnemy2":{"x": 0, "y" : 0},
+    "ShooterEnemy3":{"x": 0, "y" : 0},
+    "ShooterEnemy4":{"x": 0, "y" : 0},
+    "ShooterEnemy5":{"x": 0, "y" : 0},
+    "ShooterEnemy6":{"x": 0, "y" : 0},
+    "ShooterEnemy7":{"x": 0, "y" : 0},
+    "ShooterEnemy8":{"x": 0, "y" : 0},
+
+    "ReloadZone1":{"x": 0, "y" : 0},
+    "ReloadZone2":{"x": 0, "y" : 0},
+    "ReloadZone3":{"x": 0, "y" : 0},
+
+    "Player":{"x": 1200, "y" : 1600},
+
+    "HealZone":{"x": 0, "y" : 0},
+    "Shop":{"x": 0, "y" : 0},
+    "BuyShotgun":{"x": 0, "y" : 0},
+    "BuyBow":{"x": 0, "y" : 0},
+
+    "RAE":{"x": 1200, "y" : 300}
 }
