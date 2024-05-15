@@ -63,7 +63,7 @@ DISTANCE_DETECTION_REC_AMMO = 100;
 
 // LOCALIZATION CONSTANTS
 
-const MAX_POS_Y_ENEMIES = 2900;
+const MAX_POS_Y_ENEMIES = 2900 , RAE_Y = 300 , WORLD_CENTER_X = WORLD_WIDTH / 2;
 
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
@@ -72,7 +72,7 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup;
+advancedEnemiesGroup , enemy1;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -334,15 +334,21 @@ class AdvancedEnemy
         this.bulletSprite = bulletSprite;
 
         this.enemyWeapon = game.add.weapon( 1000 , this.bulletSprite );
-        this.enemyWeapon.trackSprite( this.sprite , 0 , 0 , true );
+        this.enemyWeapon.trackSprite( this.sprite , 10 , -25 , true );
         this.enemyWeapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
         this.enemyWeapon.bulletSpeed = 800;
-        this.enemyWeapon.fireRate = 0;
+        this.enemyWeapon.fireRate = 1000;
         this.enemyWeapon.bulletAngleVariance = 10;
 
-        setInterval( function() {
+        this.alive = true;
+    }
+
+    ShootAdvancedEnemy ()
+    {
+        if ( this.alive )
+        {
             this.enemyWeapon.fire();
-        }.bind(this), 1000 );
+        }
     }
 }
 
@@ -631,6 +637,27 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
+    game.physics.arcade.overlap(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        bullet.kill();
+        enemy.kill();
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
+    game.physics.arcade.overlap(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        enemy.kill();
+        enemy.alive = false;
+        DropInkBag( enemy );
+        BlastAnimation( enemy );
+    });
+
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesZone1.forEach( EnemyCollideWithCharacter , this );
     basicEnemiesZone2.forEach( EnemyCollideWithCharacter , this );
@@ -643,14 +670,14 @@ function UpdateCollisions ()
 
     if ( btnInteract.visible && closeToBarrier )
     {
-        if ( barriers.countLiving() > 0 && character.y < 2850)
+        if ( barriers.countLiving() > 0 && character.y < 2550)
         {
             let barrier = barriers.getFirstAlive(true);
 
             if ( barrier )
             {
                 // Lo subiremos a [6500 , 4000 , 2000 , 500]
-                let costs = [ 0 , 0 , 0 , 0 ];
+                let costs = [ 0 , 0 , 0 , 100 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
                 costOfIt.text = "COST: " + cost;
@@ -681,6 +708,34 @@ function UpdateCollisions ()
             }
         }
     }
+
+    game.physics.arcade.overlap(enemy1.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
 }
 
 function BlastAnimation ( enemy )
@@ -696,6 +751,22 @@ function BlastAnimation ( enemy )
     let blastTween = game.add.tween(blast.scale).to({ x: 0, y: 0 }, 1000, Phaser.Easing.Linear.None, true);
     blastTween.onComplete.add(function() {
         blast.destroy();
+    }, this);
+}
+
+function ClackAnimation ( character )
+{
+    let clack = game.add.sprite( character.x , character.y , 'clack' );
+    clack.anchor.setTo( 0.5 , 0.5 );
+
+    // Random scale between 1 and 1.25
+    let randomScale = game.rnd.realInRange(5, 5.25);
+    clack.scale.setTo(randomScale, randomScale);
+
+    // Tween to make the sprite smaller and then disappear
+    let clackTween = game.add.tween(clack.scale).to({ x: 0, y: 0 }, 1000, Phaser.Easing.Linear.None, true);
+    clackTween.onComplete.add(function() {
+        clack.destroy();
     }, this);
 }
 
@@ -798,6 +869,13 @@ function UpdateEnemies ()
     spawn3.MoveEnemies(3);
     spawn4.MoveEnemies(4);
     spawn5.MoveEnemies(5);
+
+    advancedEnemiesGroup.forEach( AdvancedEnemyShoot , this);
+}
+
+function AdvancedEnemyShoot ( enemy )
+{
+    enemy.ShootAdvancedEnemy();
 }
 
 function CreateEnemies ()
@@ -819,19 +897,19 @@ function CreateEnemies ()
     inkBags = game.add.group();
     inkBags.enableBody = true;
 
-    shine_rae = game.add.sprite( WORLD_WIDTH / 2 , 300 , 'shine_rae' );
+    shine_rae = game.add.sprite( WORLD_CENTER_X , RAE_Y , 'shine_rae' );
     shine_rae.anchor.setTo( 0.5 );
     shine_rae.scale.setTo( 2 );
 
     raeGroup = game.add.group();
     raeGroup.enableBody = true;
-    rae = raeGroup.create( WORLD_WIDTH / 2 , 300 , 'rae' );
+    rae = raeGroup.create( WORLD_CENTER_X , RAE_Y , 'rae' );
     rae.anchor.setTo( 0.5 );
     rae.body.immovable = true;
 
     time = 0;
 
-    let enemy1 = new AdvancedEnemy( 100 , 2800 , 'basicEnemy' , 'S' );
+    enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
 }
 
 function CreateTimers ()
@@ -891,6 +969,9 @@ function CreateImages ()
     game.load.image( 'shop' , 'assets/imgs/Shop.png' );
     game.load.image( 'shotgun' , 'assets/imgs/shotgun.png' );
     game.load.image( 'bow' , 'assets/imgs/bow.png' );
+    game.load.image( 'grapadora' , 'assets/imgs/Grapa.png' );
+    game.load.image( 'grapas' , 'assets/imgs/Dora.png' );
+    game.load.image( 'clack' , 'assets/imgs/Clack.png' );
 }
 
 function CreateBackground ()
@@ -1006,6 +1087,7 @@ function CreateCharacter ()
     canSwitchBetweenWeapons = true;
 
     advancedEnemiesGroup = game.add.group();
+    advancedEnemiesGroup.enableBody = true;
 }
 
 function CreateHUD ()
