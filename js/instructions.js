@@ -1,6 +1,7 @@
 let instructionsState = {
     preload: preloadInstructions,
-    create: createInstructions
+    create: createInstructions,
+    shutdown: shutdownInstructions
 };
 
 function preloadInstructions ()
@@ -29,7 +30,6 @@ function nextInstruction() {
 
     if ( instructionIndex >= instructions.length ) {
         skipInstructions();
-        instructionIndex = 0;
         return;
     }
 
@@ -38,4 +38,10 @@ function nextInstruction() {
 
 function skipInstructions() {
     game.state.start( 'init' );
+}
+
+function shutdownInstructions() {
+    instructionSprite.destroy();
+    nextButton.destroy();
+    skipButton.destroy();
 }
