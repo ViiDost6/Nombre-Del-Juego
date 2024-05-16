@@ -18,7 +18,14 @@ class AdvancedEnemy
         
 
         this.triggerTimer = game.time.events.loop( 1000 , this.firefunction , this );
-            
+        if ( this.sprite.x == 100 )
+        {
+            this.sprite.rotation = Phaser.Math.degToRad(0);
+        }
+        else
+        {
+            this.sprite.rotation = Phaser.Math.degToRad(180);
+        }
     }
 
     firefunction (){

@@ -72,7 +72,7 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -85,11 +85,14 @@ function PreloadPlay () // LOAD ASSETS FOR THE GAME
 
 function CreatePlay () // SET UP THE GAME
 {
+    levelConfig = JSON.parse(game.cache.getText('level'));        
+    console.log( game.cache.getText('level'));
     CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackground();
     CreateCharacter();
     CreateEnemies();
     CreateHUD();
+    
 }
 
 function UpdatePlay () // GAME LOOP
@@ -541,7 +544,14 @@ function CreateEnemies ()
     spawn4 = new SpawnerBasicEnemy( 4 , 'basicEnemy' );
     spawn5 = new SpawnerBasicEnemy( 5 , 'basicEnemy' );
 
-    enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
+    enemy1 = new AdvancedEnemy( levelConfig.ShooterEnemy1.x , levelConfig.ShooterEnemy1.y, 'grapadora' , 'grapas' );
+    enemy2 = new AdvancedEnemy( levelConfig.ShooterEnemy2.x , levelConfig.ShooterEnemy2.y, 'grapadora' , 'grapas' );
+    enemy3 = new AdvancedEnemy( levelConfig.ShooterEnemy3.x , levelConfig.ShooterEnemy3.y, 'grapadora' , 'grapas' );
+    enemy4 = new AdvancedEnemy( levelConfig.ShooterEnemy4.x , levelConfig.ShooterEnemy4.y, 'grapadora' , 'grapas' );
+    enemy5 = new AdvancedEnemy( levelConfig.ShooterEnemy5.x , levelConfig.ShooterEnemy5.y, 'grapadora' , 'grapas' );
+    enemy6 = new AdvancedEnemy( levelConfig.ShooterEnemy6.x , levelConfig.ShooterEnemy6.y, 'grapadora' , 'grapas' );
+    enemy7 = new AdvancedEnemy( levelConfig.ShooterEnemy7.x , levelConfig.ShooterEnemy7.y, 'grapadora' , 'grapas' );
+    enemy8 = new AdvancedEnemy( levelConfig.ShooterEnemy8.x , levelConfig.ShooterEnemy8.y, 'grapadora' , 'grapas' );
 
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies , this , 1 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies , this , 2 );
@@ -629,6 +639,7 @@ function CreateImages ()
     game.load.image( 'grapadora' , 'assets/imgs/Grapa.png' );
     game.load.image( 'grapas' , 'assets/imgs/Dora.png' );
     game.load.image( 'clack' , 'assets/imgs/Clack.png' );
+    game.load.text('level', 'assets/levels/level1.json', true);
 }
 
 function CreateBackground ()
