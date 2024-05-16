@@ -166,18 +166,6 @@ class SpawnerBasicEnemy
         }
     }
 
-    /* NumberOfEnemies ( zoneNumber ) // GET THE NUMBER OF ENEMIES IN A SPECIFIC ZONE
-    {
-        if ( Enemy.enemyGroup[ zoneNumber ] )
-        {
-            return Enemy.enemyGroup[ zoneNumber ].countLiving();
-        }
-        else
-        {
-            return 0;
-        }
-    } */
-
     MoveEnemies ( zoneNumber )
     {
         switch (zoneNumber)
@@ -338,17 +326,8 @@ class AdvancedEnemy
         this.enemyWeapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
         this.enemyWeapon.bulletSpeed = 800;
         this.enemyWeapon.fireRate = 1000;
-        this.enemyWeapon.bulletAngleVariance = 10;
-
+        this.enemyWeapon.bulletAngleVariance = 5;
         this.alive = true;
-    }
-
-    ShootAdvancedEnemy ()
-    {
-        if ( this.alive )
-        {
-            this.enemyWeapon.fire();
-        }
     }
 }
 
@@ -450,6 +429,8 @@ function UpdatePlay () // GAME LOOP
         UpdateCollisions();
         UpdateRotations();
         UpdateSprites();
+
+        
     }
     else
     {
@@ -637,25 +618,19 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
-    game.physics.arcade.overlap(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+    game.physics.arcade.collide(enemy1.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
         bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
     });
 
-    game.physics.arcade.overlap(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
-        enemy.kill();
-        enemy.alive = false;
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
+    advancedEnemiesGroup.forEach( (enemy) => {
+        if (enemy.enemyWeapon) {
+            enemy.enemyWeapon.bullets.forEach( (bullet) => {
+                if ( bullet.y > 2850 )
+                {
+                    bullet.kill();
+                }
+            });
+        }
     });
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
@@ -869,13 +844,6 @@ function UpdateEnemies ()
     spawn3.MoveEnemies(3);
     spawn4.MoveEnemies(4);
     spawn5.MoveEnemies(5);
-
-    advancedEnemiesGroup.forEach( AdvancedEnemyShoot , this);
-}
-
-function AdvancedEnemyShoot ( enemy )
-{
-    enemy.ShootAdvancedEnemy();
 }
 
 function CreateEnemies ()
@@ -1353,7 +1321,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
 function RotateAdvancedEnemies (enemy)
 {
-    if ( game.physics.arcade.distanceBetween( enemy , character ) < DISTANCE_DETECTION_ENEMY )
+    if ( game.physics.arcade.distanceBetween( enemy , character ) < DISTANCE_DETECTION_ENEMY * 2 )
     {
         let angle = game.physics.arcade.angleBetween( enemy , character );
         enemy.rotation = angle;
