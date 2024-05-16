@@ -328,18 +328,22 @@ class AdvancedEnemy
         this.enemyWeapon.bulletSpeed = 800;
         this.enemyWeapon.fireRate = 1000;
         this.enemyWeapon.bulletAngleVariance = 5;
-        this.alive = true;
+        
+
+        this.triggerTimer = game.time.events.loop( 1000 , this.firefunction , this );
+            
     }
 
-    ShootAdvanced ()
-    {
-        console.log( this.alive );
-        if ( this.alive )
+    firefunction (){
+        if ( this.sprite.alive )
         {
-            console.log( 'adios' );
+            console.log( this.sprite.alive );
             this.enemyWeapon.fire();
         }
     }
+
+
+    
 }
 
 class Weapon
@@ -635,36 +639,30 @@ function UpdateCollisions ()
 
     game.physics.arcade.collide(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
         BlastAnimation(enemy);
-        enemy.destroy();
-        bullet.kill();
         enemy.alive = false;
+        enemy.kill();
+        bullet.kill();
+        
     });
 
     game.physics.arcade.collide(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
         BlastAnimation(enemy);
-        enemy.destroy();
-        bullet.kill();
         enemy.alive = false;
+        enemy.kill();
+        bullet.kill();
+        
     });
 
     game.physics.arcade.collide(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
         BlastAnimation(enemy);
-        enemy.destroy();
-        bullet.kill();
         enemy.alive = false;
+        enemy.kill();
+        bullet.kill();
+        
     });
 
-    advancedEnemiesGroup.forEach( (enemy) => {
-        if (enemy.enemyWeapon) {
-            enemy.enemyWeapon.bullets.forEach( (bullet) => {
-                if ( bullet.y > 2850 )
-                {
-                    
-                    bullet.kill();
-                }
-            });
-        }
-    });
+    
+
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesZone1.forEach( EnemyCollideWithCharacter , this );
@@ -895,7 +893,7 @@ function CreateEnemies ()
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
 
-    game.time.events.loop( 1000 , enemy1.ShootAdvanced , this );
+    
 
     setInterval( UpdateEnemies , 1000 );
 
