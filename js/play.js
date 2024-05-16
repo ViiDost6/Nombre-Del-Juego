@@ -329,15 +329,16 @@ class AdvancedEnemy
         this.enemyWeapon.fireRate = 1000;
         this.enemyWeapon.bulletAngleVariance = 5;
         this.alive = true;
+    }
 
-        setInterval( () =>{
-            if ( this.alive )
-            {
-                this.enemyWeapon.fire();
-            }
-        
-        } , 1000 );
-
+    ShootAdvanced ()
+    {
+        console.log( this.alive );
+        if ( this.alive )
+        {
+            console.log( 'adios' );
+            this.enemyWeapon.fire();
+        }
     }
 }
 
@@ -886,11 +887,15 @@ function CreateEnemies ()
     spawn4 = new SpawnerBasicEnemy( 4 , 'basicEnemy' );
     spawn5 = new SpawnerBasicEnemy( 5 , 'basicEnemy' );
 
+    enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
+
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies , this , 1 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies , this , 2 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies , this , 3 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
+
+    game.time.events.loop( 1000 , enemy1.ShootAdvanced , this );
 
     setInterval( UpdateEnemies , 1000 );
 
@@ -908,8 +913,6 @@ function CreateEnemies ()
     rae.body.immovable = true;
 
     time = 0;
-
-    enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
 }
 
 function CreateTimers ()
