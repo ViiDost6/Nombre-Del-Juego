@@ -72,7 +72,7 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -386,15 +386,15 @@ class Weapon
 
         if ( this.numberOfReloads < this.maxMagazines )
         {
-            if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
+            if ( canShoot && isNotInSafeZone ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
             {
                 this.core.fireAtPointer( game.input.activePointer );  
             }
-            else if ( isShooting )
+            else if ( isShooting && isNotInSafeZone )
             {
                 this.core.fireAtPointer( game.input.activePointer );
             }   
-            else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
+            else if ( needsReload && isNotInSafeZone ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
             {
                 if ( this.weaponType == 'pistol' )
                 {
@@ -1090,6 +1090,7 @@ function CreateCharacter ()
     advancedEnemiesGroup = game.add.group();
     advancedEnemiesGroup.enableBody = true;
     
+    isNotInSafeZone = true;
 }
 
 function CreateHUD ()
@@ -1351,6 +1352,15 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     }
 
     advancedEnemiesGroup.forEach( RotateAdvancedEnemies , this );
+
+    if ( character.y > 2850 )
+    {
+        isNotInSafeZone = false;
+    }
+    else
+    {
+        isNotInSafeZone = true;
+    }
 }
 
 function RotateAdvancedEnemies (enemy)
