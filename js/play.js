@@ -320,6 +320,7 @@ class AdvancedEnemy
         this.sprite = advancedEnemiesGroup.create( x , y , sprite )
         this.sprite.anchor.setTo( 0.5 , 0.5 );
         this.bulletSprite = bulletSprite;
+        this.sprite.body.immovable = true;
 
         this.enemyWeapon = game.add.weapon( 1000 , this.bulletSprite );
         this.enemyWeapon.trackSprite( this.sprite , 10 , -25 , true );
@@ -328,6 +329,15 @@ class AdvancedEnemy
         this.enemyWeapon.fireRate = 1000;
         this.enemyWeapon.bulletAngleVariance = 5;
         this.alive = true;
+
+        setInterval( () =>{
+            if ( this.alive )
+            {
+                this.enemyWeapon.fire();
+            }
+        
+        } , 1000 );
+
     }
 }
 
@@ -622,11 +632,33 @@ function UpdateCollisions ()
         bullet.kill();
     });
 
+    game.physics.arcade.collide(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        BlastAnimation(enemy);
+        enemy.destroy();
+        bullet.kill();
+        enemy.alive = false;
+    });
+
+    game.physics.arcade.collide(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        BlastAnimation(enemy);
+        enemy.destroy();
+        bullet.kill();
+        enemy.alive = false;
+    });
+
+    game.physics.arcade.collide(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
+        BlastAnimation(enemy);
+        enemy.destroy();
+        bullet.kill();
+        enemy.alive = false;
+    });
+
     advancedEnemiesGroup.forEach( (enemy) => {
         if (enemy.enemyWeapon) {
             enemy.enemyWeapon.bullets.forEach( (bullet) => {
                 if ( bullet.y > 2850 )
                 {
+                    
                     bullet.kill();
                 }
             });
@@ -1056,6 +1088,7 @@ function CreateCharacter ()
 
     advancedEnemiesGroup = game.add.group();
     advancedEnemiesGroup.enableBody = true;
+    
 }
 
 function CreateHUD ()
