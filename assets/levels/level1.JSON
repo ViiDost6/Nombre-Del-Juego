@@ -26,10 +26,10 @@
 
     "Player":{"x": 1200, "y" : 1600},
 
-    "HealZone":{"x": 0, "y" : 0},
-    "Shop":{"x": 0, "y" : 0},
-    "BuyShotgun":{"x": 0, "y" : 0},
-    "BuyBow":{"x": 0, "y" : 0},
+    "HealZone":{"x": 0, "y" : 3075},
+    "Shop":{"x": 0, "y" : 3015},
+    "BuyShotgun":{"x": 0, "y" : 3050},
+    "BuyBow":{"x": 0, "y" : 3130},
 
     "RAE":{"x": 1200, "y" : 300}
 }
