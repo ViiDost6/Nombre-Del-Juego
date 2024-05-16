@@ -28,7 +28,4 @@ class AdvancedEnemy
             this.enemyWeapon.fire();
         }
     }
-
-
-    
 }

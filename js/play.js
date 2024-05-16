@@ -1012,6 +1012,16 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     if ( character.y > 2850 )
     {
         isNotInSafeZone = false;
+        advancedEnemiesGroup.forEach( function(enemy) {
+            if ( enemy.x == 100 )
+            {
+                enemy.rotation = Phaser.Math.degToRad(0);
+            }
+            else
+            {
+                enemy.rotation = Phaser.Math.degToRad(180);
+            }
+        });
     }
     else
     {
