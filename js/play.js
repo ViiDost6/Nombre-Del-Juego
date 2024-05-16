@@ -342,7 +342,7 @@ function UpdateCollisions ()
             if ( barrier )
             {
                 // Lo subiremos a [6500 , 4000 , 2000 , 500]
-                let costs = [ 0 , 0 , 0 , 100 ];
+                let costs = [ 0 , 0 , 0 , 0 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
                 costOfIt.text = "COST: " + cost;
@@ -566,13 +566,13 @@ function CreateEnemies ()
     inkBags = game.add.group();
     inkBags.enableBody = true;
 
-    shine_rae = game.add.sprite( WORLD_CENTER_X , RAE_Y , 'shine_rae' );
+    shine_rae = game.add.sprite( levelConfig.RAE.x, levelConfig.RAE.y, 'shine_rae' );
     shine_rae.anchor.setTo( 0.5 );
     shine_rae.scale.setTo( 2 );
 
     raeGroup = game.add.group();
     raeGroup.enableBody = true;
-    rae = raeGroup.create( WORLD_CENTER_X , RAE_Y , 'rae' );
+    rae = raeGroup.create( levelConfig.RAE.x, levelConfig.RAE.y, 'rae' );
     rae.anchor.setTo( 0.5 );
     rae.body.immovable = true;
 
@@ -655,35 +655,35 @@ function CreateBackground ()
     barriers = game.add.group();
     barriers.enableBody = true; // Enable physics for the barriers
 
-    let barrierBetween4And5 = barriers.create( 0 , ZONES_HEIGHT * 4 , 'barrier' );
+    let barrierBetween4And5 = barriers.create( levelConfig.Barrier4.x , levelConfig.Barrier4.y  , 'barrier' );
     barrierBetween4And5.body.immovable = true; // Make the barrier immovable
 
-    let barrierBetween3And4 = barriers.create( 0 , ZONES_HEIGHT * 3 , 'barrier' );
+    let barrierBetween3And4 = barriers.create( levelConfig.Barrier3.x , levelConfig.Barrier3.y , 'barrier' );
     barrierBetween3And4.body.immovable = true; // Make the barrier immovable
 
-    let barrierBetween2And3 = barriers.create( 0 , ZONES_HEIGHT * 2 , 'barrier' );
+    let barrierBetween2And3 = barriers.create( levelConfig.Barrier2.x , levelConfig.Barrier2.y , 'barrier' );
     barrierBetween2And3.body.immovable = true; // Make the barrier immovable
 
-    let barrierBetween1And2 = barriers.create( 0 , ZONES_HEIGHT , 'barrier' );
+    let barrierBetween1And2 = barriers.create( levelConfig.Barrier1.x , levelConfig.Barrier1.y , 'barrier' );
     barrierBetween1And2.body.immovable = true; // Make the barrier immovable
 
     barrierSafeZoneGroup = game.add.group();
     barrierSafeZoneGroup.enableBody = true;
 
-    barrierSafeZone = barrierSafeZoneGroup.create( 0 , 2900 , 'safe_zone_closed' );
+    barrierSafeZone = barrierSafeZoneGroup.create( levelConfig.BarrierSafe.x , levelConfig.BarrierSafe.y , 'safe_zone_closed' );
     barrierSafeZone.body.immovable = true;
 
     // SAFE ZONE LIFE RECOVERY
     rec_life = game.add.group();
     rec_life.enableBody = true;
 
-    let recLife = rec_life.create( 100 , 3075 , 'rec_life' );
+    let recLife = rec_life.create( levelConfig.HealZone.x , levelConfig.HealZone.y , 'rec_life' );
     recLife.body.immovable = true;
 
     shopGroup = game.add.group();
     shopGroup.enableBody = true;
 
-    let shop = shopGroup.create( 300 , 3015 , 'shop' );
+    let shop = shopGroup.create( levelConfig.Shop.x , levelConfig.Shop.y , 'shop' );
     shop.body.immovable = true;
 
     shineShopGroup = game.add.group();
@@ -694,29 +694,31 @@ function CreateBackground ()
 
     
 
-    let shineShotgun = shineShopGroup.create( 600 , 3050 , 'shine_rae' );
+    let shineShotgun = shineShopGroup.create( levelConfig.BuyShotgun.x , levelConfig.BuyShotgun.y , 'shine_rae' );
     shineShotgun.body.immovable = true;
     shineShotgun.anchor.setTo( 0.5 , 0.5);
     shineShotgun.scale.setTo( 0.75 );
-    let shopShotgun = shopWeaponsGroup.create( 600 , 3050 , 'shotgun' );
+    let shopShotgun = shopWeaponsGroup.create( levelConfig.BuyShotgun.x , levelConfig.BuyShotgun.y , 'shotgun' );
     shopShotgun.body.immovable = true;
     shopShotgun.anchor.setTo( 0.5 , 0.5);
     shopShotgun.scale.setTo( 1.85 );
 
-    let shineBow = shineShopGroup.create( 600 , 3130 , 'shine_rae' );
+    let shineBow = shineShopGroup.create( levelConfig.BuyBow.x , levelConfig.BuyBow.y , 'shine_rae' );
     shineBow.body.immovable = true;
     shineBow.anchor.setTo( 0.5 , 0.5);
     shineBow.scale.setTo( 0.75 );
-    let shopBow = shopWeaponsGroup.create( 600 , 3130 , 'bow' );
+    let shopBow = shopWeaponsGroup.create( levelConfig.BuyBow.x , levelConfig.BuyBow.y , 'bow' );
     shopBow.body.immovable = true;
     shopBow.anchor.setTo( 0.5 , 0.5);
 }
 
 function CreateCharacter ()
 {
-    ReloadZone.AddReloadZone( WORLD_WIDTH / 2 , 2700 );
+    ReloadZone.AddReloadZone( levelConfig.ReloadZone1.x , levelConfig.ReloadZone1.y );
+    ReloadZone.AddReloadZone( levelConfig.ReloadZone2.x , levelConfig.ReloadZone2.y );
+    ReloadZone.AddReloadZone( levelConfig.ReloadZone3.x , levelConfig.ReloadZone3.y );
 
-    character = game.add.sprite( WORLD_WIDTH / 2 , 2800 , 'player_pistol' );
+    character = game.add.sprite( levelConfig.Player.x , levelConfig.Player.y , 'player_pistol' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -1024,7 +1026,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
     {
         isNotInSafeZone = false;
         advancedEnemiesGroup.forEach( function(enemy) {
-            if ( enemy.x == 100 )
+        if ( enemy.x == 100 )
             {
                 enemy.rotation = Phaser.Math.degToRad(0);
             }
