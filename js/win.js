@@ -7,6 +7,7 @@ function preloadWin()
 {
     game.load.image( 'background' , 'assets/imgs/Win.png' );
     game.load.image('btnHome', 'assets/imgs/skipButton.png');
+    game.load.image('btnPlayOptional', 'assets/imgs/nextButton.png');
 }
 
 function createWin()
@@ -15,6 +16,9 @@ function createWin()
 
     let btnHome = game.add.button(GAME_STAGE_WIDTH / 2, 500, 'btnHome', startInit, this);
     btnHome.anchor.setTo(0.5, 0.5);
+
+    let btnPlayOptional = game.add.button(GAME_STAGE_WIDTH / 2, 550, 'btnPlayOptional', startOptional, this);
+    btnPlayOptional.anchor.setTo(0.5, 0.5);
 
     let blue_tint_win = game.add.text(625, 332, totalBlueTint, { font: "25px Kalam", fill: "#000000" });
     blue_tint_win.anchor.setTo(0.5, 0.5);
@@ -32,4 +36,9 @@ function createWin()
 function startInit()
 {
     game.state.start('init');
+}
+
+function startOptional()
+{
+    game.state.start('playOptional');
 }

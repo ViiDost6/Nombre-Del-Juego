@@ -16,6 +16,7 @@ function startGame()
 {
     game.state.add( 'init' , initState );
     game.state.add( 'play' , playState );
+    game.state.add( 'playOptional' , playOptionalState );
     game.state.add( 'instructions' , instructionsState );
     game.state.add( 'endscreen' , gameOverState );
     game.state.add( 'win' , winState );
