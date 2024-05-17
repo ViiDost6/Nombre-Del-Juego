@@ -206,7 +206,7 @@ function UpdateCollisions ()
         BlastAnimation( enemy );
     });
 
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
+    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
         enemy.kill();
         DropInkBag( enemy );
         BlastAnimation( enemy );
