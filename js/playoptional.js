@@ -115,7 +115,7 @@ function UpdateSpritesOptional ()
     let newScale = 3 + 1.5 * Math.sin(timeOptional / 2000); // Reduced from 0.1 to 0.01
 
     // Apply new scale and position
-    shine_rae.scale.set(newScale);
+    shine_raeOptional.scale.set(newScale);
 }
 
 function UpdateSpriteSingleEnemyOptional ( enemy )
@@ -141,127 +141,47 @@ function RotateSingleEnemy ( enemy )
 
 function UpdateCollisionsOptional ()
 {
-    game.physics.arcade.collide(characterOptional, rae);
+    game.physics.arcade.collide(characterOptional, raeOptional);
 
     // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
-    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
+    game.physics.arcade.overlap(pistolOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
+        DropInkBagOptional( enemy );
+        BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone1, function(bullet, enemy) {
+    game.physics.arcade.overlap(shotgunOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
+        DropInkBagOptional( enemy );
+        BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
+    game.physics.arcade.overlap(bowOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
+        DropInkBagOptional( enemy );
+        BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone2, function(bullet, enemy) {
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone3, function(bullet, enemy) {
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone4, function(bullet, enemy) {
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(pistol.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(shotgun.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
-        bullet.kill();
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.overlap(bow.core.bullets, basicEnemiesZone5, function(bullet, enemy) {
-        enemy.kill();
-        DropInkBag( enemy );
-        BlastAnimation( enemy );
-    });
-
-    game.physics.arcade.collide(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
-        BlastAnimation(enemy);
+    game.physics.arcade.collide(pistol.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+        BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
         
     });
 
-    game.physics.arcade.collide(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
-        BlastAnimation(enemy);
+    game.physics.arcade.collide(bow.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+        BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
         
     });
 
-    game.physics.arcade.collide(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
-        BlastAnimation(enemy);
+    game.physics.arcade.collide(shotgun.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+        BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
@@ -269,16 +189,13 @@ function UpdateCollisionsOptional ()
     });
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
-    basicEnemiesZone1.forEach( EnemyCollideWithCharacter , this );
-    basicEnemiesZone2.forEach( EnemyCollideWithCharacter , this );
-    basicEnemiesZone3.forEach( EnemyCollideWithCharacter , this );
-    basicEnemiesZone4.forEach( EnemyCollideWithCharacter , this );
-    basicEnemiesZone5.forEach( EnemyCollideWithCharacter , this );
+    basicEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
+    advancedEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
 
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
-    inkBags.forEach( InkBagCollideWithCharacter , this );
+    inkBagsOptional.forEach( InkBagCollideWithCharacterOptional , this );
 
-    game.physics.arcade.overlap(enemy1.enemyWeapon.bullets, characterOptional, function(characterOptional,bullet) {
+    /* game.physics.arcade.overlap(enemy1.enemyWeapon.bullets, characterOptional, function(characterOptional,bullet) {
         bullet.kill();
         if ( canReceiveDamage )
         {
@@ -304,10 +221,10 @@ function UpdateCollisionsOptional ()
             lifeTween.start();
         }
         ClackAnimation( characterOptional );
-    });
+    }); */
 }
 
-function BlastAnimation ( enemy )
+function BlastAnimationOptional ( enemy )
 {
     let blast = game.add.sprite( enemy.x , enemy.y , 'bam' );
     blast.anchor.setTo( 0.5 , 0.5 );
@@ -323,7 +240,7 @@ function BlastAnimation ( enemy )
     }, this);
 }
 
-function ClackAnimation ( characterOptional )
+function ClackAnimationOptional ( characterOptional )
 {
     let clack = game.add.sprite( characterOptional.x , characterOptional.y , 'clack' );
     clack.anchor.setTo( 0.5 , 0.5 );
@@ -339,7 +256,7 @@ function ClackAnimation ( characterOptional )
     }, this);
 }
 
-function InkBagCollideWithCharacter ( inkBag )
+function InkBagCollideWithCharacterOptional ( inkBag )
 {
     game.physics.arcade.overlap(characterOptional, inkBag, function() {
         totalBlackTint += 100;
@@ -353,29 +270,29 @@ function DropInkBag ( enemy )
 {
     let inkBag;
 
-    inkBag = inkBags.create(enemy.x, enemy.y, 'black_tint');
+    inkBag = inkBagsOptional.create(enemy.x, enemy.y, 'black_tint');
 
     // Add a cool tween
     game.add.tween(inkBag).to({y: inkBag.y + 10}, 500, Phaser.Easing.Bounce.Out, true);
 }
 
-function EnemyCollideWithCharacter ( enemy )
+function EnemyCollideWithCharacterOptional ( enemy )
 {
-    if ( canReceiveDamage )
+    if ( canReceiveDamageOptional )
     {
         game.physics.arcade.overlap(characterOptional, enemy, function() {
-            if ( isDashing )
+            if ( isDashingOptional )
             {
-                inkBagsDropSwitch = true;
+                inkBagsDropSwitchOptional = true;
             }
             else
             {
-                character_health -= 10;
-                inkBagsDropSwitch = false;
+                character_healthOptional -= 10;
+                inkBagsDropSwitchOptional = false;
             }
-            canReceiveDamage = false;
+            canReceiveDamageOptional = false;
             setTimeout( function() {
-                canReceiveDamage = true;
+                canReceiveDamageOptional = true;
             }, 1000 );
     
             // Stop the enemy
@@ -388,103 +305,91 @@ function EnemyCollideWithCharacter ( enemy )
             // When the tween completes, kill the enemy
             shrinkTween.onComplete.add(function() {
                 enemy.kill();
-                inkBagsDropSwitch ? DropInkBag( enemy ) : null;
-                inkBagsDropSwitch = false;
+                inkBagsDropSwitchOptional ? DropInkBag( enemy ) : null;
+                inkBagsDropSwitchOptional = false;
             }, this);
 
-            if ( ! isDashing )
+            if ( ! isDashingOptional )
             {
                 // Update the life bar
-                if ( lifeTween )
+                if ( lifeTweenOptional )
                 {
-                    lifeTween.stop();
+                    lifeTweenOptional.stop();
                 }
     
-                let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+                let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH;
         
-                lifeTween = game.add.tween(life_bar.scale).to({
+                lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
                     y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
                 }, 1000, Phaser.Easing.Linear.None, true);
         
-                lifeTween.start();
+                lifeTweenOptional.start();
             }
         });
     }
 }
 
-function UpdateEnemies ()
+function UpdateEnemiesOptional ()
 {
-    spawn1.MoveEnemies(1);
-    spawn2.MoveEnemies(2);
-    spawn3.MoveEnemies(3);
-    spawn4.MoveEnemies(4);
-    spawn5.MoveEnemies(5);
+    spawnEnemiesOptional.MoveEnemies();
 }
 
 function CreateEnemiesOptional ()
 {
-    spawn1 = new SpawnerBasicEnemy( 1 , 'basicEnemy' );
-    spawn2 = new SpawnerBasicEnemy( 2 , 'basicEnemy' );
-    spawn3 = new SpawnerBasicEnemy( 3 , 'basicEnemy' );
-    spawn4 = new SpawnerBasicEnemy( 4 , 'basicEnemy' );
-    spawn5 = new SpawnerBasicEnemy( 5 , 'basicEnemy' );
+    spawnEnemiesOptional = new SpawnerBasicEnemy( 1 , 'basicEnemy' );
 
-    enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
+    // enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
 
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn1.SpawnEnemies , this , 1 );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn2.SpawnEnemies , this , 2 );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn3.SpawnEnemies , this , 3 );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn4.SpawnEnemies , this , 4 );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawn5.SpawnEnemies , this , 5 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN , spawnEnemiesOptional.SpawnEnemies , this , 1 );
 
-    setInterval( UpdateEnemies , 1000 );
+    setInterval( UpdateEnemiesOptional , 1000 );
 
-    inkBags = game.add.group();
-    inkBags.enableBody = true;
+    inkBagsOptional = game.add.group();
+    inkBagsOptional.enableBody = true;
 
-    shine_rae = game.add.sprite( WORLD_CENTER_X , RAE_Y , 'shine_rae' );
-    shine_rae.anchor.setTo( 0.5 );
-    shine_rae.scale.setTo( 2 );
+    shine_raeOptional = game.add.sprite( WORLD_CENTER_X , RAE_Y , 'shine_rae' );
+    shine_raeOptional.anchor.setTo( 0.5 );
+    shine_raeOptional.scale.setTo( 2 );
 
-    raeGroup = game.add.group();
-    raeGroup.enableBody = true;
-    rae = raeGroup.create( WORLD_CENTER_X , RAE_Y , 'rae' );
-    rae.anchor.setTo( 0.5 );
-    rae.body.immovable = true;
+    raeGroupOptional = game.add.group();
+    raeGroupOptional.enableBody = true;
+    raeOptional = raeGroupOptional.create( WORLD_CENTER_X , RAE_Y , 'rae' );
+    raeOptional.anchor.setTo( 0.5 );
+    raeOptional.body.immovable = true;
 
-    time = 0;
+    timeOptional = 0;
 }
 
 function CreateTimersOptional ()
 {
-    xTimer = game.time.create( false );
-    yTimer = game.time.create( false );
+    xTimerOptional = game.time.create( false );
+    yTimerOptional = game.time.create( false );
 }
 
 function CreateImagesOptional ()
 {
-    game.load.image( 'player' , 'assets/imgs/Base_Player.png' );
-    game.load.image( 'background' , 'assets/imgs/background.png' );
-    game.load.image( 'sprintHolder' , 'assets/imgs/sprint_holder.png' );
-    game.load.image( 'sprintBar' , 'assets/imgs/sprint_bar.png' );
-    game.load.image( 'check_dash' , 'assets/imgs/check_dash.png' );
-    game.load.spritesheet( 'bullets' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
-    game.load.image( 'basicEnemy' , 'assets/imgs/Base_Enemy.png' );
-    game.load.image( 'life_bar' , 'assets/imgs/life_bar.png' );
-    game.load.image( 'basicEnemyDirty' , 'assets/imgs/Base_PlayerDirty.png' );
-    game.load.image( 'black_tint' , 'assets/imgs/red_tint.png' );
-    game.load.image( 'btnE' , 'assets/imgs/btnE.png' );
-    game.load.image( 'bam' , 'assets/imgs/bam.png' );
-    game.load.image( 'rae' , 'assets/imgs/santa_rae.png' );
-    game.load.image( 'shine_rae' , 'assets/imgs/shine.png' );
-    game.load.image( 'player_pistol' , 'assets/imgs/PlayerPistol.png' );
-    game.load.spritesheet( 'buckshot' , 'assets/imgs/buckshot.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
-    game.load.image( 'player_shotgun' , 'assets/imgs/PlayerShotgun.png' );
-    game.load.image( 'arrow' , 'assets/imgs/arrow.png' );
-    game.load.image( 'player_bow' , 'assets/imgs/PlayerBow.png' );
-    game.load.image( 'grapadora' , 'assets/imgs/Grapa.png' );
-    game.load.image( 'grapas' , 'assets/imgs/Dora.png' );
-    game.load.image( 'clack' , 'assets/imgs/Clack.png' );
+    game.load.image( 'playerOptional' , 'assets/imgs/Base_Player.png' );
+    game.load.image( 'backgroundOptional' , 'assets/imgs/background.png' );
+    game.load.image( 'sprintHolderOptional' , 'assets/imgs/sprint_holder.png' );
+    game.load.image( 'sprintBarOptional' , 'assets/imgs/sprint_bar.png' );
+    game.load.image( 'check_dashOptional' , 'assets/imgs/check_dash.png' );
+    game.load.spritesheet( 'bulletsOptional' , 'assets/imgs/bullet.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
+    game.load.image( 'basicEnemyOptional' , 'assets/imgs/Base_Enemy.png' );
+    game.load.image( 'life_barOptional' , 'assets/imgs/life_bar.png' );
+    game.load.image( 'basicEnemyDirtyOptional' , 'assets/imgs/Base_PlayerDirty.png' );
+    game.load.image( 'black_tintOptional' , 'assets/imgs/red_tint.png' );
+    game.load.image( 'btnEOptional' , 'assets/imgs/btnE.png' );
+    game.load.image( 'bamOptional' , 'assets/imgs/bam.png' );
+    game.load.image( 'raeOptional' , 'assets/imgs/santa_rae.png' );
+    game.load.image( 'shine_raeOptional' , 'assets/imgs/shine.png' );
+    game.load.image( 'player_pistolOptional' , 'assets/imgs/PlayerPistol.png' );
+    game.load.spritesheet( 'buckshotOptional' , 'assets/imgs/buckshot.png' , BULLET_SPRITE_X , BULLET_SPRITE_Y );
+    game.load.image( 'player_shotgunOptional' , 'assets/imgs/PlayerShotgun.png' );
+    game.load.image( 'arrowOptional' , 'assets/imgs/arrow.png' );
+    game.load.image( 'player_bowOptional' , 'assets/imgs/PlayerBow.png' );
+    game.load.image( 'grapadoraOptional' , 'assets/imgs/Grapa.png' );
+    game.load.image( 'grapasOptional' , 'assets/imgs/Dora.png' );
+    game.load.image( 'clackOptional' , 'assets/imgs/Clack.png' );
 }
 
 function CreateBackgroundOptional ()
@@ -501,14 +406,14 @@ function CreateCharacterOptional ()
 {
     characterOptional = game.add.sprite( 1200 , 1200 , 'player_pistol' );
     characterOptional.anchor.setTo( ANCHOR_X , ANCHOR_Y );
-    character_health = DEFAULT_CHARACTER_HEALTH;
-    canReceiveDamage = true;
+    character_healthOptional = DEFAULT_CHARACTER_HEALTH;
+    canReceiveDamageOptional = true;
     
     game.physics.arcade.enable( characterOptional );
     sprintEnabled = true;
     sprintLeft = TOTAL_SPRINT;
     canDash = true;
-    isDashing = false;
+    isDashingOptional = false;
 
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( characterOptional );
@@ -521,7 +426,7 @@ function CreateCharacterOptional ()
     btnInteract = game.add.sprite( 1200 , 1150 , 'btnE' );
     btnInteract.anchor.setTo( 0.5 , 0.5 );
     btnInteract.visible = false;
-    inkBagsDropSwitch = true;
+    inkBagsDropSwitchOptional = true;
 
     weaponSelected = 0;
     hasBow = false;
@@ -543,9 +448,9 @@ function CreateHUDOptional ()
     checkDash = hudGroup.create( DASH_INDICATOR_X , DASH_INDICATOR_Y , 'check_dash' ); // CHECK DASH
     checkDash.visible = false; // HIDE THE CHECK DASH
     checkDash.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
-    life_bar = hudGroup.create( 5 , 50 , 'life_bar' );
-    life_bar.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
-    life_bar.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
+    lifeTweenOptional = hudGroup.create( 5 , 50 , 'life_bar' );
+    lifeTweenOptional.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
+    lifeTweenOptional.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
     life_holder = hudGroup.create( 5 , 50 , 'sprintHolder' );
     life_holder.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
     life_holder.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
@@ -599,14 +504,14 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     btnInteract.x = characterOptional.x;
     btnInteract.y = characterOptional.y - 60;
 
-    if ( character_health <= 0 )
+    if ( character_healthOptional <= 0 )
     {
         game.state.start('endscreen');
     }
 
-    inkBags.forEach( InkBagFollowsCharacter , this );
+    inkBagsOptional.forEach( InkBagFollowsCharacter , this );
 
-    if ( game.physics.arcade.distanceBetween( characterOptional , shine_rae ) < DISTANCE_DETECTION_RAE )
+    if ( game.physics.arcade.distanceBetween( characterOptional , shine_raeOptional ) < DISTANCE_DETECTION_RAE )
     {
         btnInteract.visible = true;
 
@@ -660,11 +565,11 @@ function CheckDash () // DASH FUNCTIONALITY
 
     if ( wantsToDash && canDash )
     {
-        isDashing = true;
+        isDashingOptional = true;
         canDash = false;
 
         setTimeout( function() {
-            isDashing = false;
+            isDashingOptional = false;
             setTimeout( function() {
                 canDash = true;
             }, DASH_COOLDOWN * 1000 ); // WE MULTIPLY BY 1000 TO GET DASH COOLDOWN IN SECONDS
@@ -676,7 +581,7 @@ function CheckDash () // DASH FUNCTIONALITY
 
 function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
 {
-    let movementMultiplier = isDashing ? DASH_MULTIPLIER : 1; // IF THE CHARACTER IS DASHING, MULTIPLY THE SPEED BY THE DASH MULTIPLIER
+    let movementMultiplier = isDashingOptional ? DASH_MULTIPLIER : 1; // IF THE CHARACTER IS DASHING, MULTIPLY THE SPEED BY THE DASH MULTIPLIER
     let canSprint = sprintEnabled && game.input.keyboard.isDown( Phaser.Keyboard.SHIFT );
 
     if ( direction == 'left' )
@@ -705,7 +610,7 @@ function CheckSprint ( direction ) // SPRINT FUNCTIONALITY
 
 function SmoothStopping ( x , timeToStop ) // GRADUALLY DECREASE THE SPEED OF THE CHARACTER. IT MAKES THE MOVEMENT SMOOTHER
 {
-    let timer = x ? xTimer : yTimer; // IT CHOOSES THE TIMER TO USE
+    let timer = x ? xTimerOptional : yTimerOptional; // IT CHOOSES THE TIMER TO USE
     let axis = x ? 'x' : 'y'; // IT CHOOSES THE AXIS TO STOP
     let decreaseAmount = characterOptional.body.velocity[ axis ] / ( timeToStop * FPS );
 
@@ -793,12 +698,12 @@ function CheckMovement ()
     if ( canMoveLeftwards )
     {
         CheckSprint( 'left' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+        xTimerOptional.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else if ( canMoveRightwards )
     {
         CheckSprint( 'right' ); // CHECKS IF THE CHARACTER SPRINTS TO THE RIGHT
-        xTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+        xTimerOptional.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else // NO HORIZONTAL MOVEMENT KEY IS PRESSED
     {
@@ -809,12 +714,12 @@ function CheckMovement ()
     if ( canMoveUpwards  )
     {
         CheckSprint( 'up' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+        yTimerOptional.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else if ( canMoveDownwards )
     {
         CheckSprint( 'down' ); // CHECKS IF THE CHARACTER SPRINTS TO THE LEFT
-        yTimer.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
+        yTimerOptional.stop(); // STOP THE TIMER IF A KEY IS PRESSED SO THE CHARACTER CAN MOVE
     }
     else
     {

@@ -718,7 +718,7 @@ function CreateCharacter ()
     ReloadZone.AddReloadZone( levelConfig.ReloadZone2.x , levelConfig.ReloadZone2.y );
     ReloadZone.AddReloadZone( levelConfig.ReloadZone3.x , levelConfig.ReloadZone3.y );
 
-    character = game.add.sprite( levelConfig.Player.x , levelConfig.Player.y , 'player_pistol' );
+    character = game.add.sprite( levelConfig.Player.x , levelConfig.Player.y , 'player_bow' );
     character.anchor.setTo( ANCHOR_X , ANCHOR_Y );
     character_health = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamage = true;
@@ -750,7 +750,7 @@ function CreateCharacter ()
     safeZoneSecondsCounter = 0;
     canEnterSafeZone = true;
 
-    weaponSelected = 0;
+    weaponSelected = 2;
     hasBow = false;
     hasShotgun = false;
 
