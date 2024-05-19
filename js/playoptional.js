@@ -284,11 +284,11 @@ function UpdateEnemiesOptional ()
 
 function CreateEnemiesOptional ()
 {
-    spawnEnemiesOptional = new SpawnerBasicEnemy( 1 , 'basicEnemyOptional' );
+    spawnEnemiesOptional = new SpawnerBasicEnemyOptional( 'basicEnemyOptional' );
 
     // enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
 
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnEnemiesOptional.SpawnEnemies , this , 1 );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnEnemiesOptional.SpawnEnemies , this );
 
     setInterval( UpdateEnemiesOptional , 1000 );
 
