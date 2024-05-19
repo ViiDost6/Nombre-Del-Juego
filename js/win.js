@@ -17,7 +17,7 @@ function createWin()
     let btnHome = game.add.button(GAME_STAGE_WIDTH / 2, 500, 'btnHome', startInit, this);
     btnHome.anchor.setTo(0.5, 0.5);
 
-    let btnPlayOptional = game.add.button(GAME_STAGE_WIDTH / 2, 550, 'btnPlayOptional', startOptional, this);
+    let btnPlayOptional = game.add.button(GAME_STAGE_WIDTH / 2, 550, 'btnPlayOptional', startLoadScreen, this);
     btnPlayOptional.anchor.setTo(0.5, 0.5);
 
     let blue_tint_win = game.add.text(625, 332, totalBlueTint, { font: "25px Kalam", fill: "#000000" });
@@ -38,7 +38,7 @@ function startInit()
     game.state.start('init');
 }
 
-function startOptional()
+function startLoadScreen()
 {
-    game.state.start('playOptional');
+    game.state.start('loadscreen');
 }

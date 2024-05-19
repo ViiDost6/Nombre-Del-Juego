@@ -20,5 +20,6 @@ function startGame()
     game.state.add( 'instructions' , instructionsState );
     game.state.add( 'endscreen' , gameOverState );
     game.state.add( 'win' , winState );
+    game.state.add( 'loadscreen', LoadState );
     game.state.start( 'init' );
 }

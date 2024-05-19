@@ -41,14 +41,14 @@ function createInit()
     btnA.anchor.setTo(0);
     game.add.tween(btnA).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnB = game.add.button(450, -100, 'btnB', startPlayOptional, this);
+    btnB = game.add.button(450, -100, 'btnB', startLoadScreen, this);
     btnB.anchor.setTo(0);
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 }
 
-function startPlayOptional()
+function startLoadScreen()
 {
-    game.state.start('playOptional');
+    game.state.start('loadscreen');
 }
 
 function startPlayEasy()
