@@ -82,7 +82,7 @@ function UpdateSpritesOptional ()
 
 function UpdateRotationsOptional ()
 {
-    advancedEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
+    // advancedEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
     basicEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
 }
 
@@ -117,7 +117,7 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+    /* game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
@@ -135,11 +135,11 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
-    });
+    }); */
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
-    advancedEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
+    // advancedEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
 
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
     inkBagsOptional.forEach( InkBagCollideWithCharacterOptional , this );
@@ -286,8 +286,6 @@ function CreateEnemiesOptional ()
 {
     spawnEnemiesOptional = new SpawnerBasicEnemyOptional( 'basicEnemyOptional' );
 
-    // enemy1 = new AdvancedEnemy( 100 , 2800 , 'grapadora' , 'grapas' );
-
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnEnemiesOptional.SpawnEnemies , this );
 
     setInterval( UpdateEnemiesOptional , 1000 );
@@ -306,9 +304,6 @@ function CreateEnemiesOptional ()
     raeOptional.body.immovable = true;
 
     timeOptional = 0;
-
-    advancedEnemiesOptional = game.add.group();
-    advancedEnemiesOptional.enableBody = true;
 }
 
 function CreateTimersOptional ()
@@ -482,7 +477,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
         outOfAmmoTextOptional.visible = false;
     }
 
-    advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
+    // advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
 }
 
 function RotateAdvancedEnemiesOptional (enemy)

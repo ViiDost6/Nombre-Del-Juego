@@ -6,14 +6,16 @@ class SpawnerBasicEnemyOptional
         basicEnemiesOptional.enableBody = true;
         basicEnemiesOptional.createMultiple( ZONE_1_MAX_ENEMIES * difficultyMultiplier , sprite );
         basicEnemiesOptional.callAll( 'anchor.setTo' , 'anchor' , BASIC_ENEMIES_ANCHOR_X , BASIC_ENEMIES_ANCHOR_Y );
-        /* basicEnemiesOptional.maxEnemies = this.getMaxEnemies();
-        basicEnemiesOptional.currentEnemies = 0; */
+        basicEnemiesOptional.maxEnemies = this.getMaxEnemies();
+        basicEnemiesOptional.currentEnemies = 0;
+
+        console.log( 'Basic Enemy Optional created' );
     }
 
-    /* getMaxEnemies ()
+    getMaxEnemies ()
     {
         return 20 * difficultyMultiplier;
-    } */
+    }
 
     MoveEnemies ()
     {
@@ -43,9 +45,18 @@ class SpawnerBasicEnemyOptional
 
         if ( canSpawn )
         {
-            // let enemy = basicEnemiesOptional.getFirstExists( false );
+            let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 48;
+            let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+            let xSpawnCoordinate = 48 / 2 + xRandomSpawnCoordinate;
 
-            let enemy = game.add.sprite( WORLD_WIDTH_OPTIONAL / 2 , WORLD_HEIGHT_OPTIONAL / 2 , 'basicEnemyOptional' );
+            let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 50;
+            let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+            let ySpawnCoordinate = 50 / 2 + yRandomSpawnCoordinate;
+
+            
+            let enemy = basicEnemiesOptional.create( xSpawnCoordinate , ySpawnCoordinate , 'basicEnemyOptional' );
+
+            /* enemy = basicEnemiesOptional.getFirstExists( false );
 
             console.log( enemy );
 
@@ -61,7 +72,7 @@ class SpawnerBasicEnemyOptional
 
                 enemy.reset( xSpawnCoordinate , ySpawnCoordinate );
                 console.log( 'Basic Enemy Optional spawned at: ' + xSpawnCoordinate + ' ' + ySpawnCoordinate );
-            }
+            } */
         }
     }
 }
