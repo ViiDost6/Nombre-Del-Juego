@@ -16,7 +16,7 @@ WORLD_WIDTH_OPTIONAL = 2400 ,
 WORLD_HEIGHT_OPTIONAL = 2400 , 
 SCROLL_FACTOR_OPTIONAL = 0.7 , 
 DEFAULT_CHARACTER_HEALTH_OPTIONAL = 100 , 
-TIMER_BASIC_ENEMY_SPAWN_OPTIONAL = 0.1 * Phaser.Timer.SECOND ,
+TIMER_BASIC_ENEMY_SPAWN_OPTIONAL = 1 * Phaser.Timer.SECOND ,
 WORLD_CENTER_X_OPTIONAL = WORLD_WIDTH_OPTIONAL / 2 , 
 RAE_Y_OPTIONAL = 300 , 
 BULLET_KILL_DISTANCE_OPTIONAL = 300 , 
@@ -40,7 +40,7 @@ black_tint_counterOptional , inkBagsOptional , basicEnemiesOptional , advancedEn
 shotgunOptional , bowOptional , weaponSelectedOptional , canReceiveDamageOptional , inkBagsDropSwitchOptional , 
 lifeTweenOptional , spawnEnemiesOptional , raeOptional , raeGroupOptional , btnInteractOptional , hudGroupOptional , 
 sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOptional , outOfAmmoTextOptional , 
-sprintTweenOptional;
+sprintTweenOptional , life_barOptional;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -391,9 +391,9 @@ function CreateHUDOptional ()
     checkDashOptional = hudGroupOptional.create( DASH_INDICATOR_X , DASH_INDICATOR_Y , 'check_dashOptional' ); // CHECK DASH
     checkDashOptional.visible = false; // HIDE THE CHECK DASH
     checkDashOptional.anchor.setTo( HUD_ANCHOR_X , HUD_ANCHOR_Y ); // ANCHOR THE CHECK DASH
-    lifeTweenOptional = hudGroupOptional.create( 5 , 50 , 'life_barOptional' );
-    lifeTweenOptional.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
-    lifeTweenOptional.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
+    life_barOptional = hudGroupOptional.create( 5 , 50 , 'life_barOptional' );
+    life_barOptional.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
+    life_barOptional.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
     life_holderOptional = hudGroupOptional.create( 5 , 50 , 'sprintHolderOptional' );
     life_holderOptional.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
     life_holderOptional.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
