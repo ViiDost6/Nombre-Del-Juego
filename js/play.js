@@ -72,7 +72,7 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -296,6 +296,34 @@ function UpdateCollisions ()
         bullet.kill();
     });
 
+    game.physics.arcade.collide(enemy2.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy3.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy4.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy5.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy6.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy7.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(enemy8.enemyWeapon.bullets, barrierSafeZoneGroup, function(bullet) {
+        bullet.kill();
+    });
+
     game.physics.arcade.collide(pistol.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
         BlastAnimation(enemy);
         enemy.alive = false;
@@ -375,6 +403,202 @@ function UpdateCollisions ()
     }
 
     game.physics.arcade.overlap(enemy1.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy2.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy3.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy4.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy5.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy6.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy7.enemyWeapon.bullets, character, function(character,bullet) {
+        bullet.kill();
+        if ( canReceiveDamage )
+        {
+            character_health -= 10;
+            console.log( character_health );
+            canReceiveDamage = false;
+            setTimeout( function() {
+                canReceiveDamage = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTween )
+            {
+                lifeTween.stop();
+            }
+
+            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+
+            lifeTween = game.add.tween(life_bar.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTween.start();
+        }
+        ClackAnimation( character );
+    });
+
+    game.physics.arcade.overlap(enemy8.enemyWeapon.bullets, character, function(character,bullet) {
         bullet.kill();
         if ( canReceiveDamage )
         {
