@@ -4,9 +4,7 @@ class ReloadZone
     {
         this.x = x;
         this.y = y;
-        rec_ammo_group1 = game.add.group();
-        rec_ammo_group1.enableBody = true;
-        let rec_ammo = rec_ammo_group1.create( this.x , this.y , 'rec_ammo' );
+        let rec_ammo = rec_ammo_group.create( this.x , this.y , 'rec_ammo' );
         rec_ammo.anchor.setTo( 0.5 , 0.5 );
         rec_ammo.scale.setTo( 2 );
         rec_ammo.body.immovable = true;

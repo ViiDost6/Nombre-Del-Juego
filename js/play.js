@@ -71,8 +71,8 @@ sprintBar , hudGroup , sprintHolder , sprintTween , checkDash, basicEnemiesZone1
 basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , spawn3 , spawn4 , spawn5 , 
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
-barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , rec_ammo_group1 , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8;
+barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -904,6 +904,9 @@ function CreateBackground ()
     let recLife = rec_life.create( levelConfig.HealZone.x , levelConfig.HealZone.y , 'rec_life' );
     recLife.body.immovable = true;
 
+    rec_ammo_group = game.add.group();
+    rec_ammo_group.enableBody = true;
+
     shopGroup = game.add.group();
     shopGroup.enableBody = true;
 
@@ -1231,7 +1234,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
     rec_life.forEach( CheckDistanceWithRecLife , this );
 
-    rec_ammo_group1.forEach( CheckDistanceWithRecAmmo , this );
+    rec_ammo_group.forEach( CheckDistanceWithRecAmmo , this );
 
     shopWeaponsGroup.forEach( CheckDistanceWithShopWeapons , this );
 
