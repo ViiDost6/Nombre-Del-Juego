@@ -40,7 +40,7 @@ black_tint_counterOptional , inkBagsOptional , basicEnemiesOptional , advancedEn
 shotgunOptional , bowOptional , weaponSelectedOptional , canReceiveDamageOptional , inkBagsDropSwitchOptional , 
 lifeTweenOptional , spawnEnemiesOptional , raeOptional , raeGroupOptional , btnInteractOptional , hudGroupOptional , 
 sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOptional , outOfAmmoTextOptional , 
-sprintTweenOptional , life_barOptional;
+sprintTweenOptional , life_barOptional , spawnAdvancedEnemiesOptional;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -82,7 +82,7 @@ function UpdateSpritesOptional ()
 
 function UpdateRotationsOptional ()
 {
-    // advancedEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
+    advancedEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
     basicEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
 }
 
@@ -117,7 +117,7 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional( enemy );
     });
 
-    /* game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
@@ -135,42 +135,46 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional(enemy);
         enemy.alive = false;
         enemy.kill();
-    }); */
+    });
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
-    // advancedEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
+    advancedEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
 
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
     inkBagsOptional.forEach( InkBagCollideWithCharacterOptional , this );
 
-    /* game.physics.arcade.overlap(enemy1.enemyWeapon.bullets, characterOptional, function(characterOptional,bullet) {
+    advancedEnemiesOptional.forEach( DamageFromAdvancedEnemiesOptional , this );
+}
+
+function DamageFromAdvancedEnemiesOptional ( enemy )
+{
+    game.physics.arcade.overlap(enemy.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
         bullet.kill();
-        if ( canReceiveDamage )
+        if ( canReceiveDamageOptional )
         {
-            character_health -= 10;
-            console.log( character_health );
-            canReceiveDamage = false;
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
             setTimeout( function() {
-                canReceiveDamage = true;
+                canReceiveDamageOptional = true;
             }, 1000 );
 
             // Update the life bar
-            if ( lifeTween )
+            if ( lifeTweenOptional )
             {
-                lifeTween.stop();
+                lifeTweenOptional.stop();
             }
 
-            let newHealth = character_health / DEFAULT_CHARACTER_HEALTH;
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
 
-            lifeTween = game.add.tween(life_bar.scale).to({
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
             }, 1000, Phaser.Easing.Linear.None, true);
 
-            lifeTween.start();
+            lifeTweenOptional.start();
         }
-        ClackAnimation( characterOptional );
-    }); */
+        ClackAnimationOptional( characterOptional );
+    });
 }
 
 function BlastAnimationOptional ( enemy )
@@ -280,13 +284,16 @@ function EnemyCollideWithCharacterOptional ( enemy )
 function UpdateEnemiesOptional ()
 {
     spawnEnemiesOptional.MoveEnemies();
+    spawnAdvancedEnemiesOptional.MoveEnemies();
 }
 
 function CreateEnemiesOptional ()
 {
     spawnEnemiesOptional = new SpawnerBasicEnemyOptional( 'basicEnemyOptional' );
+    spawnAdvancedEnemiesOptional = new AdvancedEnemyOptional( 'grapasOptional' );
 
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnEnemiesOptional.SpawnEnemies , this );
+    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnAdvancedEnemiesOptional.SpawnEnemies , this );
 
     setInterval( UpdateEnemiesOptional , 1000 );
 
@@ -477,7 +484,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
         outOfAmmoTextOptional.visible = false;
     }
 
-    // advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
+    advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
 }
 
 function RotateAdvancedEnemiesOptional (enemy)

@@ -28,24 +28,15 @@ class SpawnerBasicEnemyOptional
     
     SpawnEnemies ()
     {
-        let canSpawn;
+        let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 48;
+        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+        let xSpawnCoordinate = 48 / 2 + xRandomSpawnCoordinate;
 
-        canSpawn = true;
+        let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 50;
+        let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+        let ySpawnCoordinate = 50 / 2 + yRandomSpawnCoordinate;
 
-        console.log( 'Basic Enemy Optional can spawn: ' + canSpawn );
-
-        if ( canSpawn )
-        {
-            let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 48;
-            let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
-            let xSpawnCoordinate = 48 / 2 + xRandomSpawnCoordinate;
-
-            let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 50;
-            let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
-            let ySpawnCoordinate = 50 / 2 + yRandomSpawnCoordinate;
-
-            
-            let enemy = basicEnemiesOptional.create( xSpawnCoordinate , ySpawnCoordinate , 'basicEnemyOptional' );
-        }
+        
+        basicEnemiesOptional.create( xSpawnCoordinate , ySpawnCoordinate , 'basicEnemyOptional' );
     }
 }
