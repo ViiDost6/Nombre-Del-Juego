@@ -40,7 +40,10 @@ black_tint_counterOptional , inkBagsOptional , basicEnemiesOptional , advancedEn
 shotgunOptional , bowOptional , weaponSelectedOptional , canReceiveDamageOptional , inkBagsDropSwitchOptional , 
 lifeTweenOptional , spawnEnemiesOptional , raeOptional , raeGroupOptional , btnInteractOptional , hudGroupOptional , 
 sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOptional , outOfAmmoTextOptional , 
-sprintTweenOptional , life_barOptional , spawnAdvancedEnemiesOptional;
+sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdvancedEnemiesOptional , enemy1Optional ,
+enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
+enemy9Optional , enemy10Optional , enemy11Optional , enemy12Optional , timeRemainingOptional , black_tint , timeRemainingText , 
+numberOfBlackInkBags;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -82,7 +85,6 @@ function UpdateSpritesOptional ()
 
 function UpdateRotationsOptional ()
 {
-    advancedEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
     basicEnemiesOptional.forEach( RotateSingleEnemyOptional , this );
 }
 
@@ -118,23 +120,24 @@ function UpdateCollisionsOptional ()
     });
 
     game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimationOptional(enemy);
-        enemy.alive = false;
-        enemy.kill();
-        bullet.kill();
-    });
-
-    game.physics.arcade.collide(shotgunOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimationOptional(enemy);
+        BlastAnimation(enemy);
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
     });
 
     game.physics.arcade.collide(bowOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimationOptional(enemy);
+        BlastAnimation(enemy);
         enemy.alive = false;
         enemy.kill();
+        bullet.kill();
+    });
+
+    game.physics.arcade.collide(shotgunOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+        BlastAnimation(enemy);
+        enemy.alive = false;
+        enemy.kill();
+        bullet.kill();
     });
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
@@ -144,12 +147,304 @@ function UpdateCollisionsOptional ()
     // MAKE THE INKBAGS COLLIDE WITH THE CHARACTER
     inkBagsOptional.forEach( InkBagCollideWithCharacterOptional , this );
 
-    advancedEnemiesOptional.forEach( DamageFromAdvancedEnemiesOptional , this );
-}
+    game.physics.arcade.overlap(enemy1Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
 
-function DamageFromAdvancedEnemiesOptional ( enemy )
-{
-    game.physics.arcade.overlap(enemy.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy2Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy3Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy4Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy5Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy6Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy7Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy8Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy9Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy10Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy11Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        bullet.kill();
+        if ( canReceiveDamageOptional )
+        {
+            character_healthOptional -= 10;
+            canReceiveDamageOptional = false;
+            setTimeout( function() {
+                canReceiveDamageOptional = true;
+            }, 1000 );
+
+            // Update the life bar
+            if ( lifeTweenOptional )
+            {
+                lifeTweenOptional.stop();
+            }
+
+            let newHealth = character_healthOptional / DEFAULT_CHARACTER_HEALTH_OPTIONAL;
+
+            lifeTweenOptional = game.add.tween(life_barOptional.scale).to({
+                y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
+            }, 1000, Phaser.Easing.Linear.None, true);
+
+            lifeTweenOptional.start();
+        }
+        ClackAnimationOptional( characterOptional );
+    });
+
+    game.physics.arcade.overlap(enemy12Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
         bullet.kill();
         if ( canReceiveDamageOptional )
         {
@@ -215,6 +510,11 @@ function InkBagCollideWithCharacterOptional ( inkBag )
         totalBlackTintOptional += 100;
         black_tint_counterOptional.text = totalBlackTintOptional;
         inkBag.kill();
+        if ( ++numberOfBlackInkBags == 2 )
+        {
+            timeRemainingOptional++;
+            numberOfBlackInkBags = 0;
+        }
     });
 }
 
@@ -284,16 +584,49 @@ function EnemyCollideWithCharacterOptional ( enemy )
 function UpdateEnemiesOptional ()
 {
     spawnEnemiesOptional.MoveEnemies();
-    spawnAdvancedEnemiesOptional.MoveEnemies();
 }
 
 function CreateEnemiesOptional ()
 {
+    advancedEnemiesOptional = game.add.group();
+    advancedEnemiesOptional.enableBody = true;
     spawnEnemiesOptional = new SpawnerBasicEnemyOptional( 'basicEnemyOptional' );
-    spawnAdvancedEnemiesOptional = new AdvancedEnemyOptional( 'grapasOptional' );
 
     game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnEnemiesOptional.SpawnEnemies , this );
-    game.time.events.loop( TIMER_BASIC_ENEMY_SPAWN_OPTIONAL , spawnAdvancedEnemiesOptional.SpawnEnemies , this );
+    
+    let randomLocationsX = [];
+    let randomLocationsY = [];
+
+    for ( let i = 0 ; i < 12 ; i++ )
+    {
+        let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 50;
+        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+        let xSpawnCoordinate = 50 / 2 + xRandomSpawnCoordinate;
+
+        randomLocationsX.push( xSpawnCoordinate );
+    }
+
+    for ( let i = 0 ; i < 12 ; i++ )
+    {
+        let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 70;
+        let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+        let ySpawnCoordinate = 70 / 2 + yRandomSpawnCoordinate;
+
+        randomLocationsY.push( ySpawnCoordinate );
+    }
+
+    enemy1Optional = new AdvancedEnemyOptional( randomLocationsX[0] , randomLocationsY[0] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy2Optional = new AdvancedEnemyOptional( randomLocationsX[1] , randomLocationsY[1] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy3Optional = new AdvancedEnemyOptional( randomLocationsX[2] , randomLocationsY[2] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy4Optional = new AdvancedEnemyOptional( randomLocationsX[3] , randomLocationsY[3] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy5Optional = new AdvancedEnemyOptional( randomLocationsX[4] , randomLocationsY[4] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy6Optional = new AdvancedEnemyOptional( randomLocationsX[5] , randomLocationsY[5] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy7Optional = new AdvancedEnemyOptional( randomLocationsX[6] , randomLocationsY[6] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy8Optional = new AdvancedEnemyOptional( randomLocationsX[7] , randomLocationsY[7] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy9Optional = new AdvancedEnemyOptional( randomLocationsX[8] , randomLocationsY[8] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy10Optional = new AdvancedEnemyOptional( randomLocationsX[9] , randomLocationsY[9] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy11Optional = new AdvancedEnemyOptional( randomLocationsX[10] , randomLocationsY[10] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy12Optional = new AdvancedEnemyOptional( randomLocationsX[11] , randomLocationsY[11] , 'grapadoraOptional' , 'grapasOptional' );
 
     setInterval( UpdateEnemiesOptional , 1000 );
 
@@ -372,9 +705,9 @@ function CreateCharacterOptional ()
     game.camera.follow( characterOptional );
 
     // SET UP THE WEAPON FOR THE CHARACTER
-    pistolOptional = new Weapon( 6 , 'bulletsOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL , 'pistolOptional' , 10 );
+    pistolOptional = new Weapon( 6 , 'bulletsOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL , 'pistol' , 10 );
     shotgunOptional = new Weapon( 8 , 'buckshotOptional' , BULLET_KILL_DISTANCE_OPTIONAL / 2 , BULLET_SPEED_OPTIONAL / 1.5 , 0 , 40 , 'shotgunOptional' , 5 );
-    bowOptional = new Weapon( 3 , 'arrowOptional' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bowOptional' , 4 );
+    bowOptional = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bow' , 4 );
 
     btnInteractOptional = game.add.sprite( 1200 , 1150 , 'btnEOptional' );
     btnInteractOptional.anchor.setTo( 0.5 , 0.5 );
@@ -386,6 +719,17 @@ function CreateCharacterOptional ()
     hasShotgunOptional = false;
 
     canSwitchBetweenWeaponsOptional = true; */
+
+    maxAdvancedEnemiesOptional = 5;
+    currentAdvancedEnemiesOptional = 0;
+
+    isNotInSafeZone = true;
+
+    timeRemainingOptional = 30; // 10 seconds
+
+    totalBlackTintOptional = 0;
+
+    numberOfBlackInkBags = 0;
 }
 
 function CreateHUDOptional ()
@@ -404,11 +748,15 @@ function CreateHUDOptional ()
     life_holderOptional = hudGroupOptional.create( 5 , 50 , 'sprintHolderOptional' );
     life_holderOptional.anchor.setTo( ANCHOR_X_LIFEBAR , ANCHOR_Y_LIFEBAR );
     life_holderOptional.rotation = Phaser.Math.degToRad( FIXED_ANGLE );
+    black_tint = hudGroupOptional.create( SPRINT_BAR_X + 65 , SPRINT_BAR_Y - 25 , 'black_tintOptional' );
+    black_tint.anchor.setTo( 0.5 );
 
-    outOfAmmoTextOptional = game.add.text( 590 , 10 , "OUT OF AMMO" , { font: "30px Kalam" , fill: "#000000" } );
-    outOfAmmoTextOptional.visible = false;
+    black_tint_counterOptional = game.add.text( black_tint.x + 20 , black_tint.y - 17 , totalBlackTintOptional , { font: '30px Kalam' , fill: '#000000' } );
 
-    hudGroupOptional.add(outOfAmmoTextOptional);
+    timeRemainingText = game.add.text( 275 , 10 , "TIME REMAINING: " + timeRemainingOptional + "s" , { font: "30px Kalam" , fill: "#000000" } );
+
+    hudGroupOptional.add( black_tint_counterOptional );
+    hudGroupOptional.add( timeRemainingText );
 
     hudGroupOptional.fixedToCamera = true; // FIX THE HUD TO THE CAMERA
 }
@@ -438,14 +786,17 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
         case 0:
             characterOptional.loadTexture( 'player_pistolOptional' , 0 );
             pistolOptional.Shoot();
+            console.log( 'Pistol' );
             break;
         case 1:
             characterOptional.loadTexture( 'player_shotgunOptional' , 0 );
             shotgunOptional.Shoot();
+            console.log( 'Shotgun' );
             break;
         case 2:
             characterOptional.loadTexture( 'player_bowOptional' , 0 );
             bowOptional.Shoot();
+            console.log( 'Bow' );
             break;
         default:
             break;
@@ -475,16 +826,15 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
         }
     }
 
-    if ( needsToReload )
-    {
-        outOfAmmoTextOptional.visible = true;
-    }
-    else
-    {
-        outOfAmmoTextOptional.visible = false;
-    }
-
     advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
+
+    timeRemainingOptional -= game.time.elapsed / 1000;
+    timeRemainingText.text = "TIME REMAINING: " + Math.ceil( timeRemainingOptional ) + "s";
+
+    if ( timeRemainingOptional <= 0 )
+    {
+        game.state.start('endscreen');
+    }
 }
 
 function RotateAdvancedEnemiesOptional (enemy)

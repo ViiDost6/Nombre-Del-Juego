@@ -40,6 +40,7 @@ class Weapon
         {
             if ( canShoot && isNotInSafeZone ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
             {
+                console.log( game.input.activePointer );
                 this.core.fireAtPointer( game.input.activePointer );  
             }
             else if ( isShooting && isNotInSafeZone )
