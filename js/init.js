@@ -51,7 +51,11 @@ function createInit()
 
     ambient = game.add.audio('ambient');
     ambient.loop = true;
-    ambient.play();
+    if (ambient.isPlaying == false)
+    {
+        ambient.play();
+    }
+    
 
     buttonsnd = game.add.audio('button');
 }
