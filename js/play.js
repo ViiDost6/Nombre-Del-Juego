@@ -1219,7 +1219,13 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
                     if (counter >= 1) {
                         // Cambiar el sprite del contador
                         safeZoneSecondsCounter.loadTexture('safeZoneCounter' + counter, 0);
-                    } else {
+
+                        if (counter == 3)
+                        {
+                            alarmsound.play();
+                        }
+                    } 
+                    else {
                         // Detener el contador y ocultarlo
                         clearInterval(timer);
                         safeZoneSecondsCounter.loadTexture('safeZoneCounter1', 0);
