@@ -128,8 +128,14 @@ function startPlayOptional() {
 function skipScene()
 {
     //makes all the scene skippable by clicking
-    let btnSkip = game.add.button(0, 0, 'skip', startPlayOptional, this);
+    let btnSkip = game.add.button(0, 0, 'skip', skipSound, this);
     btnSkip.width = game.world.width;
     btnSkip.height = game.world.height;
     btnSkip.alpha = 0;
+}
+
+function skipSound()
+{
+    buttonsnd.play();
+    startPlayOptional();
 }

@@ -19,8 +19,8 @@ function createInstructions ()
 {
     instructionSprite = game.add.sprite( 0 , 0 , instructions[ instructionIndex ] ); // DISPLAY FIRST INSTRUCTION
 
-    nextButton = game.add.button( 550 , 525 , 'nextButton' , nextInstruction , this ); // DISPLAY NEXT BUTTON
-    skipButton = game.add.button( 675 , 525 , 'skipButton' , skipInstructions , this ); // DISPLAY SKIP BUTTON
+    nextButton = game.add.button( 550 , 525 , 'nextButton' , nextSound , this ); // DISPLAY NEXT BUTTON
+    skipButton = game.add.button( 675 , 525 , 'skipButton' , skipSound2 , this ); // DISPLAY SKIP BUTTON
 
     game.time.events.loop( Phaser.Timer.SECOND * 5 , nextInstruction , this ); // AUTO-CHANGE INSTRUCTION EVERY 5 SECONDS
 }
@@ -45,4 +45,16 @@ function shutdownInstructions() {
     instructionSprite.destroy();
     nextButton.destroy();
     skipButton.destroy();
+}
+
+function nextSound()
+{
+    buttonsnd.play();
+    nextInstruction();
+}
+
+function skipSound2()
+{
+    buttonsnd.play();
+    skipInstructions();
 }
