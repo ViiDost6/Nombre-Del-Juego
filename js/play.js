@@ -72,7 +72,8 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group,
+alarmsound, arrowsound, bamsound, buckshotsound, bulletsound, buysound, blodsound, damagesound, pickitemsound, reloadsound, clacksound;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -85,14 +86,30 @@ function PreloadPlay () // LOAD ASSETS FOR THE GAME
 
 function CreatePlay () // SET UP THE GAME
 {
-    levelConfig = JSON.parse(game.cache.getText('level'));        
-    console.log( game.cache.getText('level'));
+    levelConfig = JSON.parse(game.cache.getText('level'));      
+    CreateSounds();  
     CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackground();
     CreateCharacter();
     CreateEnemies();
     CreateHUD();
     
+    
+}
+
+function CreateSounds ()
+{
+    alarmsound = game.add.audio('alarm');
+    arrowsound = game.add.audio('arrow');
+    bamsound = game.add.audio('bam');
+    buckshotsound = game.add.audio('buckshot');
+    bulletsound = game.add.audio('bullet');
+    buysound = game.add.audio('buy');
+    blodsound = game.add.audio('blod');
+    damagesound = game.add.audio('damage');
+    pickitemsound = game.add.audio('pickitem');
+    reloadsound = game.add.audio('pags');
+    clacksound = game.add.audio('clack');
 }
 
 function UpdatePlay () // GAME LOOP
@@ -386,6 +403,7 @@ function UpdateCollisions ()
                 {
                     if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
                     {
+                        buysound.play();
                         totalRedTint -= cost;
                         barrier.kill();
                         red_tint_counter.text = totalRedTint;
@@ -407,7 +425,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -435,7 +452,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -463,7 +479,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -491,7 +506,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -519,7 +533,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -547,7 +560,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -575,7 +587,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -603,7 +614,6 @@ function UpdateCollisions ()
         if ( canReceiveDamage )
         {
             character_health -= 10;
-            console.log( character_health );
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
@@ -629,6 +639,7 @@ function UpdateCollisions ()
 
 function BlastAnimation ( enemy )
 {
+    bamsound.play();
     let blast = game.add.sprite( enemy.x , enemy.y , 'bam' );
     blast.anchor.setTo( 0.5 , 0.5 );
 
@@ -645,6 +656,7 @@ function BlastAnimation ( enemy )
 
 function ClackAnimation ( character )
 {
+    clacksound.play();
     let clack = game.add.sprite( character.x , character.y , 'clack' );
     clack.anchor.setTo( 0.5 , 0.5 );
 
@@ -674,7 +686,7 @@ function InkBagCollideWithCharacter ( inkBag )
             globalScore += 80;
             blue_tint_counter.text = totalBlueTint;
         }
-
+        pickitemsound.play();
         globalScoreText.text = "SCORE: " + globalScore;
 
         inkBag.kill();
@@ -709,6 +721,7 @@ function EnemyCollideWithCharacter ( enemy )
             }
             else
             {
+                damagesound.play();
                 character_health -= 10;
                 inkBagsDropSwitch = false;
             }
@@ -864,6 +877,18 @@ function CreateImages ()
     game.load.image( 'grapas' , 'assets/imgs/Dora.png' );
     game.load.image( 'clack' , 'assets/imgs/Clack.png' );
     game.load.text('level', 'assets/levels/level1.json', true);
+
+    game.load.audio('alarm', 'assets/snds/Alarma.wav');
+    game.load.audio('arrow', 'assets/snds/Arrow.wav');
+    game.load.audio('bam', 'assets/snds/Bam.wav');
+    game.load.audio('buckshot', 'assets/snds/Buckshot.wav');
+    game.load.audio('bullet', 'assets/snds/Bullet.wav');
+    game.load.audio('buy', 'assets/snds/Comprar.wav');
+    game.load.audio('blod', 'assets/snds/ComprarSangre.wav');
+    game.load.audio('damage', 'assets/snds/Ouch.wav');
+    game.load.audio('pickitem', 'assets/snds/pickitem.wav');
+    game.load.audio('pags', 'assets/snds/RecortarPáginas.wav');
+    game.load.audio('clack', 'assets/snds/clack.wav');
 }
 
 function CreateBackground ()
@@ -937,6 +962,7 @@ function CreateBackground ()
     let shopBow = shopWeaponsGroup.create( levelConfig.BuyBow.x , levelConfig.BuyBow.y , 'bow' );
     shopBow.body.immovable = true;
     shopBow.anchor.setTo( 0.5 , 0.5);
+
 }
 
 function CreateCharacter ()
@@ -960,9 +986,9 @@ function CreateCharacter ()
     game.camera.follow( character );
 
     // SET UP THE WEAPON FOR THE CHARACTER
-    pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE , 'pistol' , 10 );
-    shotgun = new Weapon( 8 , 'buckshot' , BULLET_KILL_DISTANCE / 2 , BULLET_SPEED / 1.5 , 0 , 40 , 'shotgun' , 5 );
-    bow = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE * 3 , BULLET_SPEED / 2 , FIRE_RATE / 2 , BULLET_ANGLE_VARIANCE + 10 , 'bow' , 4 );
+    pistol = new Weapon( DEFAULT_NUMBER_BULLETS , 'bullets' , BULLET_KILL_DISTANCE , BULLET_SPEED , FIRE_RATE , BULLET_ANGLE_VARIANCE , 'pistol' , 10, bulletsound );
+    shotgun = new Weapon( 8 , 'buckshot' , BULLET_KILL_DISTANCE / 2 , BULLET_SPEED / 1.5 , 0 , 40 , 'shotgun' , 5, buckshotsound);
+    bow = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE * 3 , BULLET_SPEED / 2 , FIRE_RATE / 2 , BULLET_ANGLE_VARIANCE + 10 , 'bow' , 4, arrowsound );
 
     totalRedTint = 0;
     totalBlueTint = 0;
@@ -1119,7 +1145,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             pistol.Shoot();
             break;
         case 1:
-            character.loadTexture( 'player_shotgun' , 0 );
+            character.loadTexture( 'player_shotgun' , 0 );   
             shotgun.Shoot();
             break;
         case 2:
@@ -1306,11 +1332,13 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
         {
             if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 100 )
             {
+                buysound.play();
                 hasShotgun = true;
                 shopWeapon.kill();
             }
             else if ( shopWeapon.key == 'bow' && totalBlueTint >= 200 )
             {
+                buysound.play();
                 hasBow = true;
                 shopWeapon.kill();
             }
@@ -1350,6 +1378,7 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
         {
             if ( needsToReload )
             {
+                reloadsound.play();
                 if ( weaponSelected == 0 )
                 {
                     ReloadZone.ReloadCharacter(pistol);
@@ -1395,6 +1424,7 @@ function CheckDistanceWithRecAmmo ( rec_ammo )
 
                 setTimeout( function() {
                     isBuyingReloads = false;
+                    reloadsound.stop();
                 }, 2000 );
             }
         }
@@ -1423,6 +1453,7 @@ function CheckDistanceWithRecLife ( recLife )
 
         if ( totalRedTint >= 500 && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
+            blodsound.play();
             totalRedTint -= 500;
             red_tint_counter.text = totalRedTint;
             character_health = DEFAULT_CHARACTER_HEALTH;
