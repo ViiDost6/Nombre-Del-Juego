@@ -43,7 +43,7 @@ sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOption
 sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdvancedEnemiesOptional , enemy1Optional ,
 enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
 enemy9Optional , enemy10Optional , enemy11Optional , enemy12Optional , timeRemainingOptional , black_tint , timeRemainingText , 
-numberOfBlackInkBags;
+numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -676,6 +676,14 @@ function CreateImagesOptional ()
     game.load.image( 'grapasOptional' , 'assets/imgs/Dora.png' );
     game.load.image( 'clackOptional' , 'assets/imgs/Clack.png' );
     game.load.image( 'lanceOptional' , 'assets/imgs/lance.png' );
+    game.load.spritesheet( 'flameOptional' , 'assets/imgs/flame.png' , BULLET_SPRITE_X_OPTIONAL , BULLET_SPRITE_Y_OPTIONAL);
+    game.load.image( 'player_flamethrowerOptional' , 'assets/imgs/PlayerFlamethrower.png' );
+    game.load.image( 'grenadeOptional' , 'assets/imgs/grenade.png' );
+    game.load.image( 'player_grenadeOptional' , 'assets/imgs/PlayerGrenade.png' );
+    game.load.image( 'mineOptional' , 'assets/imgs/landmine.png' );
+    game.load.image( 'player_mineOptional' , 'assets/imgs/PlayerLandmine.png' );
+    game.load.image( 'player_lanceOptional' , 'assets/imgs/PlayerLance.png' );
+
 }
 
 function CreateBackgroundOptional ()
@@ -709,12 +717,20 @@ function CreateCharacterOptional ()
     shotgunOptional = new Weapon( 8 , 'buckshotOptional' , BULLET_KILL_DISTANCE_OPTIONAL / 2 , BULLET_SPEED_OPTIONAL / 1.5 , 0 , 40 , 'shotgunOptional' , 5 );
     bowOptional = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bow' , 4 ); */
 
+    flamethrowerOptional = new OptionalWeapons( 5 , 'flameOptional' , BULLET_KILL_DISTANCE_OPTIONAL/ 2 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL - 10 , 'flamethrower' , 999 );
+
+    grenadeOptional = new OptionalWeapons( 1 , 'grenadeOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , 0 , 0 , 'grenade' , 999 );
+
+    mineOptional = new OptionalWeapons( 7 , 'mineOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL *4 , 0 , 'mine' , 999 );
+
+    lanceOptional = new OptionalWeapons( 1 , 'lanceOptional' , BULLET_KILL_DISTANCE_OPTIONAL *2, BULLET_SPEED_OPTIONAL , 0 , 0 , 'lance' , 999 );
+
     btnInteractOptional = game.add.sprite( 1200 , 1150 , 'btnEOptional' );
     btnInteractOptional.anchor.setTo( 0.5 , 0.5 );
     btnInteractOptional.visible = false;
     inkBagsDropSwitchOptional = true;
 
-    weaponSelectedOptional = 0;
+    weaponSelectedOptional = 3;
     /* hasBowOptional = false;
     hasShotgunOptional = false;
 
@@ -784,19 +800,24 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     switch ( weaponSelectedOptional )
     {
         case 0:
-            characterOptional.loadTexture( 'player_pistolOptional' , 0 );
+            characterOptional.loadTexture( 'player_flamethrowerOptional' , 0 );
             // pistolOptional.Shoot();
-            console.log( 'Pistol' );
+            flamethrowerOptional.shootFlame();
             break;
         case 1:
-            characterOptional.loadTexture( 'player_shotgunOptional' , 0 );
+            characterOptional.loadTexture( 'player_grenadeOptional' , 0 );
             // shotgunOptional.Shoot();
-            console.log( 'Shotgun' );
+            grenadeOptional.shootGrenade();
             break;
         case 2:
-            characterOptional.loadTexture( 'player_bowOptional' , 0 );
+            characterOptional.loadTexture( 'player_mineOptional' , 0 );
             // bowOptional.Shoot();
-            console.log( 'Bow' );
+            mineOptional.shootMine();
+            break;
+        case 3:
+            characterOptional.loadTexture( 'player_lanceOptional' , 0 );
+            // bowOptional.Shoot();
+            lanceOptional.shootLance();
             break;
         default:
             break;
