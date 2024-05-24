@@ -14,6 +14,9 @@ function preloadInit()
     game.load.image('btnInstructions', 'assets/imgs/btnInstructions.png');
     game.load.image('btnA', 'assets/imgs/btnA.png');
     game.load.image('btnB', 'assets/imgs/btnB.png');
+
+    game.load.audio('backround_music', 'assets/snds/Ambiente.waw');
+    game.load.audio('button', 'assets/snds/Button.waw');
 }
 
 function createInit()
@@ -44,6 +47,10 @@ function createInit()
     btnB = game.add.button(450, -100, 'btnB', startLoadScreen, this);
     btnB.anchor.setTo(0);
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
+
+    let ambient = game.sound.add('backbround_music');
+    ambient.loop = true;
+    ambient.play();
 }
 
 function startLoadScreen()
