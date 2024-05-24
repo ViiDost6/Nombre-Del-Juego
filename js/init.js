@@ -1,4 +1,5 @@
 let difficultyMultiplier = 0;
+let ambient, buttonsnd;
 
 let initState = {
     preload: preloadInit,
@@ -15,8 +16,8 @@ function preloadInit()
     game.load.image('btnA', 'assets/imgs/btnA.png');
     game.load.image('btnB', 'assets/imgs/btnB.png');
 
-    game.load.audio('backround_music', 'assets/snds/Ambiente.waw');
-    game.load.audio('button', 'assets/snds/Button.waw');
+    game.load.audio('ambient', 'assets/snds/Ambiente.wav');
+    game.load.audio('button', 'assets/snds/Button.wav');
 }
 
 function createInit()
@@ -48,35 +49,42 @@ function createInit()
     btnB.anchor.setTo(0);
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    let ambient = game.sound.add('backbround_music');
+    ambient = game.add.audio('ambient');
     ambient.loop = true;
     ambient.play();
+
+    buttonsnd = game.add.audio('button');
 }
 
 function startLoadScreen()
 {
+    buttonsnd.play();
     game.state.start('loadscreen');
 }
 
 function startPlayEasy()
 {
+    buttonsnd.play();
     difficultyMultiplier = 1;
     game.state.start('play');
 }
 
 function startPlayMedium()
 {
+    buttonsnd.play();
     difficultyMultiplier = 2;
     game.state.start('play');
 }
 
 function startPlayHard()
 {
+    buttonsnd.play();
     difficultyMultiplier = 3;
     game.state.start('play');
 }
 
 function startInstructions()
 {
+    buttonsnd.play();
     game.state.start('instructions');
 }
