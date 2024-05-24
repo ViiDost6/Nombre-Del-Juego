@@ -1220,7 +1220,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
                         // Cambiar el sprite del contador
                         safeZoneSecondsCounter.loadTexture('safeZoneCounter' + counter, 0);
 
-                        if (counter == 3)
+                        if (counter == 3 && ! isNotInSafeZone)
                         {
                             alarmsound.play();
                         }
@@ -1341,12 +1341,16 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
                 buysound.play();
                 hasShotgun = true;
                 shopWeapon.kill();
+                totalBlueTint -= 100;
+                blue_tint_counter.text = totalBlueTint;
             }
             else if ( shopWeapon.key == 'bow' && totalBlueTint >= 200 )
             {
                 buysound.play();
                 hasBow = true;
                 shopWeapon.kill();
+                totalBlueTint -= 200;
+                blue_tint_counter.text = totalBlueTint;
             }
             else
             {

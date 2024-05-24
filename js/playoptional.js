@@ -99,7 +99,7 @@ function UpdateCollisionsOptional ()
     game.physics.arcade.collide(characterOptional, raeOptional);
 
     // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
-    game.physics.arcade.overlap(pistolOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
+    /* game.physics.arcade.overlap(pistolOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBagOptional( enemy );
@@ -138,7 +138,7 @@ function UpdateCollisionsOptional ()
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
-    });
+    }); */
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
@@ -705,9 +705,9 @@ function CreateCharacterOptional ()
     game.camera.follow( characterOptional );
 
     // SET UP THE WEAPON FOR THE CHARACTER
-    pistolOptional = new Weapon( 6 , 'bulletsOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL , 'pistol' , 10 );
+    /* pistolOptional = new Weapon( 6 , 'bulletsOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL , 'pistol' , 10 );
     shotgunOptional = new Weapon( 8 , 'buckshotOptional' , BULLET_KILL_DISTANCE_OPTIONAL / 2 , BULLET_SPEED_OPTIONAL / 1.5 , 0 , 40 , 'shotgunOptional' , 5 );
-    bowOptional = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bow' , 4 );
+    bowOptional = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bow' , 4 ); */
 
     btnInteractOptional = game.add.sprite( 1200 , 1150 , 'btnEOptional' );
     btnInteractOptional.anchor.setTo( 0.5 , 0.5 );
@@ -785,17 +785,17 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     {
         case 0:
             characterOptional.loadTexture( 'player_pistolOptional' , 0 );
-            pistolOptional.Shoot();
+            // pistolOptional.Shoot();
             console.log( 'Pistol' );
             break;
         case 1:
             characterOptional.loadTexture( 'player_shotgunOptional' , 0 );
-            shotgunOptional.Shoot();
+            // shotgunOptional.Shoot();
             console.log( 'Shotgun' );
             break;
         case 2:
             characterOptional.loadTexture( 'player_bowOptional' , 0 );
-            bowOptional.Shoot();
+            // bowOptional.Shoot();
             console.log( 'Bow' );
             break;
         default:
