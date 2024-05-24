@@ -43,7 +43,7 @@ sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOption
 sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdvancedEnemiesOptional , enemy1Optional ,
 enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
 enemy9Optional , enemy10Optional , enemy11Optional , enemy12Optional , timeRemainingOptional , black_tint , timeRemainingText , 
-numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional;
+numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional , timeUntilNextWeaponOptional;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -700,7 +700,7 @@ function CreateCharacterOptional ()
 {
     characterOptional = game.add.sprite( 1200 , 1200 , 'player_pistol' );
     characterOptional.anchor.setTo( 0.5 );
-    character_healthOptional = DEFAULT_CHARACTER_HEALTH;
+    character_healthOptional = DEFAULT_CHARACTER_HEALTH * 10;
     canReceiveDamageOptional = true;
     
     game.physics.arcade.enable( characterOptional );
@@ -712,14 +712,9 @@ function CreateCharacterOptional ()
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( characterOptional );
 
-    // SET UP THE WEAPON FOR THE CHARACTER
-    /* pistolOptional = new Weapon( 6 , 'bulletsOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL , 'pistol' , 10 );
-    shotgunOptional = new Weapon( 8 , 'buckshotOptional' , BULLET_KILL_DISTANCE_OPTIONAL / 2 , BULLET_SPEED_OPTIONAL / 1.5 , 0 , 40 , 'shotgunOptional' , 5 );
-    bowOptional = new Weapon( 3 , 'arrow' , BULLET_KILL_DISTANCE_OPTIONAL * 3 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL / 2 , BULLET_ANGLE_VARIANCE_OPTIONAL + 10 , 'bow' , 4 ); */
-
     flamethrowerOptional = new OptionalWeapons( 5 , 'flameOptional' , BULLET_KILL_DISTANCE_OPTIONAL/ 2 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL - 10 , 'flamethrower' , 999 );
 
-    grenadeOptional = new OptionalWeapons( 1 , 'grenadeOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , 0 , 0 , 'grenade' , 999 );
+    grenadeOptional = new OptionalWeapons( 1 , 'grenadeOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL/2 , 0 , 0 , 'grenade' , 999 );
 
     mineOptional = new OptionalWeapons( 7 , 'mineOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL *4 , 0 , 'mine' , 999 );
 
@@ -730,22 +725,20 @@ function CreateCharacterOptional ()
     btnInteractOptional.visible = false;
     inkBagsDropSwitchOptional = true;
 
-    weaponSelectedOptional = 3;
-    /* hasBowOptional = false;
-    hasShotgunOptional = false;
-
-    canSwitchBetweenWeaponsOptional = true; */
+    weaponSelectedOptional = 0;
 
     maxAdvancedEnemiesOptional = 5;
     currentAdvancedEnemiesOptional = 0;
 
     isNotInSafeZone = true;
 
-    timeRemainingOptional = 30; // 10 seconds
+    timeRemainingOptional = 60;
 
     totalBlackTintOptional = 0;
 
     numberOfBlackInkBags = 0;
+
+    timeUntilNextWeaponOptional = 10;
 }
 
 function CreateHUDOptional ()
@@ -801,22 +794,18 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     {
         case 0:
             characterOptional.loadTexture( 'player_flamethrowerOptional' , 0 );
-            // pistolOptional.Shoot();
             flamethrowerOptional.shootFlame();
             break;
         case 1:
             characterOptional.loadTexture( 'player_grenadeOptional' , 0 );
-            // shotgunOptional.Shoot();
             grenadeOptional.shootGrenade();
             break;
         case 2:
             characterOptional.loadTexture( 'player_mineOptional' , 0 );
-            // bowOptional.Shoot();
             mineOptional.shootMine();
             break;
         case 3:
             characterOptional.loadTexture( 'player_lanceOptional' , 0 );
-            // bowOptional.Shoot();
             lanceOptional.shootLance();
             break;
         default:
@@ -850,11 +839,18 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
 
     timeRemainingOptional -= game.time.elapsed / 1000;
+    timeUntilNextWeaponOptional -= game.time.elapsed / 1000;
     timeRemainingText.text = "TIME REMAINING: " + Math.ceil( timeRemainingOptional ) + "s";
 
     if ( timeRemainingOptional <= 0 )
     {
         game.state.start('endscreen');
+    }
+
+    if ( timeUntilNextWeaponOptional <= 0 )
+    {
+        weaponSelectedOptional = Math.floor( Math.random() * 4 );
+        timeUntilNextWeaponOptional = 10;
     }
 }
 
