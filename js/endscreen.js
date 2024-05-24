@@ -19,5 +19,6 @@ function createEndScreen()
 
 function startInit()
 {
+    buttonsnd.play();
     game.state.start('init');
 }
