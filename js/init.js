@@ -50,9 +50,10 @@ function createInit()
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
     ambient = game.add.audio('ambient');
-    ambient.loop = true;
+    
     if (ambient.isPlaying == false)
     {
+        ambient.loop = true;
         ambient.play();
     }
     
