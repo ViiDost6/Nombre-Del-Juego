@@ -22,7 +22,7 @@ function createInstructions ()
     nextButton = game.add.button( 550 , 525 , 'nextButton' , nextSound , this ); // DISPLAY NEXT BUTTON
     skipButton = game.add.button( 675 , 525 , 'skipButton' , skipSound2 , this ); // DISPLAY SKIP BUTTON
 
-    game.time.events.loop( Phaser.Timer.SECOND * 5 , nextInstruction , this ); // AUTO-CHANGE INSTRUCTION EVERY 5 SECONDS
+    game.time.events.loop( Phaser.Timer.SECOND * 10 , nextInstruction , this ); // AUTO-CHANGE INSTRUCTION EVERY 10 SECONDS
 }
 
 function nextInstruction() {
