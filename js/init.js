@@ -1,4 +1,4 @@
-let difficultyMultiplier = 0;
+let difficultyMultiplier = 0, ft = false;
 let ambient, buttonsnd;
 
 let initState = {
@@ -49,12 +49,14 @@ function createInit()
     btnB.anchor.setTo(0);
     game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    ambient = game.add.audio('ambient');
     
-    if (ambient.isPlaying == false)
+    if (ft == false)
     {
+        ambient = game.add.audio('ambient');
         ambient.loop = true;
+        ambient.volume = 0.05;
         ambient.play();
+        ft = true;  
     }
     
 
