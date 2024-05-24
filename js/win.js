@@ -35,10 +35,12 @@ function createWin()
 
 function startInit()
 {
+    buttonsnd.play();
     game.state.start('init');
 }
 
 function startLoadScreen()
 {
+    buttonsnd.play();
     game.state.start('loadscreen');
 }
