@@ -124,6 +124,7 @@ function UpdateCollisionsOptional ()
 
     game.physics.arcade.collide(lanceOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         enemy.kill();
+        // lanceOptional.lanceiscoming = true;
         currentAdvancedEnemiesOptional--;
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
@@ -878,7 +879,7 @@ function CreateCharacterOptional ()
     btnInteractOptional.visible = false;
     inkBagsDropSwitchOptional = true;
 
-    weaponSelectedOptional = 0;
+    weaponSelectedOptional = 3;
 
     maxAdvancedEnemiesOptional = 5;
     currentAdvancedEnemiesOptional = 0;
@@ -1002,7 +1003,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
     if ( timeUntilNextWeaponOptional <= 0 )
     {
-        weaponSelectedOptional = Math.floor( Math.random() * 4 );
+        // weaponSelectedOptional = Math.floor( Math.random() * 4 );
         if ( weaponSelectedOptional == 3 )
         {
             lanceOptional.lanceisback = true;
