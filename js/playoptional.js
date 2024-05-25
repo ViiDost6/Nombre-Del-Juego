@@ -736,13 +736,17 @@ function RespawnAdvancedEnemiesOptional ()
 {
     if ( currentAdvancedEnemiesOptional < maxAdvancedEnemiesOptional )
     {
-        let possibleXCoordinate = WORLD_WIDTH_OPTIONAL - 50;
-        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinate );
-        let xSpawnCoordinate = 50 / 2 + xRandomSpawnCoordinate;
+        let xSpawnCoordinate , ySpawnCoordinate;
+        do
+        {
+            let possibleXCoordinate = WORLD_WIDTH_OPTIONAL - 50;
+            let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinate );
+            xSpawnCoordinate = 50 / 2 + xRandomSpawnCoordinate;
 
-        let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 70;
-        let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
-        let ySpawnCoordinate = 70 / 2 + yRandomSpawnCoordinate;
+            let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 70;
+            let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+            ySpawnCoordinate = 70 / 2 + yRandomSpawnCoordinate;
+        } while ( game.physics.arcade.distanceBetween( characterOptional , { x: xSpawnCoordinate , y: ySpawnCoordinate } ) < 100 );
 
         let randomEnemy = Math.floor( Math.random() * 12 );
 
