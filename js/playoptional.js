@@ -69,6 +69,8 @@ function UpdatePlayOptional () // GAME LOOP
     UpdateCollisionsOptional();
     UpdateRotationsOptional();
     UpdateSpritesOptional();
+
+    console.log( currentAdvancedEnemiesOptional );
 }
 
 function UpdateSpritesOptional ()
@@ -115,12 +117,14 @@ function UpdateCollisionsOptional ()
     game.physics.arcade.collide(flamethrowerOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
+        currentAdvancedEnemiesOptional--;
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
     });
 
     game.physics.arcade.collide(lanceOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         enemy.kill();
+        currentAdvancedEnemiesOptional--;
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
     });
@@ -146,6 +150,7 @@ function UpdateCollisionsOptional ()
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
+                        currentAdvancedEnemiesOptional--;
                         DropInkBagOptional( enemy );
                         BlastAnimationOptional( enemy );
                     }
@@ -157,6 +162,7 @@ function UpdateCollisionsOptional ()
             game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
                 bullet.kill();
                 enemy.kill();
+                currentAdvancedEnemiesOptional--;
                 DropInkBagOptional( enemy );
                 BlastAnimationOptional( enemy );
 
@@ -173,6 +179,7 @@ function UpdateCollisionsOptional ()
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
+                        currentAdvancedEnemiesOptional--;
                         DropInkBagOptional( enemy );
                         BlastAnimationOptional( enemy );
                     }
@@ -530,6 +537,7 @@ function GrenadeExplodes ( bullet )
         if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
         {
             enemy.kill();
+            currentAdvancedEnemiesOptional--;
             DropInkBagOptional( enemy );
             BlastAnimationOptional( enemy );
         }
@@ -680,19 +688,33 @@ function CreateEnemiesOptional ()
     }
 
     enemy1Optional = new AdvancedEnemyOptional( randomLocationsX[0] , randomLocationsY[0] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy1Optional.sprite.kill();
     enemy2Optional = new AdvancedEnemyOptional( randomLocationsX[1] , randomLocationsY[1] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy2Optional.sprite.kill();
     enemy3Optional = new AdvancedEnemyOptional( randomLocationsX[2] , randomLocationsY[2] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy3Optional.sprite.kill();
     enemy4Optional = new AdvancedEnemyOptional( randomLocationsX[3] , randomLocationsY[3] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy4Optional.sprite.kill();
     enemy5Optional = new AdvancedEnemyOptional( randomLocationsX[4] , randomLocationsY[4] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy5Optional.sprite.kill();
     enemy6Optional = new AdvancedEnemyOptional( randomLocationsX[5] , randomLocationsY[5] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy6Optional.sprite.kill();
     enemy7Optional = new AdvancedEnemyOptional( randomLocationsX[6] , randomLocationsY[6] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy7Optional.sprite.kill();
     enemy8Optional = new AdvancedEnemyOptional( randomLocationsX[7] , randomLocationsY[7] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy8Optional.sprite.kill();
     enemy9Optional = new AdvancedEnemyOptional( randomLocationsX[8] , randomLocationsY[8] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy9Optional.sprite.kill();
     enemy10Optional = new AdvancedEnemyOptional( randomLocationsX[9] , randomLocationsY[9] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy10Optional.sprite.kill();
     enemy11Optional = new AdvancedEnemyOptional( randomLocationsX[10] , randomLocationsY[10] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy11Optional.sprite.kill();
     enemy12Optional = new AdvancedEnemyOptional( randomLocationsX[11] , randomLocationsY[11] , 'grapadoraOptional' , 'grapasOptional' );
+    enemy12Optional.sprite.kill();
 
     setInterval( UpdateEnemiesOptional , 1000 );
+
+    setInterval( RespawnAdvancedEnemiesOptional , 5000 );
 
     inkBagsOptional = game.add.group();
     inkBagsOptional.enableBody = true;
@@ -709,6 +731,69 @@ function CreateEnemiesOptional ()
 
     timeOptional = 0;
 }
+
+function RespawnAdvancedEnemiesOptional ()
+{
+    if ( currentAdvancedEnemiesOptional < maxAdvancedEnemiesOptional )
+    {
+        let possibleXCoordinate = WORLD_WIDTH_OPTIONAL - 50;
+        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinate );
+        let xSpawnCoordinate = 50 / 2 + xRandomSpawnCoordinate;
+
+        let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 70;
+        let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+        let ySpawnCoordinate = 70 / 2 + yRandomSpawnCoordinate;
+
+        let randomEnemy = Math.floor( Math.random() * 12 );
+
+        switch ( randomEnemy )
+        {
+            case 0:
+                enemy1Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 1:
+                enemy2Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 2:
+                enemy3Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 3:
+                enemy4Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 4:
+                enemy5Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 5:
+                enemy6Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 6:
+                enemy7Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 7:
+                enemy8Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 8:
+                enemy9Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 9:
+                enemy10Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 10:
+                enemy11Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            case 11:
+                enemy12Optional.sprite.revive( xSpawnCoordinate , ySpawnCoordinate );
+                break;
+            default:
+                break;
+        }
+
+        console.log( "enemy revived at: " + xSpawnCoordinate + " , " + ySpawnCoordinate);
+
+        currentAdvancedEnemiesOptional++;
+    }
+}
+
 
 function CreateTimersOptional ()
 {
