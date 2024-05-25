@@ -1,6 +1,6 @@
 class OptionalWeapons
 {
-    constructor ( nbullets , sprite , distance , speed , rate , variance , weaponType , maxMagazines, sound,  )
+    constructor ( nbullets , sprite , distance , speed , rate , variance , weaponType , maxMagazines, sound )
     {
         this.core = game.add.weapon( nbullets , sprite ); // CREATE THE WEAPON
         this.core.trackSprite( characterOptional , WEAPON_OFFSET_X , WEAPON_OFFSET_Y , true ); // TRACK THE CHARACTER
@@ -15,7 +15,6 @@ class OptionalWeapons
         this.maxMagazines = maxMagazines; // THE MAXIMUM NUMBER OF SHOTS
         this.delayShoot = false; // THE DELAY TO SHOOT    
         this.sound = sound; // THE SOUND OF THE WEAPON
-        console.log( this.sound );
         this.distance = distance;
         this.lanceisback = true;
         this.lancedistance = 0;
@@ -32,27 +31,23 @@ class OptionalWeapons
 
     shootFlame () 
     {
-        
         let shotsThatHaveBeenShot = this.core.shots; // GET THE NUMBER OF BULLETS SHOT
-        // console.log( shotsThatHaveBeenShot );
-        
         
         let canShoot = game.input.activePointer.leftButton.isDown && shotsThatHaveBeenShot == 0;
         let isShooting = shotsThatHaveBeenShot > 0 && shotsThatHaveBeenShot < this.nbullets;
         let needsReload = shotsThatHaveBeenShot == this.nbullets;
         
-        if ( canShoot) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
+        if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
         {
             this.core.fireAtPointer( game.input.activePointer );  
         }
-        else if ( isShooting)
+        else if ( isShooting )
         {
             this.core.fireAtPointer( game.input.activePointer );
         }   
-        else if (needsReload) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
+        else if ( needsReload ) // ONCE ALL 6 BULLETS ARE FIRED, THE COUNTER IS RESET TO RESTART THE PROCESS.
         {
             shotsThatHaveBeenShot = this.core.resetShots();
-            
         }     
     }
 
@@ -64,74 +59,71 @@ class OptionalWeapons
 
         if (canShoot)
         {
-
             this.core.fireAtPointer( game.input.activePointer );
 
-        }else if ( needsReload )
+        }
+        else if ( needsReload )
         {
-            if ( ! this.delayShoot ){
+            if ( ! this.delayShoot )
+            {
                 this.delayShoot = true;
+
                 setTimeout( function() {
                     this.shotsThatHaveBeenShot = this.core.resetShots();
                     this.delayShoot = false;
-                }.bind(this), 2000 );  
+                }.bind( this ), 2000 );  
             } 
         }   
     }
 
     shootMine()
     {
-        
         this.core.bulletSpeed = 0;
         let shotsThatHaveBeenShot = this.core.shots;
         let canShoot = game.input.activePointer.leftButton.isDown;
         let needsReload = shotsThatHaveBeenShot == this.nbullets;
 
-        if (canShoot)
+        if ( canShoot )
         {
-            
             this.core.fireAtPointer( game.input.activePointer );
 
         }else if ( needsReload )
         {
             shotsThatHaveBeenShot = this.core.resetShots();
-            
         }  
     }
 
     shootLance()
     {
         this.core.bulletKillType = Phaser.Weapon.KILL_NEVER;
-        
-        
         let canShoot = game.input.activePointer.leftButton.isDown && this.lanceisback;
 
-        if (canShoot)
+        if ( canShoot )
         {
             this.xcoord = characterOptional.x;
             this.ycoord = characterOptional.y;
             this.core.fireAtPointer( game.input.activePointer );
             this.lanceisback = false;
-        }else if ( !this.lanceisback )
+        }
+        else if ( !this.lanceisback )
         {
-            console.log(this.lancedistance);
-            if ( !this.lanceiscoming && this.lancedistance >= this.distance )
+            if ( ! this.lanceiscoming && this.lancedistance >= this.distance )
             {
-                console.log("lance is going");
                 this.lanceiscoming = true;
-            }else if ( this.lanceiscoming && !this.changed )
+            }
+            else if ( this.lanceiscoming && ! this.changed )
             {
                 this.changed = true;
-                console.log("lance is coming");
-                this.core.bullets.getAt(0).body.velocity.x = -this.core.bullets.getAt(0).body.velocity.x;
-                this.core.bullets.getAt(0).body.velocity.y = -this.core.bullets.getAt(0).body.velocity.y;
-            }else if (this.lancedistance <= 50 && this.lanceiscoming)
-            {
-                console.log("lance is back");
-                this.core.bullets.getAt(0).body.velocity.x = 0;
-                this.core.bullets.getAt(0).body.velocity.y = 0;
+                this.core.bullets.getAt( 0 ).body.velocity.x = -this.core.bullets.getAt(0).body.velocity.x;
+                this.core.bullets.getAt( 0 ).body.velocity.y = -this.core.bullets.getAt(0).body.velocity.y;
             }
-            this.lancedistance = Phaser.Math.distance(this.xcoord, this.ycoord, this.core.bullets.getAt(0).x, this.core.bullets.getAt(0).y);
+            else if ( this.lancedistance <= 50 && this.lanceiscoming )
+            {
+                this.core.bullets.getAt( 0 ).body.velocity.x = 0;
+                this.core.bullets.getAt( 0 ).body.velocity.y = 0;
+            }
+
+            this.lancedistance = Phaser.Math.distance( this.xcoord , this.ycoord , this.core.bullets.getAt( 0 ).x , this.core.bullets.getAt( 0 ).y );
         }
     }
 }

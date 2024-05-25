@@ -1,5 +1,4 @@
-let difficultyMultiplier = 0, ft = false;
-let ambient, buttonsnd;
+let difficultyMultiplier = 0 , ft = false , ambient , buttonsnd;
 
 let initState = {
     preload: preloadInit,

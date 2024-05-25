@@ -3,14 +3,15 @@ const GAME_STAGE_HEIGHT = 600;
 
 let game = new Phaser.Game( GAME_STAGE_WIDTH , GAME_STAGE_HEIGHT , Phaser.CANVAS , 'gamestage' );
 
-let wfConfig = {
+let wfConfig = 
+{
     active: function() { startGame(); },
     google: {
         families: ['Kalam']
     }
 };
 
-WebFont.load(wfConfig);
+WebFont.load( wfConfig );
 
 function startGame()
 {

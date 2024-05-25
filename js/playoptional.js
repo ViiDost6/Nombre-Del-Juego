@@ -884,8 +884,6 @@ function CreateCharacterOptional ()
     maxAdvancedEnemiesOptional = 5;
     currentAdvancedEnemiesOptional = 0;
 
-    isNotInSafeZone = true;
-
     timeRemainingOptional = 60;
 
     totalBlackTintOptional = 0;

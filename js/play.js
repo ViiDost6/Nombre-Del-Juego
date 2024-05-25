@@ -86,33 +86,31 @@ function PreloadPlay () // LOAD ASSETS FOR THE GAME
 
 function CreatePlay () // SET UP THE GAME
 {
-    levelConfig = JSON.parse(game.cache.getText('level'));      
+    levelConfig = JSON.parse( game.cache.getText( 'level' ) ); // GET THE LEVEL CONFIGURATION  
     CreateSounds();  
     CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackground();
     CreateCharacter();
     CreateEnemies();
     CreateHUD();
-    
-    
 }
 
 function CreateSounds ()
 {
-    alarmsound = game.add.audio('alarm');
-    arrowsound = game.add.audio('arrow');
-    bamsound = game.add.audio('bam');
-    buckshotsound = game.add.audio('buckshot');
-    bulletsound = game.add.audio('bullet');
-    buysound = game.add.audio('buy');
-    blodsound = game.add.audio('blod');
-    damagesound = game.add.audio('damage');
-    pickitemsound = game.add.audio('pickitem');
-    reloadsound = game.add.audio('pags');
-    clacksound = game.add.audio('clack');
+    alarmsound = game.add.audio( 'alarm' );
+    arrowsound = game.add.audio( 'arrow' );
+    bamsound = game.add.audio( 'bam' );
+    buckshotsound = game.add.audio( 'buckshot' );
+    bulletsound = game.add.audio( 'bullet' );
+    buysound = game.add.audio( 'buy' );
+    blodsound = game.add.audio( 'blod' );
+    damagesound = game.add.audio( 'damage' );
+    pickitemsound = game.add.audio( 'pickitem' );
+    reloadsound = game.add.audio( 'pags' );
+    clacksound = game.add.audio( 'clack' );
 }
 
-function UpdatePlay () // GAME LOOP
+function UpdatePlay ()
 {
     if ( ! isBuyingReloads )
     {
@@ -120,8 +118,6 @@ function UpdatePlay () // GAME LOOP
         UpdateCollisions();
         UpdateRotations();
         UpdateSprites();
-
-        
     }
     else
     {
@@ -138,20 +134,17 @@ function UpdateSprites ()
     basicEnemiesZone4.forEach( UpdateSpriteSingleEnemy , this );
     basicEnemiesZone5.forEach( UpdateSpriteSingleEnemy , this );
 
-    // Increase time
+    // INCREASE THE TIME
     time += game.time.elapsed;
 
-    // Calculate new scale and position
-    let newScale = 3 + 1.5 * Math.sin(time / 2000); // Reduced from 0.1 to 0.01
-
-    // Apply new scale and position
+    // UPDATE THE SHINE OF RAE
+    let newScale = 3 + 1.5 * Math.sin(time / 2000);
     shine_rae.scale.set(newScale);
 }
 
 function UpdateSpriteSingleEnemy ( enemy )
 {
-    game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY ? enemy.loadTexture('basicEnemyDirty', 0) : enemy.loadTexture('basicEnemy', 0);
-    
+    game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY ? enemy.loadTexture( 'basicEnemyDirty' , 0 ) : enemy.loadTexture( 'basicEnemy' , 0 ); // CHANGE THE TEXTURE OF THE ENEMY IF THE CHARACTER IS CLOSE
 }
 
 function UpdateRotations ()
@@ -346,7 +339,6 @@ function UpdateCollisions ()
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
-        
     });
 
     game.physics.arcade.collide(bow.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
@@ -354,7 +346,6 @@ function UpdateCollisions ()
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
-        
     });
 
     game.physics.arcade.collide(shotgun.core.bullets, advancedEnemiesGroup, function(bullet, enemy) {
@@ -362,11 +353,7 @@ function UpdateCollisions ()
         enemy.alive = false;
         enemy.kill();
         bullet.kill();
-        
     });
-
-    
-
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesZone1.forEach( EnemyCollideWithCharacter , this );
