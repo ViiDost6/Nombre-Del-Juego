@@ -7,7 +7,7 @@ class AdvancedEnemyOptional
         this.sprite = advancedEnemiesOptional.create( x , y , sprite );
         this.sprite.anchor.setTo( 0.5 , 0.5 );
         this.bulletSprite = bulletSprite;
-        this.sprite.body.immovable = true;
+        // this.sprite.body.immovable = true;
 
         this.enemyWeaponOptional = game.add.weapon( 1000 , this.bulletSprite );
         this.enemyWeaponOptional.trackSprite( this.sprite , 10 , -25 , true );

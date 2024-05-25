@@ -114,7 +114,7 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.collide(flamethrowerOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.overlap(flamethrowerOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         currentAdvancedEnemiesOptional--;
@@ -122,7 +122,7 @@ function UpdateCollisionsOptional ()
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.collide(lanceOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.overlap(lanceOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         enemy.kill();
         // lanceOptional.lanceiscoming = true;
         currentAdvancedEnemiesOptional--;
@@ -131,14 +131,14 @@ function UpdateCollisionsOptional ()
     });
 
     mineOptional.core.bullets.forEach( function(bullet) {
-        basicEnemiesOptional.forEach( function(enemy) {
+        basicEnemiesOptional.forEachAlive( function(enemy) {
             game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
                 bullet.kill();
                 enemy.kill();
                 DropInkBagOptional( enemy );
                 BlastAnimationOptional( enemy );
 
-                basicEnemiesOptional.forEach( function(enemy) {
+                basicEnemiesOptional.forEachAlive( function(enemy) {
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
@@ -147,7 +147,7 @@ function UpdateCollisionsOptional ()
                     }
                 });
 
-                advancedEnemiesOptional.forEach( function(enemy) {
+                advancedEnemiesOptional.forEachAlive( function(enemy) {
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
@@ -159,7 +159,7 @@ function UpdateCollisionsOptional ()
             });
         });
 
-        advancedEnemiesOptional.forEach( function(enemy) {
+        advancedEnemiesOptional.forEachAlive( function(enemy) {
             game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
                 bullet.kill();
                 enemy.kill();
@@ -167,7 +167,7 @@ function UpdateCollisionsOptional ()
                 DropInkBagOptional( enemy );
                 BlastAnimationOptional( enemy );
 
-                basicEnemiesOptional.forEach( function(enemy) {
+            basicEnemiesOptional.forEachAlive( function(enemy) {
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
@@ -176,7 +176,7 @@ function UpdateCollisionsOptional ()
                     }
                 });
 
-                advancedEnemiesOptional.forEach( function(enemy) {
+                advancedEnemiesOptional.forEachAlive( function(enemy) {
                     if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
                     {
                         enemy.kill();
@@ -525,7 +525,7 @@ function UpdateCollisionsOptional ()
 
 function GrenadeExplodes ( bullet )
 {
-    basicEnemiesOptional.forEach( function(enemy) {
+    basicEnemiesOptional.forEachAlive( function(enemy) {
         if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
         {
             enemy.kill();
@@ -534,7 +534,7 @@ function GrenadeExplodes ( bullet )
         }
     });
 
-    advancedEnemiesOptional.forEach( function(enemy) {
+    advancedEnemiesOptional.forEachAlive( function(enemy) {
         if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
         {
             enemy.kill();
@@ -879,7 +879,7 @@ function CreateCharacterOptional ()
     btnInteractOptional.visible = false;
     inkBagsDropSwitchOptional = true;
 
-    weaponSelectedOptional = 3;
+    weaponSelectedOptional = 0;
 
     maxAdvancedEnemiesOptional = 5;
     currentAdvancedEnemiesOptional = 0;
@@ -1003,13 +1003,17 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
     if ( timeUntilNextWeaponOptional <= 0 )
     {
-        // weaponSelectedOptional = Math.floor( Math.random() * 4 );
+        weaponSelectedOptional = Math.floor( Math.random() * 4 );
         if ( weaponSelectedOptional == 3 )
         {
             lanceOptional.lanceisback = true;
             lanceOptional.lancedistance = 0;
             lanceOptional.lanceiscoming = false;
             lanceOptional.changed = false;
+        }
+        else
+        {
+            lanceOptional.core.bullets.getAt(0).kill();
         }
         timeUntilNextWeaponOptional = 10;
     }
