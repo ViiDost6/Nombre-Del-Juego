@@ -28,13 +28,17 @@ class SpawnerBasicEnemyOptional
     
     SpawnEnemies ()
     {
-        let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 48;
-        let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
-        let xSpawnCoordinate = 48 / 2 + xRandomSpawnCoordinate;
+        let xSpawnCoordinate , ySpawnCoordinate;
+        do
+        {
+            let possibleXCoordinates = WORLD_WIDTH_OPTIONAL - 48;
+            let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+            xSpawnCoordinate = 48 / 2 + xRandomSpawnCoordinate;
 
-        let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 50;
-        let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
-        let ySpawnCoordinate = 50 / 2 + yRandomSpawnCoordinate;
+            let possibleYCoordinates = WORLD_HEIGHT_OPTIONAL - 50;
+            let yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+            ySpawnCoordinate = 50 / 2 + yRandomSpawnCoordinate;
+        } while ( game.physics.arcade.distanceBetween( characterOptional , { x: xSpawnCoordinate , y: ySpawnCoordinate } ) < 100 );
 
         
         basicEnemiesOptional.create( xSpawnCoordinate , ySpawnCoordinate , 'basicEnemyOptional' );

@@ -184,23 +184,27 @@ class SpawnerBasicEnemy
 
             if ( enemy )
             {
-                let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
-                let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
-                let xSpawnCoordinate = enemy.body.width / 2 + xRandomSpawnCoordinate;
-
-                let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
-                let barrierBelow = ZONES_HEIGHT * zoneNumber;
-
-                let possibleYCoordinates = 2750;
-
-                let yRandomSpawnCoordinate;
-
+                let xSpawnCoordinate , ySpawnCoordinate;
                 do
                 {
-                    yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
-                } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+                    let possibleXCoordinates = WORLD_WIDTH - enemy.body.width;
+                    let xRandomSpawnCoordinate = Math.floor( Math.random() * possibleXCoordinates );
+                    xSpawnCoordinate = enemy.body.width / 2 + xRandomSpawnCoordinate;
 
-                let ySpawnCoordinate = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                    let barrierAbove = ZONES_HEIGHT * ( zoneNumber - 1 );
+                    let barrierBelow = ZONES_HEIGHT * zoneNumber;
+
+                    let possibleYCoordinates = 2750;
+                    let yRandomSpawnCoordinate;
+
+                    do
+                    {
+                        yRandomSpawnCoordinate = Math.floor( Math.random() * possibleYCoordinates );
+                    } while ( yRandomSpawnCoordinate < barrierAbove || yRandomSpawnCoordinate > barrierBelow);
+
+                    ySpawnCoordinate = enemy.body.height / 2 + yRandomSpawnCoordinate;
+                } while ( game.physics.arcade.distanceBetween( character , { x: xSpawnCoordinate , y: ySpawnCoordinate } ) < 100 );
+                
 
                 enemy.reset( xSpawnCoordinate , ySpawnCoordinate );
             }
