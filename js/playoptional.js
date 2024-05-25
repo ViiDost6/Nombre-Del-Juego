@@ -985,7 +985,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            game.state.start('win'); // game.state.start('winOptional');
+            game.state.start('winOptional');
         }
     }
 
