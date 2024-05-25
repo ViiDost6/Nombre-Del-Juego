@@ -22,5 +22,5 @@ function startGame()
     game.state.add( 'win' , winState );
     game.state.add( 'winOptional' , winStateOptional );
     game.state.add( 'loadscreen', LoadState );
-    game.state.start( 'winOptional' );
+    game.state.start( 'init' );
 }
