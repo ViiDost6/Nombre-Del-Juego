@@ -59,12 +59,11 @@ DISTANCE_INTERACT = 125 ,
 DISTANCE_DETECTION_INKBAG = 100 , 
 DISTANCE_DETECTION_RAE = 150 , 
 RELOAD_COST = 100 , 
-DISTANCE_DETECTION_REC_AMMO = 100 , 
-COST_BETWEEN_ZONE_1AND2 = 100 ,
-COST_BETWEEN_ZONE_2AND3 = 200 ,
-COST_BETWEEN_ZONE_3AND4 = 300 ,
-COST_BETWEEN_ZONE_4AND5 = 400 , 
-SECOND = 1000;
+DISTANCE_DETECTION_REC_AMMO = 100;
+
+// LOCALIZATION CONSTANTS
+
+const MAX_POS_Y_ENEMIES = 2900 , RAE_Y = 300 , WORLD_CENTER_X = WORLD_WIDTH / 2;
 
 
 let character , xTimer , yTimer , sprintEnabled , sprintLeft, pistol , canDash , isDashing , 
@@ -374,7 +373,8 @@ function UpdateCollisions ()
 
             if ( barrier )
             {
-                let costs = [ COST_BETWEEN_ZONE_1AND2 , COST_BETWEEN_ZONE_2AND3 , COST_BETWEEN_ZONE_3AND4 , COST_BETWEEN_ZONE_4AND5 ];
+                // Lo subiremos a [6500 , 4000 , 2000 , 500]
+                let costs = [ 0 , 0 , 0 , 0 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
                 costOfIt.text = "COST: " + cost;
@@ -383,7 +383,7 @@ function UpdateCollisions ()
 
                 setTimeout( function() {
                     costOfIt.visible = false;
-                }, SECOND );
+                }, 1000 );
 
 
                 if ( totalRedTint >= cost )
@@ -401,7 +401,7 @@ function UpdateCollisions ()
                     textNoMoney.visible = true;
                     setTimeout( function() {
                         textNoMoney.visible = false;
-                    }, SECOND * 2 );
+                    }, 2000 );
                 }
             }
         }
@@ -415,7 +415,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -427,7 +427,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -442,7 +442,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -454,7 +454,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -469,7 +469,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -481,7 +481,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -496,7 +496,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -508,7 +508,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -523,7 +523,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -535,7 +535,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -550,7 +550,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -562,7 +562,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -577,7 +577,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -589,7 +589,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }
@@ -604,7 +604,7 @@ function UpdateCollisions ()
             canReceiveDamage = false;
             setTimeout( function() {
                 canReceiveDamage = true;
-            }, SECOND );
+            }, 1000 );
 
             // Update the life bar
             if ( lifeTween )
@@ -616,7 +616,7 @@ function UpdateCollisions ()
 
             lifeTween = game.add.tween(life_bar.scale).to({
                 y: newHealth // Assuming the full scale on y-axis represents the bar being completely filled
-            }, SECOND, Phaser.Easing.Linear.None, true);
+            }, 1000, Phaser.Easing.Linear.None, true);
 
             lifeTween.start();
         }

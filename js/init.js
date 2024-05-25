@@ -1,10 +1,5 @@
 let difficultyMultiplier = 0 , ft = false , ambient , buttonsnd;
 
-const INITIAL_Y = -100 , 
-ANCHOR_BUTTON = 0 , 
-SECOND = 1000 , 
-AMBIENT_VOLUME = 0.05;
-
 let initState = {
     preload: preloadInit,
     create: createInit
@@ -29,36 +24,36 @@ function createInit()
     game.add.tileSprite(0, 0, game.world.width, game.world.height, 'initialBackground');
     let btnEasy, btnMedium, btnHard, btnInstructions, btnA, btnB;
 
-    btnEasy = game.add.button(50, INITIAL_Y, 'btnEasy', startPlayEasy, this, 'btnEasy');
-    btnEasy.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnEasy).to({y: 100}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnEasy = game.add.button(50, -100, 'btnEasy', startPlayEasy, this, 'btnEasy');
+    btnEasy.anchor.setTo(0);
+    game.add.tween(btnEasy).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnMedium = game.add.button(300, INITIAL_Y, 'btnMedium', startPlayMedium, this, 'btnMedium');
-    btnMedium.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnMedium).to({y: 100}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnMedium = game.add.button(300, -100, 'btnMedium', startPlayMedium, this, 'btnMedium');
+    btnMedium.anchor.setTo(0);
+    game.add.tween(btnMedium).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnHard = game.add.button(550, INITIAL_Y, 'btnHard', startPlayHard, this, 'btnHard');
-    btnHard.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnHard).to({y: 100}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnHard = game.add.button(550, -100, 'btnHard', startPlayHard, this, 'btnHard');
+    btnHard.anchor.setTo(0);
+    game.add.tween(btnHard).to({y: 100}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnInstructions = game.add.button(100, INITIAL_Y, 'btnInstructions', startInstructions, this);
-    btnInstructions.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnInstructions).to({y: 250}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnInstructions = game.add.button(100, -100, 'btnInstructions', startInstructions, this);
+    btnInstructions.anchor.setTo(0);
+    game.add.tween(btnInstructions).to({y: 250}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnA = game.add.button(200, INITIAL_Y, 'btnA', startPlayEasy, this, null);
-    btnA.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnA).to({y: 400}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnA = game.add.button(200, -100, 'btnA', startPlayEasy, this, null);
+    btnA.anchor.setTo(0);
+    game.add.tween(btnA).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
-    btnB = game.add.button(450, INITIAL_Y, 'btnB', startLoadScreen, this);
-    btnB.anchor.setTo(ANCHOR_BUTTON);
-    game.add.tween(btnB).to({y: 400}, SECOND, Phaser.Easing.Bounce.Out, true);
+    btnB = game.add.button(450, -100, 'btnB', startLoadScreen, this);
+    btnB.anchor.setTo(0);
+    game.add.tween(btnB).to({y: 400}, 1000, Phaser.Easing.Bounce.Out, true);
 
     
     if (ft == false)
     {
         ambient = game.add.audio('ambient');
         ambient.loop = true;
-        ambient.volume = AMBIENT_VOLUME;
+        ambient.volume = 0.05;
         ambient.play();
         ft = true;  
     }
