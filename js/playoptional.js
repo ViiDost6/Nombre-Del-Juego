@@ -99,46 +99,89 @@ function UpdateCollisionsOptional ()
     game.physics.arcade.collide(characterOptional, raeOptional);
 
     // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
-    /* game.physics.arcade.overlap(pistolOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.overlap(flamethrowerOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.overlap(shotgunOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.overlap(lanceOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
+        enemy.kill();
+        DropInkBagOptional( enemy );
+        BlastAnimationOptional( enemy );
+    });
+
+    game.physics.arcade.collide(flamethrowerOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
         enemy.kill();
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.overlap(bowOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
+    game.physics.arcade.collide(lanceOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
         enemy.kill();
         DropInkBagOptional( enemy );
         BlastAnimationOptional( enemy );
     });
 
-    game.physics.arcade.collide(pistolOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimation(enemy);
-        enemy.alive = false;
-        enemy.kill();
-        bullet.kill();
+    mineOptional.core.bullets.forEach( function(bullet) {
+        basicEnemiesOptional.forEach( function(enemy) {
+            game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
+                bullet.kill();
+                enemy.kill();
+                DropInkBagOptional( enemy );
+                BlastAnimationOptional( enemy );
+
+                basicEnemiesOptional.forEach( function(enemy) {
+                    if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+                    {
+                        enemy.kill();
+                        DropInkBagOptional( enemy );
+                        BlastAnimationOptional( enemy );
+                    }
+                });
+
+                advancedEnemiesOptional.forEach( function(enemy) {
+                    if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+                    {
+                        enemy.kill();
+                        DropInkBagOptional( enemy );
+                        BlastAnimationOptional( enemy );
+                    }
+                });
+            });
+        });
+
+        advancedEnemiesOptional.forEach( function(enemy) {
+            game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
+                bullet.kill();
+                enemy.kill();
+                DropInkBagOptional( enemy );
+                BlastAnimationOptional( enemy );
+
+                basicEnemiesOptional.forEach( function(enemy) {
+                    if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+                    {
+                        enemy.kill();
+                        DropInkBagOptional( enemy );
+                        BlastAnimationOptional( enemy );
+                    }
+                });
+
+                advancedEnemiesOptional.forEach( function(enemy) {
+                    if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+                    {
+                        enemy.kill();
+                        DropInkBagOptional( enemy );
+                        BlastAnimationOptional( enemy );
+                    }
+                });
+            });
+        });
     });
 
-    game.physics.arcade.collide(bowOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimation(enemy);
-        enemy.alive = false;
-        enemy.kill();
-        bullet.kill();
-    });
-
-    game.physics.arcade.collide(shotgunOptional.core.bullets, advancedEnemiesOptional, function(bullet, enemy) {
-        BlastAnimation(enemy);
-        enemy.alive = false;
-        enemy.kill();
-        bullet.kill();
-    }); */
+    grenadeOptional.core.onKill.add(GrenadeExplodes, this);
 
     // MAKE THE CHARACTER COLLIDE WITH THE ENEMIES
     basicEnemiesOptional.forEach( EnemyCollideWithCharacterOptional , this );
@@ -469,6 +512,27 @@ function UpdateCollisionsOptional ()
             lifeTweenOptional.start();
         }
         ClackAnimationOptional( characterOptional );
+    });
+}
+
+function GrenadeExplodes ( bullet )
+{
+    basicEnemiesOptional.forEach( function(enemy) {
+        if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+        {
+            enemy.kill();
+            DropInkBagOptional( enemy );
+            BlastAnimationOptional( enemy );
+        }
+    });
+
+    advancedEnemiesOptional.forEach( function(enemy) {
+        if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
+        {
+            enemy.kill();
+            DropInkBagOptional( enemy );
+            BlastAnimationOptional( enemy );
+        }
     });
 }
 
@@ -805,7 +869,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
             mineOptional.shootMine();
             break;
         case 3:
-            characterOptional.loadTexture( 'player_lanceOptional' , 0 );
+            lanceOptional.lanceisback ? characterOptional.loadTexture( 'player_lanceOptional' , 0 ) : characterOptional.loadTexture( 'playerOptional' , 0 );
             lanceOptional.shootLance();
             break;
         default:
@@ -850,7 +914,24 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
     if ( timeUntilNextWeaponOptional <= 0 )
     {
         weaponSelectedOptional = Math.floor( Math.random() * 4 );
+        if ( weaponSelectedOptional == 3 )
+        {
+            lanceOptional.lanceisback = true;
+            lanceOptional.lancedistance = 0;
+            lanceOptional.lanceiscoming = false;
+            lanceOptional.changed = false;
+        }
         timeUntilNextWeaponOptional = 10;
+    }
+
+    if ( weaponSelectedOptional == 3 && lanceOptional.lanceiscoming )
+    {
+        game.physics.arcade.overlap( characterOptional , lanceOptional.core.bullets , function(characterOptional,bullet) {
+            bullet.kill();
+            lanceOptional.lanceisback = true;
+            lanceOptional.lanceiscoming = false;
+            lanceOptional.changed = false;
+        });
     }
 }
 
