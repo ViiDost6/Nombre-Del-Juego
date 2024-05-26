@@ -359,10 +359,10 @@ function UpdateCollisions ()
 
             if ( barrier )
             {
-                let costs = [ 6500 , 4000 , 2000 , 500 ];
+                let costs = [ 6500 / (4 - difficultyMultiplier) , 4000 / (4 - difficultyMultiplier) , 2000 / (4 - difficultyMultiplier) , 500 / (4 - difficultyMultiplier) ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
-                costOfIt.text = "COST: " + cost;
+                costOfIt.text = "COST: " + Math.ceil( cost );
                 costOfIt.fill = "#ff0000";
                 costOfIt.visible = true;
 
@@ -1150,7 +1150,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( totalBlueTint >= 10000 )
+            if ( totalBlueTint >= 10000 / (4 - difficultyMultiplier) )
             {
                 game.state.start('win');
             }
@@ -1283,14 +1283,14 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
 
         if ( shopWeapon.key == 'shotgun' )
         {
-            cost = 500;
+            cost = 500 / (4 - difficultyMultiplier);
         }
         else if ( shopWeapon.key == 'bow' )
         {
-            cost = 1000;
+            cost = 1000 / (4 - difficultyMultiplier);
         }
 
-        costOfIt.text = "COST: " + cost;
+        costOfIt.text = "COST: " + Math.ceil( cost );
         costOfIt.fill = "#0000ff";
         costOfIt.visible = true;
 
@@ -1300,26 +1300,26 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 500 )
+            if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 500 / (4 - difficultyMultiplier) )
             {
                 if ( ! onePurchaseDone )
                 {
                     buysound.play();
                     hasShotgun = true;
                     shopWeapon.kill();
-                    totalBlueTint -= 500;
+                    totalBlueTint -= 500 / (4 - difficultyMultiplier);
                     blue_tint_counter.text = totalBlueTint;
                     onePurchaseDone = true;
                 }
             }
-            else if ( shopWeapon.key == 'bow' && totalBlueTint >= 1000 )
+            else if ( shopWeapon.key == 'bow' && totalBlueTint >= 1000 / (4 - difficultyMultiplier) )
             {
                 if ( ! onePurchaseDone )
                 {
                     buysound.play();
                     hasBow = true;
                     shopWeapon.kill();
-                    totalBlueTint -= 1000;
+                    totalBlueTint -= 1000 / (4 - difficultyMultiplier);
                     blue_tint_counter.text = totalBlueTint;
                     onePurchaseDone = true;
                 }
