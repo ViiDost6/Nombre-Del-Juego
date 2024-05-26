@@ -72,7 +72,7 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group , onePurchaseDone;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -944,6 +944,8 @@ function CreateCharacter ()
     canDash = true;
     isDashing = false;
 
+    onePurchaseDone = false;
+
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( character );
 
@@ -1300,19 +1302,27 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
         {
             if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 500 )
             {
-                buysound.play();
-                hasShotgun = true;
-                shopWeapon.kill();
-                totalBlueTint -= 500;
-                blue_tint_counter.text = totalBlueTint;
+                if ( ! onePurchaseDone )
+                {
+                    buysound.play();
+                    hasShotgun = true;
+                    shopWeapon.kill();
+                    totalBlueTint -= 500;
+                    blue_tint_counter.text = totalBlueTint;
+                    onePurchaseDone = true;
+                }
             }
             else if ( shopWeapon.key == 'bow' && totalBlueTint >= 1000 )
             {
-                buysound.play();
-                hasBow = true;
-                shopWeapon.kill();
-                totalBlueTint -= 1000;
-                blue_tint_counter.text = totalBlueTint;
+                if ( ! onePurchaseDone )
+                {
+                    buysound.play();
+                    hasBow = true;
+                    shopWeapon.kill();
+                    totalBlueTint -= 1000;
+                    blue_tint_counter.text = totalBlueTint;
+                    onePurchaseDone = true;
+                }
             }
             else
             {
@@ -1425,11 +1435,15 @@ function CheckDistanceWithRecLife ( recLife )
 
         if ( totalRedTint >= 500 && game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            blodsound.play();
-            totalRedTint -= 500;
-            red_tint_counter.text = totalRedTint;
-            character_health = DEFAULT_CHARACTER_HEALTH;
-            life_bar.scale.y = 1;
+            if ( ! onePurchaseDone )
+            {
+                blodsound.play();
+                totalRedTint -= 500;
+                red_tint_counter.text = totalRedTint;
+                character_health = DEFAULT_CHARACTER_HEALTH;
+                life_bar.scale.y = 1;
+                onePurchaseDone = true;
+            }
         }
         else
         {
