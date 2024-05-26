@@ -72,8 +72,8 @@ basicEnemiesZone3 , basicEnemiesZone4 , basicEnemiesZone5 , spawn1 , spawn2 , sp
 barriers , character_health , canReceiveDamage , life_bar , life_holder , lifeTween , red_tint , blue_tint , totalRedTint , totalBlueTint , inkBags , 
 red_tint_counter , blue_tint_counter , btnInteract , globalScore , closeToBarrier , textNoMoney , inkBagsDropSwitch , rae , shine_rae , time , barrierSafeZone , 
 barrierSafeZoneGroup , raeGroup , safeZoneSecondsCounter , canEnterSafeZone , rec_life , needsToReload , isBuyingReloads , black_background , shotgun , bow , weaponSelected , hasShotgun , hasBow , shopGroup , shopWeaponsGroup , shineShopGroup , canSwitchBetweenWeapons , globalScoreText , difficultyText , outOfAmmoText , costOfIt , 
-advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group,
-alarmsound, arrowsound, bamsound, buckshotsound, bulletsound, buysound, blodsound, damagesound, pickitemsound, reloadsound, clacksound;
+advancedEnemiesGroup , enemy1 , isNotInSafeZone, levelConfig , enemy2 , enemy3 , enemy4 , enemy5 , enemy6 , enemy7 , enemy8 , rec_ammo_group;
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -87,7 +87,6 @@ function PreloadPlay () // LOAD ASSETS FOR THE GAME
 function CreatePlay () // SET UP THE GAME
 {
     levelConfig = JSON.parse( game.cache.getText( 'level' ) ); // GET THE LEVEL CONFIGURATION  
-    CreateSounds();  
     CreateTimers(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackground();
     CreateCharacter();
@@ -95,20 +94,7 @@ function CreatePlay () // SET UP THE GAME
     CreateHUD();
 }
 
-function CreateSounds ()
-{
-    alarmsound = game.add.audio( 'alarm' );
-    arrowsound = game.add.audio( 'arrow' );
-    bamsound = game.add.audio( 'bam' );
-    buckshotsound = game.add.audio( 'buckshot' );
-    bulletsound = game.add.audio( 'bullet' );
-    buysound = game.add.audio( 'buy' );
-    blodsound = game.add.audio( 'blod' );
-    damagesound = game.add.audio( 'damage' );
-    pickitemsound = game.add.audio( 'pickitem' );
-    reloadsound = game.add.audio( 'pags' );
-    clacksound = game.add.audio( 'clack' );
-}
+
 
 function UpdatePlay ()
 {
@@ -865,17 +851,7 @@ function CreateImages ()
     game.load.image( 'clack' , 'assets/imgs/Clack.png' );
     game.load.text('level', 'assets/levels/level1.json', true);
 
-    game.load.audio('alarm', 'assets/snds/Alarma.wav');
-    game.load.audio('arrow', 'assets/snds/Arrow.wav');
-    game.load.audio('bam', 'assets/snds/Bam.wav');
-    game.load.audio('buckshot', 'assets/snds/Buckshot.wav');
-    game.load.audio('bullet', 'assets/snds/Bullet.wav');
-    game.load.audio('buy', 'assets/snds/Comprar.wav');
-    game.load.audio('blod', 'assets/snds/ComprarSangre.wav');
-    game.load.audio('damage', 'assets/snds/Ouch.wav');
-    game.load.audio('pickitem', 'assets/snds/pickitem.wav');
-    game.load.audio('pags', 'assets/snds/RecortarPáginas.wav');
-    game.load.audio('clack', 'assets/snds/clack.wav');
+    
 }
 
 function CreateBackground ()

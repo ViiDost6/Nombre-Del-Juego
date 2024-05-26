@@ -41,7 +41,8 @@ sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOption
 sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdvancedEnemiesOptional , enemy1Optional ,
 enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
 enemy9Optional , enemy10Optional , enemy11Optional , enemy12Optional , timeRemainingOptional , black_tint , timeRemainingText , 
-numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional , timeUntilNextWeaponOptional;
+numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional , timeUntilNextWeaponOptional, 
+throwsound, lancesound, boomgrenadesound, boomminesound, deployminessound, flamesound;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -54,6 +55,7 @@ function PreloadPlayOptional () // LOAD ASSETS FOR THE GAME
 
 function CreatePlayOptional () // SET UP THE GAME
 {
+    createSounds();
     CreateTimersOptional(); // SET UP TIMERS FOR SMOOTH STOPPING
     CreateBackgroundOptional();
     CreateCharacterOptional();
@@ -67,6 +69,16 @@ function UpdatePlayOptional () // GAME LOOP
     UpdateCollisionsOptional();
     UpdateRotationsOptional();
     UpdateSpritesOptional();
+}
+
+function createSounds()
+{
+    throwsound = game.add.audio('throwsound');
+    lancesound = game.add.audio('lancesound');
+    boomgrenadesound = game.add.audio('boomgrenadesound');
+    boomminesound = game.add.audio('boomminesound');
+    deployminessound = game.add.audio('deployminessound');
+    flamesound = game.add.audio('flamesound');
 }
 
 function UpdateSpritesOptional ()
@@ -129,6 +141,7 @@ function UpdateCollisionsOptional ()
     mineOptional.core.bullets.forEach( function(bullet) {
         basicEnemiesOptional.forEachAlive( function(enemy) {
             game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
+                boomminesound.play();
                 bullet.kill();
                 enemy.kill();
                 DropInkBagOptional( enemy );
@@ -157,6 +170,7 @@ function UpdateCollisionsOptional ()
 
         advancedEnemiesOptional.forEachAlive( function(enemy) {
             game.physics.arcade.overlap(bullet, enemy, function(bullet, enemy) {
+                boomminesound.play();
                 bullet.kill();
                 enemy.kill();
                 currentAdvancedEnemiesOptional--;
@@ -195,6 +209,7 @@ function UpdateCollisionsOptional ()
     inkBagsOptional.forEach( InkBagCollideWithCharacterOptional , this );
 
     game.physics.arcade.overlap(enemy1Optional.enemyWeaponOptional.bullets, characterOptional, function(characterOptional,bullet) {
+        
         bullet.kill();
         if ( canReceiveDamageOptional )
         {
@@ -524,6 +539,7 @@ function GrenadeExplodes ( bullet )
     basicEnemiesOptional.forEachAlive( function(enemy) {
         if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
         {
+            boomgrenadesound.play();
             enemy.kill();
             DropInkBagOptional( enemy );
             BlastAnimationOptional( enemy );
@@ -533,6 +549,7 @@ function GrenadeExplodes ( bullet )
     advancedEnemiesOptional.forEachAlive( function(enemy) {
         if ( game.physics.arcade.distanceBetween( enemy , bullet ) < 150 )
         {
+            boomgrenadesound.play();
             enemy.kill();
             currentAdvancedEnemiesOptional--;
             DropInkBagOptional( enemy );
@@ -543,6 +560,7 @@ function GrenadeExplodes ( bullet )
 
 function BlastAnimationOptional ( enemy )
 {
+    bamsound.play();
     let blast = game.add.sprite( enemy.x , enemy.y , 'bamOptional' );
     blast.anchor.setTo( 0.5 , 0.5 );
 
@@ -559,6 +577,7 @@ function BlastAnimationOptional ( enemy )
 
 function ClackAnimationOptional ( characterOptional )
 {
+    clacksound.play();
     let clack = game.add.sprite( characterOptional.x , characterOptional.y , 'clackOptional' );
     clack.anchor.setTo( 0.5 , 0.5 );
 
@@ -575,7 +594,9 @@ function ClackAnimationOptional ( characterOptional )
 
 function InkBagCollideWithCharacterOptional ( inkBag )
 {
+    
     game.physics.arcade.overlap(characterOptional, inkBag, function() {
+        pickitemsound.play();
         totalBlackTintOptional += 100;
         black_tint_counterOptional.text = totalBlackTintOptional;
         inkBag.kill();
@@ -608,6 +629,7 @@ function EnemyCollideWithCharacterOptional ( enemy )
             }
             else
             {
+                damagesound.play();
                 character_healthOptional -= 10;
                 inkBagsDropSwitchOptional = false;
             }
@@ -833,6 +855,13 @@ function CreateImagesOptional ()
     game.load.image( 'mineOptional' , 'assets/imgs/landmine.png' );
     game.load.image( 'player_mineOptional' , 'assets/imgs/PlayerLandmine.png' );
     game.load.image( 'player_lanceOptional' , 'assets/imgs/PlayerLance.png' );
+
+    game.load.audio('boomgrenadesound', 'assets/snds/kboom.wav');
+    game.load.audio('boomminesound', 'assets/snds/bumba.wav');
+    game.load.audio('deployminessound', 'assets/snds/deployMines.wav');
+    game.load.audio('flamesound', 'assets/snds/flame.wav');
+    game.load.audio('lancesound', 'assets/snds/lanza.wav');
+    game.load.audio('throwsound', 'assets/snds/throwgrenade.wav');
 }
 
 function CreateBackgroundOptional ()
@@ -861,20 +890,20 @@ function CreateCharacterOptional ()
     // SET UP THE CAMERA THAT FOLLOWS THE CHARACTER
     game.camera.follow( characterOptional );
 
-    flamethrowerOptional = new OptionalWeapons( 5 , 'flameOptional' , BULLET_KILL_DISTANCE_OPTIONAL/ 2 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL - 10 , 'flamethrower' , 999 );
+    flamethrowerOptional = new OptionalWeapons( 5 , 'flameOptional' , BULLET_KILL_DISTANCE_OPTIONAL/ 2 , BULLET_SPEED_OPTIONAL / 2 , FIRE_RATE_OPTIONAL , BULLET_ANGLE_VARIANCE_OPTIONAL - 10 , 'flamethrower' , 999, flamesound );
 
-    grenadeOptional = new OptionalWeapons( 1 , 'grenadeOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL/2 , 0 , 0 , 'grenade' , 999 );
+    grenadeOptional = new OptionalWeapons( 1 , 'grenadeOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL/2 , 0 , 0 , 'grenade' , 999, throwsound );
 
-    mineOptional = new OptionalWeapons( 7 , 'mineOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL *4 , 0 , 'mine' , 999 );
+    mineOptional = new OptionalWeapons( 7 , 'mineOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL *4 , 0 , 'mine' , 999, deployminessound );
 
-    lanceOptional = new OptionalWeapons( 1 , 'lanceOptional' , BULLET_KILL_DISTANCE_OPTIONAL *2, BULLET_SPEED_OPTIONAL , 0 , 0 , 'lance' , 999 );
+    lanceOptional = new OptionalWeapons( 1 , 'lanceOptional' , BULLET_KILL_DISTANCE_OPTIONAL *2, BULLET_SPEED_OPTIONAL , 0 , 0 , 'lance' , 999 , lancesound);
 
     btnInteractOptional = game.add.sprite( 1200 , 1150 , 'btnEOptional' );
     btnInteractOptional.anchor.setTo( 0.5 , 0.5 );
     btnInteractOptional.visible = false;
     inkBagsDropSwitchOptional = true;
 
-    weaponSelectedOptional = 0;
+    weaponSelectedOptional = 3;
 
     maxAdvancedEnemiesOptional = 5;
     currentAdvancedEnemiesOptional = 0;
@@ -964,7 +993,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
     if ( character_healthOptional <= 0 )
     {
-        game.state.start('endscreen');
+        game.state.start('winOptional');
     }
 
     inkBagsOptional.forEach( InkBagFollowsCharacterOptional , this );

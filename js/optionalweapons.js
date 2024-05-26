@@ -39,6 +39,7 @@ class OptionalWeapons
         
         if ( canShoot ) // EACH CLICK FIRES A BULLET IF NONE HAS BEEN FIRED SINCE THE LAST RESET, INCREMENTING THE COUNTER.
         {
+            this.sound.play();
             this.core.fireAtPointer( game.input.activePointer );  
         }
         else if ( isShooting )
@@ -59,6 +60,7 @@ class OptionalWeapons
 
         if (canShoot)
         {
+            this.sound.play();
             this.core.fireAtPointer( game.input.activePointer );
 
         }
@@ -85,6 +87,7 @@ class OptionalWeapons
 
         if ( canShoot )
         {
+            this.sound.play();
             this.core.fireAtPointer( game.input.activePointer );
 
         }else if ( needsReload )
@@ -100,6 +103,7 @@ class OptionalWeapons
 
         if ( canShoot )
         {
+            this.sound.play();
             this.xcoord = characterOptional.x;
             this.ycoord = characterOptional.y;
             this.core.fireAtPointer( game.input.activePointer );

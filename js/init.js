@@ -1,4 +1,4 @@
-let difficultyMultiplier = 0 , ft = false , ambient , buttonsnd;
+let difficultyMultiplier = 0 , ft = false , ambient , buttonsnd , alarmsound, arrowsound, bamsound, buckshotsound, bulletsound, buysound, blodsound, damagesound, pickitemsound, reloadsound, clacksound;
 
 let initState = {
     preload: preloadInit,
@@ -17,6 +17,17 @@ function preloadInit()
 
     game.load.audio('ambient', 'assets/snds/Ambiente.wav');
     game.load.audio('button', 'assets/snds/Button.wav');
+    game.load.audio('alarm', 'assets/snds/Alarma.wav');
+    game.load.audio('arrow', 'assets/snds/Arrow.wav');
+    game.load.audio('bam', 'assets/snds/Bam.wav');
+    game.load.audio('buckshot', 'assets/snds/Buckshot.wav');
+    game.load.audio('bullet', 'assets/snds/Bullet.wav');
+    game.load.audio('buy', 'assets/snds/Comprar.wav');
+    game.load.audio('blod', 'assets/snds/ComprarSangre.wav');
+    game.load.audio('damage', 'assets/snds/Ouch.wav');
+    game.load.audio('pickitem', 'assets/snds/pickitem.wav');
+    game.load.audio('pags', 'assets/snds/RecortarPáginas.wav');
+    game.load.audio('clack', 'assets/snds/clack.wav');
 }
 
 function createInit()
@@ -58,8 +69,19 @@ function createInit()
         ft = true;  
     }
     
-
+    alarmsound = game.add.audio( 'alarm' );
+    arrowsound = game.add.audio( 'arrow' );
+    bamsound = game.add.audio( 'bam' );
+    buckshotsound = game.add.audio( 'buckshot' );
+    bulletsound = game.add.audio( 'bullet' );
+    buysound = game.add.audio( 'buy' );
+    blodsound = game.add.audio( 'blod' );
+    damagesound = game.add.audio( 'damage' );
+    pickitemsound = game.add.audio( 'pickitem' );
+    reloadsound = game.add.audio( 'pags' );
+    clacksound = game.add.audio( 'clack' );
     buttonsnd = game.add.audio('button');
+   
 }
 
 function startLoadScreen()
@@ -94,3 +116,4 @@ function startInstructions()
     buttonsnd.play();
     game.state.start('instructions');
 }
+
