@@ -8,8 +8,6 @@ let playOptionalState = { // GAME PHASES
     update: UpdatePlayOptional
 };
 
-// NORMAL CONSTANTS
-
 const BULLET_SPRITE_X_OPTIONAL = 26 ,
 BULLET_SPRITE_Y_OPTIONAL = 25 , 
 WORLD_WIDTH_OPTIONAL = 2400 ,
@@ -69,8 +67,6 @@ function UpdatePlayOptional () // GAME LOOP
     UpdateCollisionsOptional();
     UpdateRotationsOptional();
     UpdateSpritesOptional();
-
-    console.log( currentAdvancedEnemiesOptional );
 }
 
 function UpdateSpritesOptional ()
@@ -837,7 +833,6 @@ function CreateImagesOptional ()
     game.load.image( 'mineOptional' , 'assets/imgs/landmine.png' );
     game.load.image( 'player_mineOptional' , 'assets/imgs/PlayerLandmine.png' );
     game.load.image( 'player_lanceOptional' , 'assets/imgs/PlayerLance.png' );
-
 }
 
 function CreateBackgroundOptional ()
@@ -854,7 +849,7 @@ function CreateCharacterOptional ()
 {
     characterOptional = game.add.sprite( 1200 , 1200 , 'player_pistol' );
     characterOptional.anchor.setTo( 0.5 );
-    character_healthOptional = DEFAULT_CHARACTER_HEALTH * 10;
+    character_healthOptional = DEFAULT_CHARACTER_HEALTH;
     canReceiveDamageOptional = true;
     
     game.physics.arcade.enable( characterOptional );
