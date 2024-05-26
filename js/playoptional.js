@@ -786,8 +786,6 @@ function RespawnAdvancedEnemiesOptional ()
                 break;
         }
 
-        console.log( "enemy revived at: " + xSpawnCoordinate + " , " + ySpawnCoordinate);
-
         currentAdvancedEnemiesOptional++;
     }
 }

@@ -62,7 +62,15 @@ class OptionalWeapons
         {
             this.sound.play();
             this.core.fireAtPointer( game.input.activePointer );
+            // Create a tween that scales the bullet up and then down
+            let scaleUp = game.add.tween(this.core.bullets.getAt(0).scale).to({x: 2, y: 2}, 500, Phaser.Easing.Linear.None);
+            let scaleDown = game.add.tween(this.core.bullets.getAt(0).scale).to({x: 1, y: 1}, 500, Phaser.Easing.Linear.None);
 
+            // Chain the tweens together so they run one after the other
+            scaleUp.chain(scaleDown);
+
+            // Start the first tween
+            scaleUp.start();
         }
         else if ( needsReload )
         {

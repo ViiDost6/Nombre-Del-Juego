@@ -122,6 +122,7 @@ function createLoadScreen() {
 }
 
 function startPlayOptional() {
+    difficultyMultiplier = 1;
     game.state.start('playOptional');
 }
 

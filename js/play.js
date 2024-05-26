@@ -130,7 +130,7 @@ function UpdateSprites ()
 
 function UpdateSpriteSingleEnemy ( enemy )
 {
-    game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY ? enemy.loadTexture( 'basicEnemyDirty' , 0 ) : enemy.loadTexture( 'basicEnemy' , 0 ); // CHANGE THE TEXTURE OF THE ENEMY IF THE CHARACTER IS CLOSE
+    game.physics.arcade.distanceBetween( character , enemy ) < DISTANCE_DETECTION_ENEMY * 1.25 ? enemy.loadTexture( 'basicEnemyDirty' , 0 ) : enemy.loadTexture( 'basicEnemy' , 0 ); // CHANGE THE TEXTURE OF THE ENEMY IF THE CHARACTER IS CLOSE
 }
 
 function UpdateRotations ()
@@ -359,8 +359,7 @@ function UpdateCollisions ()
 
             if ( barrier )
             {
-                // Lo subiremos a [6500 , 4000 , 2000 , 500]
-                let costs = [ 0 , 0 , 0 , 0 ];
+                let costs = [ 6500 , 4000 , 2000 , 500 ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
                 costOfIt.text = "COST: " + cost;
@@ -1139,7 +1138,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             btnInteract.visible = false;
         }, 1000 );
 
-        costOfIt.text = "COST: " + 0;
+        costOfIt.text = "COST: 10000";
         costOfIt.fill = "#0000ff";
         costOfIt.visible = true;
 
@@ -1149,7 +1148,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( totalBlueTint >= 0 ) // 10000
+            if ( totalBlueTint >= 10000 )
             {
                 game.state.start('win');
             }
@@ -1282,11 +1281,11 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
 
         if ( shopWeapon.key == 'shotgun' )
         {
-            cost = 100;
+            cost = 500;
         }
         else if ( shopWeapon.key == 'bow' )
         {
-            cost = 200;
+            cost = 1000;
         }
 
         costOfIt.text = "COST: " + cost;
@@ -1299,20 +1298,20 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 100 )
+            if ( shopWeapon.key == 'shotgun' && totalBlueTint >= 500 )
             {
                 buysound.play();
                 hasShotgun = true;
                 shopWeapon.kill();
-                totalBlueTint -= 100;
+                totalBlueTint -= 500;
                 blue_tint_counter.text = totalBlueTint;
             }
-            else if ( shopWeapon.key == 'bow' && totalBlueTint >= 200 )
+            else if ( shopWeapon.key == 'bow' && totalBlueTint >= 1000 )
             {
                 buysound.play();
                 hasBow = true;
                 shopWeapon.kill();
-                totalBlueTint -= 200;
+                totalBlueTint -= 1000;
                 blue_tint_counter.text = totalBlueTint;
             }
             else
