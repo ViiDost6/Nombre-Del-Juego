@@ -42,7 +42,7 @@ sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdv
 enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
 enemy9Optional , enemy10Optional , enemy11Optional , enemy12Optional , timeRemainingOptional , black_tint , timeRemainingText , 
 numberOfBlackInkBags, flamethrowerOptional, grenadeOptional, mineOptional, lanceOptional , timeUntilNextWeaponOptional, 
-throwsound, lancesound, boomgrenadesound, boomminesound, deployminessound, flamesound;
+throwsound, lancesound, boomgrenadesound, boomminesound, deployminessound, flamesound , totalTimeSurvived;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS
@@ -882,6 +882,8 @@ function CreateCharacterOptional ()
     numberOfBlackInkBags = 0;
 
     timeUntilNextWeaponOptional = 10;
+
+    totalTimeSurvived = 0;
 }
 
 function CreateHUDOptional ()
@@ -966,6 +968,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
     timeRemainingOptional -= game.time.elapsed / 1000;
     timeUntilNextWeaponOptional -= game.time.elapsed / 1000;
+    totalTimeSurvived += game.time.elapsed / 1000;
     timeRemainingText.text = "TIME REMAINING: " + Math.ceil( timeRemainingOptional ) + "s";
 
     if ( timeRemainingOptional <= 0 )
