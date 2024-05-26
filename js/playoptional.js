@@ -33,10 +33,10 @@ CHARACTER_SPEED_OPTIONAL = 150 ,
 SPRINT_COOLDOWN_OPTIONAL = 2.5;
 
 let characterOptional , xTimerOptional , yTimerOptional , character_healthOptional , sprintEnabledOptional , 
-sprintLeftOptional , canDashOptional , isDashingOptional , timeOptional , shine_raeOptional , totalBlackTintOptional , 
+sprintLeftOptional , canDashOptional , isDashingOptional , timeOptional , totalBlackTintOptional , 
 black_tint_counterOptional , inkBagsOptional , basicEnemiesOptional , advancedEnemiesOptional , pistolOptional ,
 shotgunOptional , bowOptional , weaponSelectedOptional , canReceiveDamageOptional , inkBagsDropSwitchOptional , 
-lifeTweenOptional , spawnEnemiesOptional , raeOptional , raeGroupOptional , btnInteractOptional , hudGroupOptional , 
+lifeTweenOptional , spawnEnemiesOptional , hudGroupOptional , 
 sprintBarOptional , sprintHolderOptional , checkDashOptional , life_holderOptional , outOfAmmoTextOptional , 
 sprintTweenOptional , life_barOptional , maxAdvancedEnemiesOptional , currentAdvancedEnemiesOptional , enemy1Optional ,
 enemy2Optional , enemy3Optional , enemy4Optional , enemy5Optional , enemy6Optional , enemy7Optional , enemy8Optional ,
@@ -68,7 +68,6 @@ function UpdatePlayOptional () // GAME LOOP
     UpdateCharacterOptional();
     UpdateCollisionsOptional();
     UpdateRotationsOptional();
-    UpdateSpritesOptional();
 }
 
 function createSounds()
@@ -79,18 +78,6 @@ function createSounds()
     boomminesound = game.add.audio('boomminesound');
     deployminessound = game.add.audio('deployminessound');
     flamesound = game.add.audio('flamesound');
-}
-
-function UpdateSpritesOptional ()
-{
-    // Increase time
-    timeOptional += game.time.elapsed;
-
-    // Calculate new scale and position
-    let newScale = 3 + 1.5 * Math.sin(timeOptional / 2000); // Reduced from 0.1 to 0.01
-
-    // Apply new scale and position
-    shine_raeOptional.scale.set(newScale);
 }
 
 function UpdateRotationsOptional ()
@@ -106,8 +93,6 @@ function RotateSingleEnemyOptional ( enemy )
 
 function UpdateCollisionsOptional ()
 {
-    game.physics.arcade.collide(characterOptional, raeOptional);
-
     // MAKE THE BULLETS COLLIDE WITH THE ENEMIES
     game.physics.arcade.overlap(flamethrowerOptional.core.bullets, basicEnemiesOptional, function(bullet, enemy) {
         bullet.kill();
@@ -738,16 +723,6 @@ function CreateEnemiesOptional ()
     inkBagsOptional = game.add.group();
     inkBagsOptional.enableBody = true;
 
-    shine_raeOptional = game.add.sprite( WORLD_CENTER_X_OPTIONAL , RAE_Y_OPTIONAL , 'shine_raeOptional' );
-    shine_raeOptional.anchor.setTo( 0.5 );
-    shine_raeOptional.scale.setTo( 2 );
-
-    raeGroupOptional = game.add.group();
-    raeGroupOptional.enableBody = true;
-    raeOptional = raeGroupOptional.create( WORLD_CENTER_X_OPTIONAL , RAE_Y_OPTIONAL , 'raeOptional' );
-    raeOptional.anchor.setTo( 0.5 );
-    raeOptional.body.immovable = true;
-
     timeOptional = 0;
 }
 
@@ -835,10 +810,7 @@ function CreateImagesOptional ()
     game.load.image( 'basicEnemyOptional' , 'assets/imgs/Base_PlayerDirty.png' );
     game.load.image( 'life_barOptional' , 'assets/imgs/life_bar.png' );
     game.load.image( 'black_tintOptional' , 'assets/imgs/BlackInk.png' );
-    game.load.image( 'btnEOptional' , 'assets/imgs/btnE.png' );
     game.load.image( 'bamOptional' , 'assets/imgs/bam.png' );
-    game.load.image( 'raeOptional' , 'assets/imgs/santa_rae.png' );
-    game.load.image( 'shine_raeOptional' , 'assets/imgs/shine.png' );
     game.load.image( 'player_pistolOptional' , 'assets/imgs/PlayerPistol.png' );
     game.load.spritesheet( 'buckshotOptional' , 'assets/imgs/buckshot.png' , BULLET_SPRITE_X_OPTIONAL , BULLET_SPRITE_Y_OPTIONAL );
     game.load.image( 'player_shotgunOptional' , 'assets/imgs/PlayerShotgun.png' );
@@ -897,11 +869,6 @@ function CreateCharacterOptional ()
     mineOptional = new OptionalWeapons( 7 , 'mineOptional' , BULLET_KILL_DISTANCE_OPTIONAL , BULLET_SPEED_OPTIONAL , FIRE_RATE_OPTIONAL *4 , 0 , 'mine' , 999, deployminessound );
 
     lanceOptional = new OptionalWeapons( 1 , 'lanceOptional' , BULLET_KILL_DISTANCE_OPTIONAL *2, BULLET_SPEED_OPTIONAL , 0 , 0 , 'lance' , 999 , lancesound);
-
-    btnInteractOptional = game.add.sprite( 1200 , 1150 , 'btnEOptional' );
-    btnInteractOptional.anchor.setTo( 0.5 , 0.5 );
-    btnInteractOptional.visible = false;
-    inkBagsDropSwitchOptional = true;
 
     weaponSelectedOptional = 3;
 
@@ -988,29 +955,12 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
             break;
     }
 
-    btnInteractOptional.x = characterOptional.x;
-    btnInteractOptional.y = characterOptional.y - 60;
-
     if ( character_healthOptional <= 0 )
     {
         game.state.start('winOptional');
     }
 
     inkBagsOptional.forEach( InkBagFollowsCharacterOptional , this );
-
-    if ( game.physics.arcade.distanceBetween( characterOptional , shine_raeOptional ) < DISTANCE_DETECTION_RAE_OPTIONAL )
-    {
-        btnInteractOptional.visible = true;
-
-        setTimeout( function() {
-            btnInteractOptional.visible = false;
-        }, 1000 );
-
-        if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
-        {
-            game.state.start('winOptional');
-        }
-    }
 
     advancedEnemiesOptional.forEach( RotateAdvancedEnemiesOptional , this );
 
@@ -1020,7 +970,7 @@ function UpdateCharacterOptional () // UPDATE THE CHARACTER FUNCTIONALITY
 
     if ( timeRemainingOptional <= 0 )
     {
-        game.state.start('endscreen');
+        game.state.start('winOptional');
     }
 
     if ( timeUntilNextWeaponOptional <= 0 )
