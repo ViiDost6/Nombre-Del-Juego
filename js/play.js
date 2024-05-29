@@ -359,10 +359,10 @@ function UpdateCollisions ()
 
             if ( barrier )
             {
-                let costs = [ 6500 / (4 - difficultyMultiplier) , 4000 / (4 - difficultyMultiplier) , 2000 / (4 - difficultyMultiplier) , 500 / (4 - difficultyMultiplier) ];
+                let costs = [ Math.ceil(6500 / (4 - difficultyMultiplier)) , Math.ceil(4000 / (4 - difficultyMultiplier)) , Math.ceil(2000 / (4 - difficultyMultiplier)) , Math.ceil(500 / (4 - difficultyMultiplier)) ];
                 let cost = costs[ barriers.countLiving() - 1 ];
 
-                costOfIt.text = "COST: " + Math.ceil( cost );
+                costOfIt.text = "COST: " + cost;
                 costOfIt.fill = "#ff0000";
                 costOfIt.visible = true;
 
@@ -1140,7 +1140,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
             btnInteract.visible = false;
         }, 1000 );
 
-        costOfIt.text = "COST: 10000";
+        costOfIt.text = "COST: " + Math.ceil(10000 / (4 - difficultyMultiplier));
         costOfIt.fill = "#0000ff";
         costOfIt.visible = true;
 
@@ -1150,7 +1150,7 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
 
         if ( game.input.keyboard.isDown( Phaser.Keyboard.E ) )
         {
-            if ( totalBlueTint >= 10000 / (4 - difficultyMultiplier) )
+            if ( totalBlueTint >= Math.ceil(10000 / (4 - difficultyMultiplier)) )
             {
                 game.state.start('win');
             }
@@ -1221,6 +1221,8 @@ function UpdateCharacter () // UPDATE THE CHARACTER FUNCTIONALITY
                         }
                     }, 1000);
                 }, 10000);
+
+                onePurchaseDone = false;
             });
     
             // Desactivar la colisión para todos los hijos del grupo
@@ -1283,14 +1285,14 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
 
         if ( shopWeapon.key == 'shotgun' )
         {
-            cost = 500 / (4 - difficultyMultiplier);
+            cost = Math.ceil(500 / (4 - difficultyMultiplier));
         }
         else if ( shopWeapon.key == 'bow' )
         {
-            cost = 1000 / (4 - difficultyMultiplier);
+            cost = Math.ceil(1000 / (4 - difficultyMultiplier));
         }
 
-        costOfIt.text = "COST: " + Math.ceil( cost );
+        costOfIt.text = "COST: " + cost;
         costOfIt.fill = "#0000ff";
         costOfIt.visible = true;
 
@@ -1307,7 +1309,7 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
                     buysound.play();
                     hasShotgun = true;
                     shopWeapon.kill();
-                    totalBlueTint -= 500 / (4 - difficultyMultiplier);
+                    totalBlueTint -= Math.ceil(500 / (4 - difficultyMultiplier));
                     blue_tint_counter.text = totalBlueTint;
                     onePurchaseDone = true;
                 }
@@ -1319,7 +1321,7 @@ function CheckDistanceWithShopWeapons ( shopWeapon )
                     buysound.play();
                     hasBow = true;
                     shopWeapon.kill();
-                    totalBlueTint -= 1000 / (4 - difficultyMultiplier);
+                    totalBlueTint -= Math.ceil(1000 / (4 - difficultyMultiplier));
                     blue_tint_counter.text = totalBlueTint;
                     onePurchaseDone = true;
                 }
